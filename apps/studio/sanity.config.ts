@@ -20,4 +20,11 @@ const workspace = (dataset: string, title: string): WorkspaceOptions => ({
   schema: { types: schemaTypes },
 });
 
-export default defineConfig([workspace('production', 'Production'), workspace('staging', 'Staging'), workspace('development', 'Development')]);
+// Only list datasets that exist in the project; the first one is the Studio's landing workspace.
+const datasets = (process.env.SANITY_STUDIO_DATASETS ?? 'production,staging,development')
+  .split(',')
+  .map((d) => d.trim())
+  .filter(Boolean);
+const title = (dataset: string) => dataset.charAt(0).toUpperCase() + dataset.slice(1);
+
+export default defineConfig(datasets.map((dataset) => workspace(dataset, title(dataset))));
