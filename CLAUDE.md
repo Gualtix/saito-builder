@@ -19,6 +19,7 @@ npm run saito -- dev <site>                    # Astro dev server on :4321
 npm run saito -- create <site> --template <t> --tenant <t>
 npm run saito -- outdated | upgrade <site> [--dry-run]
 git diff --name-only main | npm run saito -- affected --json   # sites a change must rebuild
+npm run saito -- seed <site>|--all [--dry-run] [--overwrite]   # local content + images → Sanity (SANITY_WRITE_TOKEN)
 npm run api                                    # Fastify form API on :8787
 ```
 
@@ -34,7 +35,9 @@ There is no linter configured. TypeScript runs directly through `tsx`/Vite — p
 
 Precedence: template < site config < content overlay. `deepMerge` (`merge.ts`): objects merge, arrays replace, `null` deletes.
 
-**Override semantics are keyed by section id**, not array position: `sections.<id>: {...}` merges into the template section; `sections.<id>: false` removes it; an unknown id *with* `type` adds a new section; `order: [...]` puts listed ids first. Pages absent from the template need `title` + typed sections. Sanity documents are converted into this same shape (`sanityToOverlay`), so all sources compose identically.
+**Override semantics are keyed by section id**, not array position: `sections.<id>: {...}` merges into the template section; `sections.<id>: false` removes it; an unknown id *with* `type` adds a new section; `order: [...]` puts listed ids first. Pages absent from the template need `title` + typed sections. Sanity documents are converted into this same shape (`sanityToOverlay`), so all sources compose identically. The reverse direction, `siteToSanityDocuments` (`content/sanity-seed.ts`, used by `saito seed`), must stay its exact inverse — `packages/core/test/seed.test.ts` round-trips every site to enforce this. Sanity document ids must not contain `.` (dotted ids are private).
+
+`.env` is never loaded automatically; use exported vars or `npx tsx --env-file=.env packages/cli/src/index.ts …`.
 
 **Templates** (`packages/templates/src/<id>/vN.ts`) are `defineTemplate(manifest, migrations)` modules registered in `src/index.ts`. Multiple majors coexist. Sites pin a major, so minor/patch template changes propagate on next build; breaking changes ship a `TemplateMigration` that rewrites site overrides, applied by `saito upgrade` (which validates before writing; YAML comments are lost when overrides change).
 

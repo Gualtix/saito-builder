@@ -6,6 +6,7 @@ import type { ContentOverlay, ContentSource } from './types.ts';
 export type { ContentOverlay, ContentSource } from './types.ts';
 export { localContentSource } from './local.ts';
 export { sanityContentSource, sanityToOverlay, imageUrl } from './sanity.ts';
+export { collectImageSources, sanityDocumentId, siteToSanityDocuments, type SanityDocument } from './sanity-seed.ts';
 
 /** Applies sources in order; later sources win. */
 export function composeContentSources(...sources: ContentSource[]): ContentSource {

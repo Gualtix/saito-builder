@@ -50,6 +50,7 @@ function section(name: string, title: string, fields: FieldDefinition[]) {
         validation: (r) => r.required().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { name: 'kebab-case' }),
       }),
       defineField({ name: 'background', type: 'string', options: { list: ['default', 'surface', 'primary', 'dark'] } }),
+      defineField({ name: 'anchor', type: 'string', description: 'HTML anchor; defaults to the section id.' }),
       ...fields,
     ],
     preview: {
@@ -158,6 +159,12 @@ const sections = [
     longText('address'),
     list('hours', 'Opening hours', [text('days', 'Days', true), text('hours', 'Hours', true)]),
     defineField({ name: 'mapEmbedUrl', type: 'url' }),
+    defineField({
+      name: 'form',
+      title: 'Contact form',
+      type: 'object',
+      fields: [defineField({ name: 'enabled', type: 'boolean' }), text('submitLabel', 'Button label'), text('successMessage', 'Success message')],
+    }),
   ]),
   section('schedule', 'Schedule', [
     text('heading'),
@@ -215,6 +222,15 @@ const siteSettings = defineType({
       fields: [
         text('tagline'),
         list('columns', 'Columns', [text('title', 'Title', true), list('links', 'Links', [text('label', 'Label', true), text('href', 'Href', true)])]),
+        list('social', 'Social links', [
+          defineField({
+            name: 'platform',
+            type: 'string',
+            options: { list: ['x', 'facebook', 'instagram', 'linkedin', 'youtube', 'github', 'tiktok'] },
+            validation: (r) => r.required(),
+          }),
+          text('href', 'URL', true),
+        ]),
         text('legal'),
       ],
     }),

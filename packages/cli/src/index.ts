@@ -2,6 +2,7 @@ import { parseArgs } from 'node:util';
 import { environments, findProjectRoot, type Environment } from '@saito/core';
 import * as commands from './commands.ts';
 import { red } from './output.ts';
+import { seed } from './seed.ts';
 
 const HELP = `saito — Saito Builder website factory
 
@@ -18,6 +19,8 @@ Commands
   outdated                                      Sites with a newer template major available
   affected [<file>…] [--json]                   Sites affected by changed files (reads stdin if no files)
   upgrade <site> [--to <version>] [--dry-run]   Upgrade a site to a new template major
+  seed [<site>…|--all|--tenant <t>] [--dry-run] [--overwrite]
+                                                Push local content + images to Sanity (needs SANITY_WRITE_TOKEN)
 
 Options
   --env <development|staging|production>        Target environment (default: $SAITO_ENV or development)
@@ -37,6 +40,7 @@ async function main(argv: string[]): Promise<number> {
       env: { type: 'string' },
       json: { type: 'boolean' },
       'dry-run': { type: 'boolean' },
+      overwrite: { type: 'boolean' },
       help: { type: 'boolean', short: 'h' },
     },
   });
@@ -77,6 +81,10 @@ async function main(argv: string[]): Promise<number> {
       const ids = commands.affected(ctx, files);
       console.log(values.json ? JSON.stringify(ids) : ids.join('\n'));
       return 0;
+    }
+    case 'seed': {
+      const ids = commands.selectSites(ctx.root, { ...selection, all: values.all ?? rest.length === 0 });
+      return (await seed(ctx, ids, { dryRun: values['dry-run'], overwrite: values.overwrite })) ? 0 : 1;
     }
     case 'upgrade':
       return (await commands.upgrade(ctx, { sites: rest, to: values.to, dryRun: values['dry-run'] })) ? 0 : 1;

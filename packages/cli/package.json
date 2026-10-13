@@ -11,6 +11,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@sanity/client": "^7.6.0",
     "@saito/core": "0.1.0",
     "@saito/templates": "0.1.0",
     "yaml": "^2.8.0"

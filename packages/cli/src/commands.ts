@@ -28,7 +28,7 @@ export interface Context {
   env: Environment;
 }
 
-function selectSites(root: string, args: { sites: string[]; all?: boolean; tenant?: string }): string[] {
+export function selectSites(root: string, args: { sites: string[]; all?: boolean; tenant?: string }): string[] {
   if (args.sites.length > 0) return args.sites;
   const ids = listSiteIds(root);
   if (args.tenant) return ids.filter((id) => loadSiteConfig(root, id).tenant === args.tenant);

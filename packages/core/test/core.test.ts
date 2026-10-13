@@ -187,7 +187,7 @@ describe('sanity overlay', () => {
         hero: {
           type: 'hero',
           heading: 'From the CMS',
-          image: { src: 'https://cdn.sanity.io/images/proj/production/abc123-1200x800.jpg', alt: 'Alt' },
+          image: { src: 'https://cdn.sanity.io/images/proj/production/abc123-1200x800.jpg', alt: 'Alt', width: 1200, height: 800 },
         },
       },
     });

@@ -85,14 +85,24 @@ export function sanityToOverlay(result: SanityResult, assets: { projectId: strin
   return overlay;
 }
 
-/** Strips Sanity bookkeeping fields, drops nulls and turns image objects into `{ src, alt }`. */
+/**
+ * Strips Sanity bookkeeping fields, drops nulls and turns image objects into `{ src, alt, width, height, … }`
+ * (extra fields such as gallery captions are kept; dimensions come from the asset reference).
+ */
 function normalize(value: unknown, assets: { projectId: string; dataset: string }): unknown {
   if (Array.isArray(value)) return value.map((v) => normalize(v, assets));
   if (!isPlainObject(value)) return value;
 
   const asset = value.asset as PlainObject | undefined;
   if (value._type === 'image' && asset && typeof asset._ref === 'string') {
-    return { src: imageUrl(asset._ref, assets), alt: typeof value.alt === 'string' ? value.alt : '' };
+    const { asset: _asset, alt, ...rest } = value;
+    const size = /-(\d+)x(\d+)-\w+$/.exec(asset._ref);
+    return {
+      ...(normalize(rest, assets) as PlainObject),
+      src: imageUrl(asset._ref, assets),
+      alt: typeof alt === 'string' ? alt : '',
+      ...(size ? { width: Number(size[1]), height: Number(size[2]) } : {}),
+    };
   }
 
   const out: PlainObject = {};

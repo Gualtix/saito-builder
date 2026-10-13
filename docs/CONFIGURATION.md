@@ -128,5 +128,12 @@ integrations:
 | `SAITO_ENV` | CLI, renderer, API | `development` (default), `staging` or `production` |
 | `SAITO_CONTENT_SOURCE` | renderer | `local` (default) or `sanity` |
 | `SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_API_VERSION`, `SANITY_READ_TOKEN` | renderer | Sanity overlay; the dataset defaults to the environment name |
+| `SANITY_WRITE_TOKEN` | `saito seed` | Editor token for pushing local content and images into Sanity |
+
+Nothing loads `.env` automatically: export the variables, or run e.g. `npx tsx --env-file=.env packages/cli/src/index.ts <command>`.
+
+## Seeding Sanity from local content
+
+`saito seed [<site>…|--all] [--dry-run] [--overwrite]` pushes each site's effective content (template + site config + `content/pages`) into Sanity as `page` and `siteSettings` documents, uploading images referenced from `sites/<id>/public/` as Sanity assets. Document ids are deterministic (`saito-<site>-page-<slug>`), so re-running is safe. By default only missing documents are created, so edits made in the Studio are kept; `--overwrite` replaces them with local content.
 | `API_PORT`, `API_HOST`, `API_DATA_DIR` | API | Server binding and submission storage |
 | `SAITO_ROOT` | all | Override project root detection |
