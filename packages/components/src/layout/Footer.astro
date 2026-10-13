@@ -1,0 +1,64 @@
+---
+import { safeHref, type ResolvedSite } from '@saito/core';
+
+interface Props {
+  site: ResolvedSite;
+}
+
+const { site } = Astro.props;
+const { tagline, columns, social, legal } = site.footer;
+const year = new Date().getFullYear();
+const socialLabels: Record<string, string> = {
+  x: 'X',
+  facebook: 'Facebook',
+  instagram: 'Instagram',
+  linkedin: 'LinkedIn',
+  youtube: 'YouTube',
+  github: 'GitHub',
+  tiktok: 'TikTok',
+};
+---
+
+<footer class="border-t border-line bg-surface text-ink">
+  <div class="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 md:flex-row md:gap-16 lg:px-8">
+    <div class="md:mr-auto">
+      <p class="font-heading text-lg font-bold">{site.brand.logoText}</p>
+      {tagline && <p class="mt-2 max-w-sm text-sm text-muted">{tagline}</p>}
+      {
+        social.length > 0 && (
+          <ul class="mt-4 flex flex-wrap gap-4 text-sm">
+            {social.map((s) => (
+              <li>
+                <a href={safeHref(s.href)} rel="noopener noreferrer" class="text-muted hover:text-ink">
+                  {socialLabels[s.platform]}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+    {
+      columns.map((column) => (
+        <div>
+          <p class="text-sm font-semibold">{column.title}</p>
+          <ul class="mt-3 space-y-2 text-sm">
+            {column.links.map((link) => (
+              <li>
+                <a href={safeHref(link.href)} class="text-muted hover:text-ink">
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+  <div class="border-t border-line">
+    <p class="mx-auto max-w-7xl px-4 py-6 text-xs text-muted sm:px-6 lg:px-8">
+      © {year}
+      {site.name}. {legal}
+    </p>
+  </div>
+</footer>

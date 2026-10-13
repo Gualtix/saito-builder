@@ -1,0 +1,32 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Section from '../ui/Section.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  section: SectionOf<'testimonials'>;
+  site: ResolvedSite;
+}
+
+const { section } = Astro.props;
+---
+
+<Section section={section}>
+  <SectionHeader heading={section.heading} />
+  <div class:list={['grid gap-6', section.items.length > 1 ? 'md:grid-cols-2 lg:grid-cols-3' : 'mx-auto max-w-2xl']}>
+    {
+      section.items.map((item) => (
+        <figure class="saito-card flex flex-col">
+          <blockquote class="flex-1 text-lg">“{item.quote}”</blockquote>
+          <figcaption class="mt-6 flex items-center gap-3">
+            {item.avatar && <img src={item.avatar.src} alt="" class="h-10 w-10 rounded-full object-cover" loading="lazy" />}
+            <span>
+              <span class="block font-semibold">{item.author}</span>
+              {item.role && <span class="block text-sm text-muted">{item.role}</span>}
+            </span>
+          </figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</Section>

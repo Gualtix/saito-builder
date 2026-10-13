@@ -1,0 +1,40 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Button from '../ui/Button.astro';
+import Section from '../ui/Section.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  section: SectionOf<'pricing'>;
+  site: ResolvedSite;
+}
+
+const { section } = Astro.props;
+---
+
+<Section section={section}>
+  <SectionHeader heading={section.heading} intro={section.intro} />
+  <ul class="mx-auto grid max-w-5xl gap-6 md:grid-flow-col md:auto-cols-fr">
+    {
+      section.plans.map((plan) => (
+        <li class:list={['saito-card flex flex-col', plan.highlighted && 'ring-2 ring-primary']}>
+          <h3 class="font-heading text-lg font-semibold">{plan.name}</h3>
+          {plan.description && <p class="mt-1 text-sm text-muted">{plan.description}</p>}
+          <p class="mt-4">
+            <span class="font-heading text-4xl font-extrabold">{plan.price}</span>
+            {plan.period && <span class="text-muted">{plan.period}</span>}
+          </p>
+          <ul class="mt-6 flex-1 space-y-2">
+            {plan.features.map((feature) => (
+              <li class="flex gap-2">
+                <span class="text-primary" aria-hidden="true">✓</span>
+                {feature}
+              </li>
+            ))}
+          </ul>
+          <Button link={plan.action} variant={plan.highlighted ? 'primary' : 'secondary'} class="mt-8 w-full" />
+        </li>
+      ))
+    }
+  </ul>
+</Section>

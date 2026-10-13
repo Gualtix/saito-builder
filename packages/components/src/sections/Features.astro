@@ -1,0 +1,32 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Section from '../ui/Section.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  section: SectionOf<'features'>;
+  site: ResolvedSite;
+}
+
+const { section } = Astro.props;
+const cols = { 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:grid-cols-2 lg:grid-cols-4' };
+---
+
+<Section section={section}>
+  <SectionHeader heading={section.heading} intro={section.intro} />
+  <ul class:list={['grid gap-6', cols[section.columns]]}>
+    {
+      section.items.map((item) => (
+        <li class="saito-card">
+          {item.icon && (
+            <span class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-theme bg-primary/10 text-2xl" aria-hidden="true">
+              {item.icon}
+            </span>
+          )}
+          <h3 class="font-heading text-lg font-semibold">{item.title}</h3>
+          {item.description && <p class="mt-2 text-muted">{item.description}</p>}
+        </li>
+      ))
+    }
+  </ul>
+</Section>

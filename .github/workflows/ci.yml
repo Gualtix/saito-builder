@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Test, typecheck and validate
+    runs-on: ubuntu-latest
+    outputs:
+      sites: ${{ steps.affected.outputs.sites }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npx tsc -p tsconfig.json --noEmit
+      - run: npm run saito -- validate --all --env production
+      - name: Work out which sites this change affects
+        id: affected
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -z "$BASE" ] || ! git cat-file -e "$BASE" 2>/dev/null; then
+            sites=$(npm run -s saito -- sites --json | jq -c '[.[].id]')
+          else
+            sites=$(git diff --name-only "$BASE" HEAD | npm run -s saito -- affected --json)
+          fi
+          echo "Affected sites: $sites"
+          echo "sites=$sites" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.site }}
+    needs: verify
+    if: needs.verify.outputs.sites != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        site: ${{ fromJson(needs.verify.outputs.sites) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run saito -- build ${{ matrix.site }} --env staging
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-${{ matrix.site }}
+          path: dist/staging/${{ matrix.site }}
+          retention-days: 7

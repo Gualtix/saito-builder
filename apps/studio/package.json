@@ -1,0 +1,22 @@
+{
+  "name": "@saito/studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Sanity Studio for editing Saito site content. Installed separately (not an npm workspace) to keep builder installs light.",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy"
+  },
+  "dependencies": {
+    "@sanity/vision": "^4.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sanity": "^4.0.0",
+    "styled-components": "^6.1.18"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

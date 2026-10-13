@@ -1,0 +1,30 @@
+---
+import type { Section } from '@saito/core';
+
+interface Props {
+  section: Section;
+  width?: 'narrow' | 'default' | 'wide';
+  class?: string;
+}
+
+const { section, width = 'default', class: className } = Astro.props;
+
+const widths = { narrow: 'max-w-3xl', default: 'max-w-6xl', wide: 'max-w-7xl' };
+const backgrounds = {
+  default: 'bg-background text-ink',
+  surface: 'bg-surface text-ink',
+  primary: 'bg-primary text-primary-contrast',
+  dark: 'bg-secondary text-background',
+};
+---
+
+<section
+  id={section.anchor ?? section.id}
+  data-section={section.type}
+  data-bg={section.background}
+  class:list={['scroll-mt-20 py-16 sm:py-24', backgrounds[section.background], className]}
+>
+  <div class:list={['mx-auto px-4 sm:px-6 lg:px-8', widths[width]]}>
+    <slot />
+  </div>
+</section>

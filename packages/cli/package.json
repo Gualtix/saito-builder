@@ -1,0 +1,18 @@
+{
+  "name": "@saito/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "saito command line: create, validate, build, preview and upgrade sites",
+  "bin": {
+    "saito": "./bin/saito.js"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@saito/core": "0.1.0",
+    "@saito/templates": "0.1.0",
+    "yaml": "^2.8.0"
+  }
+}

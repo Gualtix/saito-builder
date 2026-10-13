@@ -1,0 +1,18 @@
+---
+import type { ResolvedPage } from '@saito/core';
+import { SiteLayout } from '@saito/components';
+import { getSite } from '../site.ts';
+import '../styles/global.css';
+
+const site = await getSite();
+const page: ResolvedPage = { slug: '404', path: '/404/', title: 'Page not found', description: 'Page not found', sections: [] };
+---
+
+<SiteLayout site={{ ...site, seo: { ...site.seo, noindex: true } }} page={page}>
+  <section class="mx-auto max-w-xl px-4 py-32 text-center">
+    <p class="saito-eyebrow">404</p>
+    <h1 class="font-heading mt-4 text-4xl font-bold">Page not found</h1>
+    <p class="mt-4 text-muted">The page you are looking for does not exist or has moved.</p>
+    <a href="/" class="saito-btn saito-btn-primary mt-8">Back to home</a>
+  </section>
+</SiteLayout>

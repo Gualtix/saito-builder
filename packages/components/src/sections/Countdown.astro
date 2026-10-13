@@ -1,0 +1,26 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Button from '../ui/Button.astro';
+import Section from '../ui/Section.astro';
+
+interface Props {
+  section: SectionOf<'countdown'>;
+  site: ResolvedSite;
+}
+
+const { section, site } = Astro.props;
+const fallback = new Intl.DateTimeFormat(site.locale, { dateStyle: 'full', timeStyle: 'short', timeZone: 'UTC' }).format(new Date(section.target));
+---
+
+<Section section={section} class="text-center">
+  <h2 class="font-heading text-2xl font-bold sm:text-3xl">{section.heading}</h2>
+  <saito-countdown target={section.target} expired-text={section.expiredText} class="mt-8 block">
+    <!-- Rendered without JavaScript; the Web Component replaces it with a live timer. -->
+    <p class="text-xl">{fallback} UTC</p>
+  </saito-countdown>
+  {section.action && <Button link={section.action} class="mt-8" />}
+</Section>
+
+<script>
+  import '../web/countdown.ts';
+</script>

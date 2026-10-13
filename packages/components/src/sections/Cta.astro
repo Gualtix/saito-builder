@@ -1,0 +1,21 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Button from '../ui/Button.astro';
+import Section from '../ui/Section.astro';
+
+interface Props {
+  section: SectionOf<'cta'>;
+  site: ResolvedSite;
+}
+
+const { section } = Astro.props;
+---
+
+<Section section={section} width="narrow" class="text-center">
+  <h2 class="font-heading text-3xl font-bold tracking-tight sm:text-4xl">{section.heading}</h2>
+  {section.body && <p class="saito-muted mt-4 text-lg">{section.body}</p>}
+  <div class="mt-8 flex flex-wrap justify-center gap-4">
+    <Button link={section.primaryAction} />
+    {section.secondaryAction && <Button link={section.secondaryAction} variant="secondary" />}
+  </div>
+</Section>

@@ -1,0 +1,97 @@
+# Bella Trattoria — restaurant site with online ordering via Snipcart (tenant: bella)
+
+id: bella-trattoria
+tenant: bella
+name: Bella Trattoria
+description: Family-run Italian kitchen in the heart of Springfield. Fresh pasta daily.
+template: restaurant@1
+
+environments:
+  staging:
+    url: https://bella.staging.saito.example
+  production:
+    url: https://bellatrattoria.example
+
+brand:
+  favicon: /favicon.svg
+
+seo:
+  defaultImage: /images/dish-1.svg
+
+footer:
+  tagline: Fresh pasta, made by hand every morning.
+  social:
+    - platform: instagram
+      href: https://instagram.com/bellatrattoria
+
+integrations:
+  # Snipcart public API keys are designed to be public; replace with your own.
+  commerce:
+    provider: snipcart
+    publicKey: REPLACE_WITH_SNIPCART_PUBLIC_KEY
+    currency: EUR
+  forms:
+    endpoint: http://localhost:8787
+
+navigation:
+  links:
+    - label: Menu
+      href: /menu/
+    - label: Gallery
+      href: /#gallery
+    - label: Visit
+      href: /#visit
+  cta:
+    label: Order online
+    href: /menu/
+
+pages:
+  index:
+    sections:
+      hero:
+        heading: Handmade pasta, since 1987
+        subheading: Three generations, one recipe book.
+        primaryAction:
+          label: Order online
+          href: /menu/
+        image:
+          src: /images/hero.svg
+          alt: ""
+      story:
+        body: |
+          Nonna Lucia opened Bella Trattoria with six tables and a single pasta machine. Today her grandchildren still roll every sheet of pasta **by hand, every morning**.
+
+          We buy our produce from local farms and import only what Italy does best: olive oil, Parmigiano and San Marzano tomatoes.
+      gallery:
+        type: gallery
+        heading: From our kitchen
+        images:
+          - { src: /images/dish-1.svg, alt: Tagliatelle al ragù, caption: Tagliatelle al ragù }
+          - { src: /images/dish-2.svg, alt: Margherita pizza, caption: Margherita }
+          - { src: /images/dish-3.svg, alt: Tiramisu, caption: Tiramisù della Nonna }
+      visit:
+        email: ciao@bellatrattoria.example
+        phone: "+39 055 123 4567"
+        address: |
+          Via Roma 12
+          Springfield
+    order: [hero, story, gallery, highlights, visit]
+
+  menu:
+    title: Menu & online ordering
+    sections:
+      menu:
+        intro: Order for pickup — ready in 20 minutes.
+        currency: EUR
+        categories:
+          - name: Antipasti
+            items:
+              - { id: bruschetta, name: Bruschetta, description: Tomato, basil, garlic, olive oil, price: 7.5, tags: [v], orderable: true }
+              - { id: burrata, name: Burrata, description: With heritage tomatoes, price: 11, tags: [v], orderable: true }
+          - name: Pasta
+            items:
+              - { id: tagliatelle-ragu, name: Tagliatelle al ragù, description: Slow-cooked beef and pork ragù, price: 16, orderable: true }
+              - { id: cacio-pepe, name: Cacio e pepe, description: Pecorino, black pepper, price: 14, tags: [v], orderable: true }
+          - name: Dolci
+            items:
+              - { id: tiramisu, name: Tiramisù della Nonna, price: 7, tags: [v], orderable: true }

@@ -1,0 +1,29 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Section from '../ui/Section.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  section: SectionOf<'faq'>;
+  site: ResolvedSite;
+}
+
+const { section } = Astro.props;
+---
+
+<Section section={section} width="narrow">
+  <SectionHeader heading={section.heading} />
+  <div class="divide-y divide-line border-y border-line">
+    {
+      section.items.map((item) => (
+        <details class="group py-5">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
+            {item.question}
+            <span class="transition group-open:rotate-45" aria-hidden="true">+</span>
+          </summary>
+          <p class="saito-muted mt-3">{item.answer}</p>
+        </details>
+      ))
+    }
+  </div>
+</Section>

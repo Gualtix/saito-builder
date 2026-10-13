@@ -1,0 +1,77 @@
+# Acme Rocket campaign microsite (tenant: acme)
+# Still pinned to landing@1 — run `npm run saito -- outdated` / `upgrade acme-launch` to see template upgrades.
+
+id: acme-launch
+tenant: acme
+name: Acme Rocket
+description: The reusable rocket for small payloads.
+template: landing@1
+
+environments:
+  staging:
+    url: https://acme-launch.staging.saito.example
+  production:
+    url: https://rocket.acme.example
+
+theme:
+  mode: dark
+  colors:
+    primary: "#f97316"
+    primaryContrast: "#0c0a09"
+    secondary: "#fafaf9"
+    background: "#0c0a09"
+    surface: "#1c1917"
+    text: "#fafaf9"
+    muted: "#a8a29e"
+    border: "#292524"
+
+navigation:
+  links:
+    - label: Features
+      href: "#features"
+    - label: Pricing
+      href: "#pricing"
+  cta:
+    label: Reserve a launch
+    href: "#signup"
+
+pages:
+  index:
+    sections:
+      hero:
+        eyebrow: Launching 2027
+        heading: Orbit, on demand
+        subheading: Book a ride to low Earth orbit as easily as booking a flight.
+        primaryAction:
+          label: Reserve a launch
+          href: "#signup"
+      features:
+        heading: Built for small payloads
+        items:
+          - icon: 🚀
+            title: Reusable
+            description: Every booster flies at least ten times.
+          - icon: 🛰️
+            title: Precise
+            description: Orbit insertion accurate to ±2 km.
+          - icon: 🌱
+            title: Greener
+            description: Methane engines, 70% lower emissions.
+      pricing:
+        heading: Launch packages
+        plans:
+          - name: Rideshare
+            price: $1.2M
+            features: [Up to 50 kg, Shared manifest]
+            action: { label: Enquire, href: "#signup" }
+          - name: Dedicated
+            price: $6M
+            features: [Up to 500 kg, Your schedule, Custom orbit]
+            action: { label: Enquire, href: "#signup" }
+            highlighted: true
+      signup:
+        heading: Reserve your launch window
+        body: Slots for 2027 are filling fast.
+        primaryAction:
+          label: Talk to sales
+          href: mailto:launch@acme.example

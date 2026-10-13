@@ -1,0 +1,37 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Section from '../ui/Section.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  section: SectionOf<'gallery'>;
+  site: ResolvedSite;
+}
+
+const { section } = Astro.props;
+const cols = { 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-2 lg:grid-cols-3', 4: 'sm:grid-cols-2 lg:grid-cols-4' };
+---
+
+<Section section={section} width="wide">
+  <SectionHeader heading={section.heading} />
+  <ul class:list={['grid gap-4', cols[section.columns]]}>
+    {
+      section.images.map((image) => (
+        <li>
+          <figure>
+            <img
+              src={image.src}
+              alt={image.alt}
+              width={image.width}
+              height={image.height}
+              class="aspect-[4/3] w-full rounded-theme object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+            {image.caption && <figcaption class="saito-muted mt-2 text-sm">{image.caption}</figcaption>}
+          </figure>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

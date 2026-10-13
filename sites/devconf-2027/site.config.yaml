@@ -1,0 +1,55 @@
+# DevConf 2027 — event microsite (tenant: devconf)
+
+id: devconf-2027
+tenant: devconf
+name: DevConf 2027
+description: A one-day conference about building for the web. Lisbon, 14 May 2027.
+template: event@1
+
+environments:
+  staging:
+    url: https://devconf.staging.saito.example
+  production:
+    url: https://2027.devconf.example
+
+seo:
+  schemaType: Event
+
+pages:
+  index:
+    sections:
+      hero:
+        eyebrow: 14 May 2027 · Lisbon
+        heading: DevConf 2027
+        subheading: Twelve talks, four workshops and 800 people who care about the web.
+      countdown:
+        target: "2027-05-14T09:00:00+01:00"
+        expiredText: DevConf 2027 is live — see you in the main hall!
+      speakers:
+        members:
+          - { name: Ana Costa, role: "Edge rendering in practice" }
+          - { name: Malik Haddad, role: "Design systems at scale" }
+          - { name: Yuki Tanaka, role: "Accessibility beyond compliance" }
+          - { name: Priya Nair, role: "Web Components in 2027" }
+      schedule:
+        days:
+          - label: 14 May
+            items:
+              - { time: "08:30", title: Registration & coffee }
+              - { time: "09:30", title: Edge rendering in practice, speaker: Ana Costa }
+              - { time: "10:30", title: Design systems at scale, speaker: Malik Haddad }
+              - { time: "12:00", title: Lunch }
+              - { time: "13:30", title: Accessibility beyond compliance, speaker: Yuki Tanaka }
+              - { time: "15:00", title: Web Components in 2027, speaker: Priya Nair }
+              - { time: "17:00", title: Closing party }
+      tickets:
+        plans:
+          - name: Early bird
+            price: €149
+            features: [All talks, Lunch & coffee]
+            action: { label: Buy early bird, href: "https://tickets.example/devconf-2027?tier=early" }
+          - name: Standard
+            price: €249
+            features: [All talks, Lunch & coffee, Workshop seat]
+            action: { label: Buy standard, href: "https://tickets.example/devconf-2027?tier=standard" }
+            highlighted: true

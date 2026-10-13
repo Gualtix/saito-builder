@@ -1,0 +1,114 @@
+name: Deploy
+
+# staging    — automatically on every push to main (affected sites only)
+# production — manually (workflow_dispatch), gated by the "production" GitHub environment's reviewers
+# content    — Sanity publish webhook → repository_dispatch "content-published" rebuilds one site
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
+      sites:
+        description: 'Space-separated site ids, or "all"'
+        default: all
+  repository_dispatch:
+    types: [content-published]
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || github.event.client_payload.environment || 'staging' }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      sites: ${{ steps.plan.outputs.sites }}
+      environment: ${{ steps.plan.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_SITES: ${{ github.event.inputs.sites }}
+          INPUT_ENV: ${{ github.event.inputs.environment }}
+          PAYLOAD_SITE: ${{ github.event.client_payload.site }}
+          PAYLOAD_ENV: ${{ github.event.client_payload.environment }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          all=$(npm run -s saito -- sites --json | jq -c '[.[].id]')
+          case "$EVENT" in
+            workflow_dispatch)
+              env="$INPUT_ENV"
+              if [ "$INPUT_SITES" = "all" ]; then
+                sites="$all"
+              else
+                # Keep only ids that exist in the repository.
+                sites=$(printf '%s\n' $INPUT_SITES | jq -R . | jq -sc --argjson all "$all" 'map(select(. as $s | $all | index($s)))')
+              fi ;;
+            repository_dispatch)
+              env="${PAYLOAD_ENV:-production}"
+              case "$env" in staging|production) ;; *) echo "Invalid environment: $env" >&2; exit 1 ;; esac
+              sites=$(echo "$all" | jq -c --arg s "$PAYLOAD_SITE" 'map(select(. == $s))') ;;
+            *)
+              env=staging
+              if git cat-file -e "$BEFORE" 2>/dev/null; then
+                sites=$(git diff --name-only "$BEFORE" HEAD | npm run -s saito -- affected --json)
+              else
+                sites="$all"
+              fi ;;
+          esac
+          echo "Deploying $sites to $env"
+          echo "sites=$sites" >> "$GITHUB_OUTPUT"
+          echo "environment=$env" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: ${{ matrix.site }} → ${{ needs.plan.outputs.environment }}
+    needs: plan
+    if: needs.plan.outputs.sites != '[]'
+    runs-on: ubuntu-latest
+    environment: ${{ needs.plan.outputs.environment }}
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        site: ${{ fromJson(needs.plan.outputs.sites) }}
+    env:
+      SAITO_ENV: ${{ needs.plan.outputs.environment }}
+      SAITO_CONTENT_SOURCE: ${{ vars.SAITO_CONTENT_SOURCE || 'local' }}
+      SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
+      SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run saito -- build "$SITE"
+        env:
+          SITE: ${{ matrix.site }}
+      - name: Deploy to CDN
+        run: ./scripts/deploy.sh "$PROVIDER" "dist/$SAITO_ENV/$SITE" "$SITE"
+        env:
+          SITE: ${{ matrix.site }}
+          PROVIDER: ${{ vars.DEPLOY_PROVIDER || 'none' }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          S3_BUCKET_PREFIX: ${{ vars.S3_BUCKET_PREFIX }}
+          CLOUDFRONT_DISTRIBUTIONS: ${{ vars.CLOUDFRONT_DISTRIBUTIONS }}

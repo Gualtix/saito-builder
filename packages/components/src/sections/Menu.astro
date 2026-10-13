@@ -1,0 +1,49 @@
+---
+import { formatPrice, type ResolvedSite, type SectionOf } from '@saito/core';
+import AddToCart from '../ui/AddToCart.astro';
+import Section from '../ui/Section.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  section: SectionOf<'menu'>;
+  site: ResolvedSite;
+  pageUrl: string;
+}
+
+const { section, site, pageUrl } = Astro.props;
+const canOrder = site.integrations.commerce?.provider === 'snipcart';
+---
+
+<Section section={section} width="narrow">
+  <SectionHeader heading={section.heading} intro={section.intro} />
+  <div class="space-y-12">
+    {
+      section.categories.map((category) => (
+        <div>
+          <h3 class="font-heading mb-4 border-b border-line pb-2 text-2xl font-semibold">{category.name}</h3>
+          <ul class="space-y-6">
+            {category.items.map((item) => (
+              <li class="flex items-start justify-between gap-6">
+                <div>
+                  <p class="font-semibold">
+                    {item.name}
+                    {item.tags.map((tag) => (
+                      <span class="ml-2 rounded-full border border-line px-2 py-0.5 align-middle text-xs font-normal uppercase">{tag}</span>
+                    ))}
+                  </p>
+                  {item.description && <p class="saito-muted mt-1 text-sm">{item.description}</p>}
+                </div>
+                <div class="flex shrink-0 flex-col items-end gap-2">
+                  <span class="font-semibold">{formatPrice(item.price, section.currency, site.locale)}</span>
+                  {canOrder && item.orderable && item.id && (
+                    <AddToCart id={item.id} name={item.name} price={item.price} url={pageUrl} description={item.description} />
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</Section>

@@ -1,0 +1,41 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Section from '../ui/Section.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  section: SectionOf<'team'>;
+  site: ResolvedSite;
+}
+
+const { section } = Astro.props;
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+---
+
+<Section section={section}>
+  <SectionHeader heading={section.heading} intro={section.intro} />
+  <ul class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    {
+      section.members.map((member) => (
+        <li class="text-center">
+          {member.photo ? (
+            <img src={member.photo.src} alt={member.photo.alt || member.name} class="mx-auto h-32 w-32 rounded-full object-cover" loading="lazy" />
+          ) : (
+            <span class="font-heading mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-primary/15 text-3xl font-bold text-primary" aria-hidden="true">
+              {initials(member.name)}
+            </span>
+          )}
+          <h3 class="font-heading mt-4 text-lg font-semibold">{member.name}</h3>
+          {member.role && <p class="saito-muted">{member.role}</p>}
+          {member.bio && <p class="saito-muted mt-2 text-sm">{member.bio}</p>}
+        </li>
+      ))
+    }
+  </ul>
+</Section>

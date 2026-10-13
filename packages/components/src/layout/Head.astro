@@ -1,0 +1,83 @@
+---
+import { googleFontsHref, jsonForScript, themeToCss, type ResolvedPage, type ResolvedSite } from '@saito/core';
+
+interface Props {
+  site: ResolvedSite;
+  page: ResolvedPage;
+}
+
+const { site, page } = Astro.props;
+const title = page.slug === 'index' ? site.name : site.seo.titleTemplate.replace('%s', page.title);
+const canonical = `${site.url}${page.path}`;
+const absolute = (src: string) => (src.startsWith('/') ? `${site.url}${src}` : src);
+const ogImage = site.seo.defaultImage ? absolute(site.seo.defaultImage) : undefined;
+// Only production is indexable; staging and development builds are always noindex.
+const noindex = site.seo.noindex || site.env !== 'production';
+const fonts = googleFontsHref(site.theme);
+const { analytics, commerce } = site.integrations;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': site.seo.schemaType,
+  name: site.name,
+  url: site.url,
+  ...(site.description ? { description: site.description } : {}),
+  ...(site.brand.logo ? { logo: absolute(site.brand.logo.src) } : {}),
+  ...(site.footer.social.length ? { sameAs: site.footer.social.map((s) => s.href) } : {}),
+};
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<meta name="description" content={page.description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+<meta name="generator" content={`Saito Builder (${site.template.id}@${site.template.version})`} />
+{site.brand.favicon && <link rel="icon" href={site.brand.favicon} />}
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={page.description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={site.locale} />
+{ogImage && <meta property="og:image" content={ogImage} />}
+<meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+{site.seo.twitterHandle && <meta name="twitter:site" content={site.seo.twitterHandle} />}
+
+<meta name="theme-color" content={site.theme.colors.primary} />
+{
+  fonts && (
+    <>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link rel="stylesheet" href={fonts} />
+    </>
+  )
+}
+<style is:inline set:html={themeToCss(site.theme)}></style>
+<script type="application/ld+json" is:inline set:html={jsonForScript(jsonLd)} />
+
+{analytics?.provider === 'plausible' && <script is:inline defer data-domain={analytics.id} src="https://plausible.io/js/script.js" />}
+{
+  analytics?.provider === 'ga4' && (
+    <>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(analytics.id)}`} />
+      <script
+        is:inline
+        set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config',${jsonForScript(analytics.id)});`}
+      />
+    </>
+  )
+}
+{
+  commerce?.provider === 'snipcart' && (
+    <>
+      <link rel="preconnect" href="https://app.snipcart.com" />
+      <link rel="preconnect" href="https://cdn.snipcart.com" />
+      <link rel="stylesheet" href="https://cdn.snipcart.com/themes/v3.2.0/default/snipcart.css" />
+      <script is:inline async src="https://cdn.snipcart.com/themes/v3.2.0/default/snipcart.js" />
+    </>
+  )
+}

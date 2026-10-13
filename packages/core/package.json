@@ -1,0 +1,15 @@
+{
+  "name": "@saito/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Saito Builder configuration schemas, resolution engine, themes and content sources",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@sanity/client": "^7.6.0",
+    "yaml": "^2.8.0",
+    "zod": "^3.25.0"
+  }
+}

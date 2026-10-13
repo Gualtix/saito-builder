@@ -1,0 +1,13 @@
+{
+  "name": "@saito/templates",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Saito Builder template marketplace: versioned, reusable site templates",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@saito/core": "0.1.0"
+  }
+}

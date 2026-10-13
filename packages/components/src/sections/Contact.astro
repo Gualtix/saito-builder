@@ -1,0 +1,110 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Section from '../ui/Section.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  section: SectionOf<'contact'>;
+  site: ResolvedSite;
+}
+
+const { section, site } = Astro.props;
+const endpoint = site.integrations.forms?.endpoint;
+const action = endpoint ? `${endpoint.replace(/\/+$/, '')}/v1/sites/${site.id}/contact` : undefined;
+const showForm = section.form.enabled && action;
+---
+
+<Section section={section}>
+  <SectionHeader heading={section.heading} intro={section.intro} />
+  <div class:list={['grid gap-12', showForm ? 'lg:grid-cols-2' : 'mx-auto max-w-xl']}>
+    <div class="space-y-6">
+      {
+        section.address && (
+          <div>
+            <h3 class="font-semibold">Address</h3>
+            <address class="saito-muted whitespace-pre-line not-italic">{section.address}</address>
+          </div>
+        )
+      }
+      {
+        (section.email || section.phone) && (
+          <div>
+            <h3 class="font-semibold">Contact</h3>
+            {section.email && (
+              <p>
+                <a class="underline" href={`mailto:${section.email}`}>{section.email}</a>
+              </p>
+            )}
+            {section.phone && (
+              <p>
+                <a class="underline" href={`tel:${section.phone.replace(/[^+\d]/g, '')}`}>{section.phone}</a>
+              </p>
+            )}
+          </div>
+        )
+      }
+      {
+        section.hours.length > 0 && (
+          <div>
+            <h3 class="font-semibold">Opening hours</h3>
+            <dl class="mt-1 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1">
+              {section.hours.map((row) => (
+                <>
+                  <dt class="saito-muted">{row.days}</dt>
+                  <dd>{row.hours}</dd>
+                </>
+              ))}
+            </dl>
+          </div>
+        )
+      }
+      {
+        section.mapEmbedUrl && (
+          <iframe
+            src={section.mapEmbedUrl}
+            title={`Map: ${site.name}`}
+            class="aspect-video w-full rounded-theme border border-line"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          />
+        )
+      }
+    </div>
+
+    {
+      showForm && (
+        <saito-contact-form success-message={section.form.successMessage}>
+          <form action={action} method="post" class="saito-card space-y-4">
+            <input type="hidden" name="page" value={Astro.url.pathname} />
+            {/* Honeypot: hidden from people, filled by bots, rejected by the API. */}
+            <div class="hidden" aria-hidden="true">
+              <label>
+                Leave this empty <input type="text" name="company_website" tabindex="-1" autocomplete="off" />
+              </label>
+            </div>
+            <label class="block">
+              <span class="text-sm font-medium">Name</span>
+              <input class="saito-input" type="text" name="name" required maxlength="200" autocomplete="name" />
+            </label>
+            <label class="block">
+              <span class="text-sm font-medium">Email</span>
+              <input class="saito-input" type="email" name="email" required maxlength="320" autocomplete="email" />
+            </label>
+            <label class="block">
+              <span class="text-sm font-medium">Message</span>
+              <textarea class="saito-input min-h-32" name="message" required maxlength="5000" />
+            </label>
+            <button type="submit" class="saito-btn saito-btn-primary w-full">
+              {section.form.submitLabel}
+            </button>
+            <p data-status role="status" aria-live="polite" class="text-sm" />
+          </form>
+        </saito-contact-form>
+      )
+    }
+  </div>
+</Section>
+
+<script>
+  import '../web/contact-form.ts';
+</script>

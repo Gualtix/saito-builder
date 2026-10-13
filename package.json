@@ -1,0 +1,35 @@
+{
+  "name": "saito-builder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Configuration-driven, multi-tenant website factory",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/renderer",
+    "apps/api"
+  ],
+  "scripts": {
+    "saito": "tsx packages/cli/src/index.ts",
+    "sites": "npm run saito -- sites",
+    "templates": "npm run saito -- templates",
+    "validate": "npm run saito -- validate --all",
+    "build": "npm run saito -- build --all",
+    "dev": "npm run saito -- dev",
+    "api": "npm run dev -w @saito/api",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit && npm run check -w @saito/renderer"
+  },
+  "overrides": {
+    "vite": "^6.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

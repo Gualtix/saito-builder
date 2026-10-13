@@ -1,0 +1,67 @@
+---
+import { safeHref, type ResolvedSite } from '@saito/core';
+import Button from '../ui/Button.astro';
+
+interface Props {
+  site: ResolvedSite;
+  currentPath: string;
+}
+
+const { site, currentPath } = Astro.props;
+const { links, cta } = site.navigation;
+const hasCart = site.integrations.commerce?.provider === 'snipcart';
+const isCurrent = (href: string) => href === currentPath;
+---
+
+<header class="sticky top-0 z-40 border-b border-line bg-background/90 text-ink backdrop-blur">
+  <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+    <a href="/" class="font-heading flex items-center gap-2 text-lg font-bold">
+      {
+        site.brand.logo ? (
+          <img src={site.brand.logo.src} alt={site.brand.logo.alt || site.name} class="h-8 w-auto" width={site.brand.logo.width} height={site.brand.logo.height} />
+        ) : (
+          site.brand.logoText
+        )
+      }
+    </a>
+
+    <nav aria-label="Main" class="hidden items-center gap-8 md:flex">
+      {
+        links.map((link) => (
+          <a href={safeHref(link.href)} class="text-sm font-medium text-muted transition hover:text-ink" aria-current={isCurrent(link.href) ? 'page' : undefined}>
+            {link.label}
+          </a>
+        ))
+      }
+      {
+        hasCart && (
+          <button type="button" class="snipcart-checkout text-sm font-medium">
+            Cart (<span class="snipcart-items-count">0</span>)
+          </button>
+        )
+      }
+      {cta && <Button link={cta} class="!px-4 !py-2 text-sm" />}
+    </nav>
+
+    <details class="relative md:hidden">
+      <summary class="cursor-pointer list-none rounded-theme border border-line px-3 py-1.5 text-sm font-medium">Menu</summary>
+      <nav aria-label="Mobile" class="absolute right-0 mt-2 flex w-56 flex-col gap-1 rounded-theme border border-line bg-background p-2 shadow-lg">
+        {
+          links.map((link) => (
+            <a href={safeHref(link.href)} class="rounded-theme px-3 py-2 text-sm hover:bg-surface">
+              {link.label}
+            </a>
+          ))
+        }
+        {
+          hasCart && (
+            <button type="button" class="snipcart-checkout rounded-theme px-3 py-2 text-left text-sm hover:bg-surface">
+              Cart (<span class="snipcart-items-count">0</span>)
+            </button>
+          )
+        }
+        {cta && <Button link={cta} class="mt-1 w-full !py-2 text-sm" />}
+      </nav>
+    </details>
+  </div>
+</header>

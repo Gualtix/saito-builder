@@ -1,0 +1,69 @@
+import type { Theme } from '@saito/core';
+
+/** Base themes templates start from. Sites override any token in their `theme:` block. */
+export const themes = {
+  ocean: {
+    mode: 'light',
+    colors: {
+      primary: '#1d4ed8',
+      primaryContrast: '#ffffff',
+      secondary: '#0f172a',
+      accent: '#06b6d4',
+      background: '#ffffff',
+      surface: '#f1f5f9',
+      text: '#0f172a',
+      muted: '#475569',
+      border: '#e2e8f0',
+    },
+    fonts: { heading: 'Inter', body: 'Inter', googleFonts: true },
+    radius: 'md',
+  },
+  slate: {
+    mode: 'light',
+    colors: {
+      primary: '#0f766e',
+      primaryContrast: '#ffffff',
+      secondary: '#1e293b',
+      accent: '#f59e0b',
+      background: '#ffffff',
+      surface: '#f8fafc',
+      text: '#111827',
+      muted: '#4b5563',
+      border: '#e5e7eb',
+    },
+    fonts: { heading: 'Manrope', body: 'Source Sans 3', googleFonts: true },
+    radius: 'sm',
+  },
+  bistro: {
+    mode: 'light',
+    colors: {
+      primary: '#9a3412',
+      primaryContrast: '#fff7ed',
+      secondary: '#292524',
+      accent: '#ca8a04',
+      background: '#fffbf5',
+      surface: '#f5ede1',
+      text: '#1c1917',
+      muted: '#57534e',
+      border: '#e7dccb',
+    },
+    fonts: { heading: 'Playfair Display', body: 'Lato', googleFonts: true },
+    radius: 'lg',
+  },
+  midnight: {
+    mode: 'dark',
+    colors: {
+      primary: '#a78bfa',
+      primaryContrast: '#0b0b14',
+      secondary: '#e2e8f0',
+      accent: '#f472b6',
+      background: '#0b0b14',
+      surface: '#161625',
+      text: '#f1f5f9',
+      muted: '#a1a1b5',
+      border: '#2a2a40',
+    },
+    fonts: { heading: 'Space Grotesk', body: 'Inter', googleFonts: true },
+    radius: 'lg',
+  },
+} satisfies Record<string, Theme>;

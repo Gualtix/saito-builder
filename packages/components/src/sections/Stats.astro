@@ -1,0 +1,26 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Section from '../ui/Section.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  section: SectionOf<'stats'>;
+  site: ResolvedSite;
+}
+
+const { section } = Astro.props;
+---
+
+<Section section={section}>
+  <SectionHeader heading={section.heading} />
+  <dl class="flex flex-wrap justify-center gap-x-16 gap-y-10 text-center">
+    {
+      section.items.map((item) => (
+        <div class="flex flex-col-reverse gap-2">
+          <dt class="saito-muted">{item.label}</dt>
+          <dd class="font-heading text-4xl font-extrabold tracking-tight sm:text-5xl">{item.value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</Section>

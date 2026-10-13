@@ -1,0 +1,118 @@
+# Acme Corporation — corporate website (tenant: acme)
+# Settings live here; long-form page copy lives in content/pages/*.yaml.
+
+id: acme-corp
+tenant: acme
+name: Acme Corporation
+description: Industrial engineering and consulting since 1998.
+locale: en
+template: corporate@1
+
+environments:
+  staging:
+    url: https://acme-corp.staging.saito.example
+  production:
+    url: https://www.acme.example
+
+brand:
+  logoText: ACME
+  favicon: /favicon.svg
+
+theme:
+  colors:
+    primary: "#c2410c"
+    accent: "#0ea5e9"
+  fonts:
+    heading: Poppins
+
+seo:
+  titleTemplate: "%s — Acme Corporation"
+  twitterHandle: "@acme"
+
+footer:
+  tagline: Engineering that lasts.
+  social:
+    - platform: linkedin
+      href: https://www.linkedin.com/company/acme
+    - platform: x
+      href: https://x.com/acme
+
+integrations:
+  forms:
+    endpoint: http://localhost:8787
+    webhookUrl: https://hooks.example.com/acme-contact
+  analytics:
+    provider: plausible
+    id: acme.example
+
+navigation:
+  links:
+    - label: About
+      href: /about/
+    - label: Services
+      href: /services/
+    - label: Careers
+      href: /careers/
+    - label: Contact
+      href: /contact/
+  cta:
+    label: Request a quote
+    href: /contact/
+
+pages:
+  index:
+    sections:
+      hero:
+        heading: Engineering solutions built to last
+        subheading: From feasibility studies to commissioning, Acme delivers complex industrial projects on time.
+        image:
+          src: /images/hero.svg
+          alt: Abstract illustration of an industrial plant
+      stats:
+        items:
+          - value: "1998"
+            label: Founded
+          - value: "650+"
+            label: Projects delivered
+          - value: "18"
+            label: Countries
+      testimonials: false # removed: Acme has no approved quotes yet
+
+  contact:
+    sections:
+      contact:
+        email: hello@acme.example
+        phone: "+1 (555) 010-2000"
+        address: |
+          100 Industrial Way
+          Springfield, ST 12345
+
+  # A page the template does not have: needs a title and sections with a "type".
+  careers:
+    title: Careers
+    description: Join the Acme engineering team.
+    sections:
+      intro:
+        type: hero
+        heading: Build the infrastructure of tomorrow
+        subheading: We're hiring engineers, project managers and apprentices.
+        primaryAction:
+          label: See open roles
+          href: "#roles"
+      roles:
+        type: features
+        heading: Open roles
+        columns: 2
+        items:
+          - title: Senior Process Engineer
+            description: Springfield · Full-time
+          - title: Project Manager
+            description: Remote (EU) · Full-time
+      apply:
+        type: cta
+        heading: Don't see your role?
+        body: Send us an open application.
+        primaryAction:
+          label: Contact us
+          href: /contact/
+        background: primary

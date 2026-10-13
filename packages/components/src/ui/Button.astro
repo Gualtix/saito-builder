@@ -1,0 +1,21 @@
+---
+import { safeHref, type Link } from '@saito/core';
+
+interface Props {
+  link: Link;
+  variant?: 'primary' | 'secondary';
+  class?: string;
+}
+
+const { link, variant = 'primary', class: className } = Astro.props;
+const href = safeHref(link.href);
+const external = /^https?:/i.test(href);
+---
+
+<a
+  href={href}
+  class:list={['saito-btn', variant === 'primary' ? 'saito-btn-primary' : 'saito-btn-secondary', className]}
+  rel={external ? 'noopener noreferrer' : undefined}
+>
+  {link.label}
+</a>

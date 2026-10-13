@@ -1,0 +1,26 @@
+---
+interface Props {
+  id: string;
+  name: string;
+  price: number;
+  /** Absolute page URL; Snipcart crawls it to verify the price at checkout. */
+  url: string;
+  description?: string;
+  image?: string;
+}
+
+const { id, name, price, url, description, image } = Astro.props;
+---
+
+<button
+  type="button"
+  class="snipcart-add-item saito-btn saito-btn-primary !px-4 !py-1.5 text-sm"
+  data-item-id={id}
+  data-item-name={name}
+  data-item-price={price.toFixed(2)}
+  data-item-url={url}
+  data-item-description={description}
+  data-item-image={image}
+>
+  Add to order
+</button>

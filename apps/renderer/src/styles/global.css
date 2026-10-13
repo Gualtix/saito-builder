@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+
+/* Shared components live outside this app; tell Tailwind to scan them. */
+@source '../../../../packages/components/src';
+
+/* Tailwind tokens point at per-site CSS variables emitted by themeToCss(). */
+@theme inline {
+  --color-primary: var(--saito-color-primary);
+  --color-primary-contrast: var(--saito-color-primary-contrast);
+  --color-secondary: var(--saito-color-secondary);
+  --color-accent: var(--saito-color-accent);
+  --color-background: var(--saito-color-background);
+  --color-surface: var(--saito-color-surface);
+  --color-ink: var(--saito-color-text);
+  --color-muted: var(--saito-color-muted);
+  --color-line: var(--saito-color-border);
+  --font-heading: var(--saito-font-heading);
+  --font-body: var(--saito-font-body);
+  --radius-theme: var(--saito-radius);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--saito-font-heading);
+  }
+}
+
+@layer components {
+  .saito-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-theme px-6 py-3 font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60;
+  }
+  .saito-btn-primary {
+    @apply bg-primary text-primary-contrast hover:opacity-90;
+  }
+  .saito-btn-secondary {
+    @apply border border-current hover:bg-current/10;
+  }
+  /* Invert the primary button on coloured backgrounds so it stays visible. */
+  [data-bg='primary'] .saito-btn-primary {
+    @apply bg-primary-contrast text-primary;
+  }
+  [data-bg='dark'] .saito-btn-primary {
+    @apply bg-background text-ink;
+  }
+
+  .saito-card {
+    @apply rounded-theme border border-line bg-background p-6 text-ink shadow-sm;
+  }
+  .saito-input {
+    @apply mt-1 block w-full rounded-theme border border-line bg-background px-3 py-2 text-ink focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none;
+  }
+  .saito-eyebrow {
+    @apply text-sm font-semibold tracking-widest text-primary uppercase;
+  }
+  [data-bg='primary'] .saito-eyebrow,
+  [data-bg='dark'] .saito-eyebrow {
+    @apply text-current;
+  }
+
+  /* Muted text follows the section background instead of using a fixed colour. */
+  .saito-muted {
+    color: var(--saito-color-muted);
+  }
+  [data-bg='primary'] .saito-muted,
+  [data-bg='dark'] .saito-muted {
+    color: currentColor;
+    opacity: 0.85;
+  }
+
+  .saito-prose {
+    @apply space-y-4 text-lg leading-relaxed;
+  }
+  .saito-prose a {
+    @apply text-primary underline underline-offset-2;
+  }
+}

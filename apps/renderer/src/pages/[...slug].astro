@@ -1,0 +1,32 @@
+---
+import type { GetStaticPaths } from 'astro';
+import type { ResolvedPage, ResolvedSite } from '@saito/core';
+import { sectionComponents, SiteLayout } from '@saito/components';
+import { getSite } from '../site.ts';
+import '../styles/global.css';
+
+export const getStaticPaths = (async () => {
+  const site = await getSite();
+  return site.pages.map((page) => ({
+    params: { slug: page.slug === 'index' ? undefined : page.slug },
+    props: { site, page },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  site: ResolvedSite;
+  page: ResolvedPage;
+}
+
+const { site, page } = Astro.props;
+const pageUrl = `${site.url}${page.path}`;
+---
+
+<SiteLayout site={site} page={page}>
+  {
+    page.sections.map((section) => {
+      const Component = sectionComponents[section.type];
+      return <Component section={section} site={site} pageUrl={pageUrl} />;
+    })
+  }
+</SiteLayout>

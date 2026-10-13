@@ -1,0 +1,19 @@
+{
+  "name": "@saito/components",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Saito Builder section components (Astro) and framework-independent Web Components",
+  "keywords": ["astro-component"],
+  "exports": {
+    ".": "./src/index.ts",
+    "./layout/*": "./src/layout/*",
+    "./web/*": "./src/web/*"
+  },
+  "dependencies": {
+    "@saito/core": "0.1.0"
+  },
+  "peerDependencies": {
+    "astro": "^5.0.0"
+  }
+}
