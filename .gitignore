@@ -10,3 +10,5 @@ apps/api/data/
 
 # Sanity Studio local runtime cache
 .sanity/
+
+trash/
