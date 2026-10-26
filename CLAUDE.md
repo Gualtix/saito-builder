@@ -21,6 +21,7 @@ npm run saito -- outdated | upgrade <site> [--dry-run]
 git diff --name-only main | npm run saito -- affected --json   # sites a change must rebuild
 npm run saito -- seed <site>|--all [--dry-run] [--overwrite]   # local content + images → Sanity (SANITY_WRITE_TOKEN)
 npm run api                                    # Fastify form API on :8787
+npm run live-template -- <folder>              # publish a static folder (needs index.html) as a public GitHub Pages repo via gh
 ```
 
 There is no linter configured. TypeScript runs directly through `tsx`/Vite — package `exports` point at `src/*.ts`, there is no compile step.

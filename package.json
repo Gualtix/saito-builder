@@ -21,7 +21,8 @@
     "dev": "npm run saito -- dev",
     "api": "npm run dev -w @saito/api",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json --noEmit && npm run check -w @saito/renderer"
+    "typecheck": "tsc -p tsconfig.json --noEmit && npm run check -w @saito/renderer",
+    "live-template": "python3 scripts/live_template.py"
   },
   "overrides": {
     "vite": "^6.4.0"
