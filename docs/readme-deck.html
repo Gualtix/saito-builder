@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saito Builder Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Schibsted+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: fixed 1280x720 slide canvas scaled to fit the stage; nav bar below. Diagrams are inline SVG drawn from specs. */
+:root{
+  --bg:#E6EAEF; --slide:#FBFCFD; --ink:#111A25; --muted:#566476; --line:#CDD5DE; --chip:#EEF2F6;
+  --accent:#2445D6; --accent-soft:#E2E8FD;
+  --step-f:#EAF0FF; --step-s:#3D5BDB;
+  --in-f:#F1F3F6; --in-s:#8592A3;
+  --out-f:#E3F4EB; --out-s:#1C8657;
+  --err-f:#FBE8E4; --err-s:#C0402B;
+  --end-f:#E2F1F3; --end-s:#2B7884;
+  --warn-f:#FCF2DA; --warn-s:#AE7414;
+  --dec-f:#FFFFFF; --dec-s:#4A5768;
+  --grp-f:#F2F4F8; --grp-s:#D6DCE4; --grp2-f:#EFF6F2; --grp2-s:#CBE2D5;
+  --edge:#5A6778;
+  --f-display:"Schibsted Grotesk","IBM Plex Sans",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#090D13; --slide:#111821; --ink:#E6EBF1; --muted:#97A3B4; --line:#283341; --chip:#18212C;
+  --accent:#8EA5FF; --accent-soft:#1B2547;
+  --step-f:#16223D; --step-s:#6F8CF4; --in-f:#18202A; --in-s:#6E7B8C; --out-f:#10281E; --out-s:#3DBB83;
+  --err-f:#2D1613; --err-s:#EC7A65; --end-f:#0E2528; --end-s:#4DB1BE; --warn-f:#291F10; --warn-s:#DDA446;
+  --dec-f:#111821; --dec-s:#A8B4C3; --grp-f:#141C26; --grp-s:#25303D; --grp2-f:#11211B; --grp2-s:#22392E; --edge:#8592A3;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#090D13; --slide:#111821; --ink:#E6EBF1; --muted:#97A3B4; --line:#283341; --chip:#18212C;
+  --accent:#8EA5FF; --accent-soft:#1B2547;
+  --step-f:#16223D; --step-s:#6F8CF4; --in-f:#18202A; --in-s:#6E7B8C; --out-f:#10281E; --out-s:#3DBB83;
+  --err-f:#2D1613; --err-s:#EC7A65; --end-f:#0E2528; --end-s:#4DB1BE; --warn-f:#291F10; --warn-s:#DDA446;
+  --dec-f:#111821; --dec-s:#A8B4C3; --grp-f:#141C26; --grp-s:#25303D; --grp2-f:#11211B; --grp2-s:#22392E; --edge:#8592A3;
+  color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);overflow:hidden}
+.app{height:100%;display:flex;flex-direction:column}
+.stage{flex:1;min-height:0;padding-block:14px 6px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.fit{position:relative;width:100%;height:100%;overflow:hidden}
+.canvas{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center center;background:var(--slide);border-radius:10px;box-shadow:0 1px 2px rgba(10,20,40,.08),0 12px 40px rgba(10,20,40,.10);overflow:hidden}
+.slide{position:absolute;inset:0;padding:44px 56px 46px;display:flex;flex-direction:column}
+.slide:not([hidden]){animation:sin .2s ease-out}
+@keyframes sin{from{opacity:.35;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.slide:not([hidden]){animation:none}}
+.eyebrow{margin:0;font:500 13px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.sh h2{margin:10px 0 0;font:600 36px/1.12 var(--f-display);letter-spacing:-.015em;text-wrap:balance}
+.lede{margin:10px 0 0;font-size:18px;line-height:1.45;color:var(--muted);max-width:980px;text-wrap:pretty}
+.lede code,.note code,.card code,td code,li code{font-family:var(--f-mono);font-size:.88em;background:var(--chip);padding:1px 5px;border-radius:4px;color:var(--ink);white-space:nowrap}
+.big{grid-auto-rows:1fr;align-content:stretch!important}
+.big .card{padding:22px 24px;gap:10px}
+.big .card .ct{font-size:23px}
+.big .card .cp{font-size:15px}
+.big .card .cd{font-size:18px;line-height:1.45}
+.big .chips span{font-size:15px;padding:4px 11px}
+.yml{margin:2px 0 4px;font:15px/1.6 var(--f-mono);background:var(--grp-f);border:1px solid var(--line);border-radius:8px;padding:10px 12px;white-space:pre;color:var(--ink)}
+.yml .k{color:var(--muted)} .yml .v{color:var(--accent)}
+.card .sl{font:600 12px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.sb{flex:1;min-height:0;display:flex;flex-direction:column;gap:16px;margin-top:22px}
+.sb>svg.dg{flex:1;min-height:0}
+.foot{position:absolute;left:56px;right:56px;bottom:16px;display:flex;justify-content:space-between;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:.04em}
+svg.dg{width:100%;height:100%;display:block;overflow:visible}
+.dg text{font-family:var(--f-body);fill:var(--ink)}
+.dg .nt{font-weight:600}
+.dg .ns{fill:var(--muted)}
+.dg .mono{font-family:var(--f-mono)}
+.dg .nt.mono{font-weight:500}
+.node .shape{stroke-width:1.6}
+.k-step .shape{fill:var(--step-f);stroke:var(--step-s)}
+.k-in .shape{fill:var(--in-f);stroke:var(--in-s)}
+.k-out .shape{fill:var(--out-f);stroke:var(--out-s)}
+.k-err .shape{fill:var(--err-f);stroke:var(--err-s)}
+.k-end .shape{fill:var(--end-f);stroke:var(--end-s)}
+.k-guard .shape{fill:var(--warn-f);stroke:var(--warn-s)}
+.k-dec .shape{fill:var(--dec-f);stroke:var(--dec-s);stroke-width:1.8}
+.k-ghost .shape{fill:var(--slide);stroke:var(--in-s);stroke-dasharray:6 4}
+.k-start .shape{fill:var(--ink);stroke:none}
+.node .sep{stroke-width:1.2}
+.k-step .sep{stroke:var(--step-s)} .k-out .sep{stroke:var(--out-s)} .k-in .sep{stroke:var(--in-s)}
+.dg .fl{font-family:var(--f-mono);font-size:14px;fill:var(--ink)}
+.grp rect{fill:var(--grp-f);stroke:var(--grp-s);stroke-width:1.2}
+.grp.g2 rect{fill:var(--grp2-f);stroke:var(--grp2-s)}
+.dg .gl{font-size:12.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;fill:var(--muted)}
+.dg .gs{font-size:13px;fill:var(--muted)}
+.e{fill:none;stroke:var(--edge);stroke-width:1.6;stroke-linejoin:round;marker-end:url(#ah)}
+.e.dash{stroke-dasharray:6 5}
+.e.async{stroke-dasharray:2 4}
+.e.err{stroke:var(--err-s);marker-end:url(#ah-err)}
+.e.ok{stroke:var(--out-s);marker-end:url(#ah-ok)}
+.e.acc{stroke:var(--accent);marker-end:url(#ah-acc)}
+.chip{fill:var(--slide)}
+.dg .el{font-size:13px;font-weight:500;fill:var(--muted)}
+.badge rect{stroke-width:1.2}
+.badge.b-warn rect{fill:var(--warn-f);stroke:var(--warn-s)} .badge.b-ok rect{fill:var(--out-f);stroke:var(--out-s)}
+.dg .bt{font:600 11.5px var(--f-mono);letter-spacing:.03em}
+.life{stroke:var(--line);stroke-width:1.4;stroke-dasharray:4 4}
+.fr{fill:var(--grp-f);stroke:var(--grp-s);stroke-width:1.2}
+.frtab{fill:var(--grp-s)}
+.dg .frk{font:600 12px var(--f-mono)}
+.dg .frc{font-size:13px;fill:var(--muted);font-style:italic}
+.frdiv{stroke:var(--grp-s);stroke-width:1.2;stroke-dasharray:5 4}
+.numc{fill:var(--accent)}
+.dg .numt{font:600 11px var(--f-mono);fill:var(--slide)}
+.ahp{fill:var(--edge)} .ahp.err{fill:var(--err-s)} .ahp.ok{fill:var(--out-s)} .ahp.acc{fill:var(--accent)}
+
+/* title + dividers */
+.title-slide{padding:64px 64px 50px;flex-direction:row;gap:56px;align-items:stretch}
+.t-left{flex:1.05;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.t-left h1{margin:16px 0 0;font:700 92px/0.95 var(--f-display);letter-spacing:-.035em}
+.t-left .tag{margin:22px 0 0;font-size:25px;line-height:1.35;color:var(--ink);max-width:560px;text-wrap:balance}
+.t-left .src{margin:28px 0 0;font-size:16px;line-height:1.5;color:var(--muted);max-width:520px}
+.ladder{flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0}
+.ladder .lh{font:500 13px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.rung{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:center;padding:13px 16px;border:1.5px solid var(--line);border-radius:10px;background:var(--slide)}
+.rung b{font:700 26px var(--f-display);color:var(--accent)}
+.rung .rt{font:600 18px var(--f-display)}
+.rung .rq{font-size:14.5px;color:var(--muted);margin-top:2px}
+.rung.on{border-color:var(--accent);background:var(--accent-soft)}
+.rung.dim{opacity:.55}
+.div-slide{flex-direction:row;gap:60px;padding:64px}
+.d-left{flex:1.1;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.d-num{font:700 150px/0.85 var(--f-display);color:var(--accent);letter-spacing:-.04em}
+.d-left h2{margin:18px 0 0;font:700 58px/1 var(--f-display);letter-spacing:-.025em}
+.d-left .q{margin:16px 0 0;font-size:22px;color:var(--muted);max-width:520px;text-wrap:balance}
+.d-list{margin:30px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 26px;font-size:15.5px}
+.d-list li{display:flex;gap:10px;color:var(--ink)}
+.d-list li span{font:500 13px var(--f-mono);color:var(--muted);min-width:24px;padding-top:2px}
+.d-right{flex:.9;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0}
+.d-right .rung{padding:10px 14px}
+
+/* generic content blocks */
+.row{display:flex;gap:16px}
+.row>*{flex:1;min-width:0}
+.note{border:1.5px solid var(--line);border-radius:10px;padding:14px 18px;font-size:16px;line-height:1.45;background:var(--slide)}
+.note b{font-weight:600}
+.note.acc{border-color:var(--accent);background:var(--accent-soft)}
+.note .k{display:block;font:600 12px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.grid{display:grid;gap:14px}
+.card{border:1.5px solid var(--line);border-radius:10px;padding:16px 18px;background:var(--slide);display:flex;flex-direction:column;gap:6px;min-width:0}
+.card .ct{font:600 19px var(--f-display)}
+.card .cp{font:500 13.5px var(--f-mono);color:var(--accent)}
+.card .cd{font-size:15.5px;line-height:1.42;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chips span{font-size:13px;padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--ink)}
+.pill{display:inline-block;font:500 13px var(--f-mono);padding:2px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+
+/* scope */
+.scope{flex:1;display:grid;grid-template-columns:190px 1fr 1fr;grid-template-rows:auto repeat(4,1fr);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.scope>div{padding:18px 22px;border-top:1px solid var(--line);font-size:19px;line-height:1.4;display:flex;gap:14px;align-items:center}
+.scope>.h{border-top:0;font:600 13px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-block:14px}
+.scope>.cat{font-weight:600;color:var(--ink);background:var(--grp-f)}
+.scope>.in{background:var(--out-f)}
+.scope>.out{background:var(--err-f)}
+.mark{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;margin-top:1px}
+.mark.y{background:var(--out-s)} .mark.n{background:var(--err-s)}
+.mark.y::after{content:"";width:9px;height:5px;border-left:2.5px solid var(--slide);border-bottom:2.5px solid var(--slide);transform:translateY(-1px) rotate(-45deg)}
+.mark.n::after{content:"";width:10px;height:2.5px;background:var(--slide)}
+
+/* precedence */
+.prec{display:grid;grid-template-columns:1.25fr 1fr;gap:34px;flex:1;min-height:0}
+.layers{display:flex;flex-direction:column;gap:10px}
+.layer{display:grid;grid-template-columns:190px 1fr;align-items:center;border:1.5px solid var(--line);border-radius:10px;padding:12px 16px;gap:14px;background:var(--slide)}
+.layer .ln{font:600 19px var(--f-display)} .layer .ls{font-size:14.5px;color:var(--muted)}
+.layer pre{margin:0;font:16px/1.5 var(--f-mono);white-space:pre}
+.layer.l2{margin-left:22px} .layer.l3{margin-left:44px}
+.layer.res{margin-left:66px;border-color:var(--out-s);background:var(--out-f)}
+.layer .lv{color:var(--muted)}
+.layer .hl{color:var(--accent);font-weight:500}
+.prec-arrow{font:500 13px var(--f-mono);color:var(--muted);margin-left:66px;letter-spacing:.05em}
+.rules{display:flex;flex-direction:column;gap:12px}
+.rule{border:1.5px solid var(--line);border-radius:10px;padding:13px 16px;background:var(--slide)}
+.rule .rn{font:600 19px var(--f-display);margin-bottom:10px}
+.rule .rr{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:15.5px var(--f-mono)}
+.rule .op{color:var(--muted)}
+.rule .rv{background:var(--chip);padding:3px 8px;border-radius:6px;white-space:nowrap}
+.rule .rv.res{background:var(--out-f);color:var(--ink)}
+
+/* matrix */
+.matrix{width:100%;border-collapse:separate;border-spacing:0;font-size:16px}
+.matrix th:nth-child(n+3){width:104px}
+.matrix th{font:600 12.5px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:center;padding:0 8px 10px;border-bottom:1.5px solid var(--line)}
+.matrix th:first-child,.matrix th:nth-child(2){text-align:left}
+.matrix td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
+.matrix td:first-child{text-align:left;width:120px}
+.matrix td:nth-child(2){text-align:left}
+.matrix td:nth-child(2) code{font-size:13.5px}
+.kind{font:500 12px var(--f-mono);padding:2px 8px;border-radius:999px;white-space:nowrap}
+.kind.repo{background:var(--step-f);color:var(--step-s)} .kind.env{background:var(--in-f);color:var(--ink);border:1px solid var(--in-s)} .kind.gh{background:var(--out-f);color:var(--out-s)}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--accent)}
+.dsub{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+
+/* journey */
+.journey{display:grid;grid-template-columns:repeat(5,1fr);gap:28px;flex:1;min-height:0;align-content:center}
+.jstep{position:relative;border:1.5px solid var(--step-s);background:var(--step-f);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.jstep.ship{border-color:var(--out-s);background:var(--out-f)}
+.jstep:not(:last-child)::after{content:"";position:absolute;right:-22px;top:50%;width:12px;height:12px;border-top:2.5px solid var(--edge);border-right:2.5px solid var(--edge);transform:translateY(-50%) rotate(45deg)}
+.jstep .jn{font:600 12px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.jstep .jt{font:600 24px var(--f-display)}
+.jcmd{font:15px/1.4 var(--f-mono);background:var(--slide);border:1px solid var(--line);border-radius:7px;padding:8px 10px}
+.jdown{align-self:center;width:0;height:12px;border-left:2px solid var(--edge)}
+
+/* code */
+.code{margin:0;font:15.5px/1.6 var(--f-mono);background:var(--grp-f);border:1.5px solid var(--line);border-radius:10px;padding:16px 18px;white-space:pre;overflow:auto;min-width:0}
+.code .c{color:var(--muted)} .code .k{color:var(--accent)} .code .h{background:var(--warn-f);outline:1px solid var(--warn-s);border-radius:3px}
+.ch{font:600 13px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;display:flex;gap:10px;align-items:center}
+.ann{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:15px;color:var(--muted)}
+.ann li{display:flex;gap:10px} .ann li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px}
+
+/* cheat sheet */
+.cheat{display:grid;grid-template-columns:1.15fr 1fr;gap:30px 36px}
+.cg h3{margin:0 0 12px;font:600 14px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.cg .cl{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;font-size:16.5px;align-items:baseline}
+.cg .cl code{font:15.5px var(--f-mono);white-space:nowrap}
+.cg .cl span{color:var(--muted)}
+
+/* nav */
+.bar{display:flex;align-items:center;gap:12px;padding-block:8px 10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.btn{appearance:none;border:1.5px solid var(--line);background:var(--slide);color:var(--ink);border-radius:8px;height:34px;min-width:34px;padding:0 12px;font:500 13px var(--f-body);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn:focus-visible,.seg:focus-visible,.ov button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{font:500 13px var(--f-mono);color:var(--muted);min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
+.prog{flex:1;display:flex;gap:4px;min-width:60px}
+.seg{appearance:none;border:0;padding:0;height:8px;border-radius:4px;background:var(--line);cursor:pointer;position:relative;overflow:hidden}
+.seg i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:4px}
+.secname{font:500 13px var(--f-body);color:var(--muted);white-space:nowrap}
+.hint{font-size:12px;color:var(--muted)}
+@media (max-width:720px){.secname{display:none}}
+@media (min-width:600px),(orientation:landscape){.hint{display:none}}
+.ov{position:fixed;inset:0;z-index:20;background:var(--bg);overflow:auto;padding-block:max(20px,env(safe-area-inset-top,0px)) 24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.ov-in{max-width:1100px;margin:0 auto}
+.ov-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.ov-head h2{margin:0;font:700 26px var(--f-display)}
+.ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+.ov-sec h3{margin:0 0 8px;font:600 12.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.ov-sec ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.ov button{appearance:none;width:100%;text-align:left;border:1px solid var(--line);background:var(--slide);color:var(--ink);border-radius:7px;padding:8px 10px;font:14px var(--f-body);cursor:pointer;display:flex;gap:10px}
+.ov button span{font:500 12px var(--f-mono);color:var(--muted);min-width:22px;padding-top:2px}
+.ov button.cur{border-color:var(--accent);background:var(--accent-soft)}
+</style>
+<style>body{margin:0}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="ahp" d="M0,1 L10,5 L0,9 z"/></marker>
+    <marker id="ah-err" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="ahp err" d="M0,1 L10,5 L0,9 z"/></marker>
+    <marker id="ah-ok" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="ahp ok" d="M0,1 L10,5 L0,9 z"/></marker>
+    <marker id="ah-acc" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="ahp acc" d="M0,1 L10,5 L0,9 z"/></marker>
+  </defs>
+</svg>
+
+<div class="app">
+<main class="stage"><div class="fit" id="fit"><div class="canvas" id="canvas">
+
+<!-- ============ TITLE ============ -->
+<section class="slide title-slide" data-sec="0" data-title="Saito Builder">
+  <div class="t-left">
+    <p class="eyebrow">Platform overview</p>
+    <h1>Saito Builder</h1>
+    <p class="tag">A configuration-driven, multi-tenant static website factory.</p>
+    <p class="src">Each site is a YAML file over a versioned template. One Astro renderer turns every site into static HTML for a CDN.</p>
+  </div>
+  <div class="ladder" id="ladder-title"><p class="lh">Each section zooms in one level</p></div>
+</section>
+
+<!-- ============ L1 OVERVIEW ============ -->
+<section class="slide div-slide" data-sec="1" data-title="Overview" data-divider="1"></section>
+
+<section class="slide" data-sec="1" data-title="The idea in one picture">
+  <header class="sh"><p class="eyebrow"></p><h2>A site is a YAML file over a versioned template</h2>
+  <p class="lede">Many sites, one renderer. Sites only describe what differs from their template, so a template fix reaches every site that pins it.</p></header>
+  <div class="sb"><svg class="dg" data-d="idea"></svg>
+  <div class="row">
+    <div class="note"><span class="k">Precedence</span>template &lt; site config &lt; content overlay</div>
+    <div class="note"><span class="k">Versioning</span>sites pin a major, e.g. <code>landing@1</code></div>
+    <div class="note"><span class="k">Output</span>static files only, served from a CDN</div>
+  </div></div>
+</section>
+
+<section class="slide" data-sec="1" data-title="Scope">
+  <header class="sh"><p class="eyebrow"></p><h2>What it builds, and what it deliberately does not</h2>
+  <p class="lede">Anything expressible as section data and theme tokens is in scope. Application features are not.</p></header>
+  <div class="sb">
+    <div class="scope">
+      <div class="h"></div><div class="h">In scope</div><div class="h">Out of scope</div>
+      <div class="cat">Site types</div><div class="in"><span class="mark y"></span>Content and marketing sites: landing, corporate, campaign, restaurant, event, microsites</div><div class="out"><span class="mark n"></span>ERP, CRM, SaaS products, dashboards, marketplaces</div>
+      <div class="cat">Interactivity</div><div class="in"><span class="mark y"></span>Contact forms through the optional API</div><div class="out"><span class="mark n"></span>User accounts, search, real-time features</div>
+      <div class="cat">Commerce</div><div class="in"><span class="mark y"></span>Light commerce delegated to Snipcart, Shopify or Commerce Layer</div><div class="out"><span class="mark n"></span>Checkout, payments, inventory</div>
+      <div class="cat">Customization</div><div class="in"><span class="mark y"></span>Any change expressible as section data and theme tokens</div><div class="out"><span class="mark n"></span>Bespoke layouts (need a new section type or template)</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-sec="1" data-title="System context">
+  <header class="sh"><p class="eyebrow"></p><h2>Who uses it and what it talks to</h2>
+  <p class="lede">Everything heavy happens at build time. At run time a visitor only touches the CDN, plus the optional forms API.</p></header>
+  <div class="sb"><svg class="dg" data-d="context"></svg>
+  <div class="row">
+    <div class="note"><span class="k">Solid arrow</span>request or push during normal work</div>
+    <div class="note"><span class="k">Dashed arrow</span>event-driven or optional path</div>
+  </div></div>
+</section>
+
+<!-- ============ L2 ARCHITECTURE ============ -->
+<section class="slide div-slide" data-sec="2" data-title="Architecture" data-divider="1"></section>
+
+<section class="slide" data-sec="2" data-title="Components">
+  <header class="sh"><p class="eyebrow"></p><h2>Seven parts, one shared core</h2>
+  <p class="lede">Arrows point at what a part depends on. Everything converges on <code>@saito/core</code>, the only part that reads site files.</p></header>
+  <div class="sb"><svg class="dg" data-d="components"></svg></div>
+</section>
+
+<section class="slide" data-sec="2" data-title="Component responsibilities">
+  <header class="sh"><p class="eyebrow"></p><h2>What each part is responsible for</h2></header>
+  <div class="sb"><div class="grid big" style="grid-template-columns:repeat(4,1fr);flex:1">
+    <div class="card" style="grid-column:span 2;border-color:var(--accent)"><span class="cp">packages/core</span><span class="ct">@saito/core</span><span class="cd">zod schemas, template → site resolver, deep merge, semver ranges, theme → CSS, content sources (local, Sanity)</span></div>
+    <div class="card"><span class="cp">packages/templates</span><span class="ct">Template marketplace</span><div class="chips"><span>landing v1</span><span>landing v2</span><span>corporate</span><span>restaurant</span><span>event</span></div></div>
+    <div class="card"><span class="cp">packages/components</span><span class="ct">Section components</span><span class="cd">One Astro component per section type, site layout, <code>&lt;saito-contact-form&gt;</code>, <code>&lt;saito-countdown&gt;</code></span></div>
+    <div class="card"><span class="cp">packages/cli</span><span class="ct">saito command</span><div class="chips"><span>sites</span><span>templates</span><span>create</span><span>validate</span><span>build</span><span>dev</span><span>outdated</span><span>upgrade</span><span>affected</span><span>seed</span></div></div>
+    <div class="card"><span class="cp">apps/renderer</span><span class="ct">One Astro project</span><span class="cd">Renders whichever site <code>SAITO_SITE</code> selects</span></div>
+    <div class="card"><span class="cp">apps/api</span><span class="ct">Forms backend</span><span class="cd">Tenant-aware contact form handling (Fastify)</span></div>
+    <div class="card"><span class="cp">apps/studio</span><span class="ct">Sanity Studio</span><span class="cd">Editor schemas. Not a workspace: <code>cd apps/studio</code> then <code>npm install</code></span></div>
+  </div></div>
+</section>
+
+<section class="slide" data-sec="2" data-title="Folder structure">
+  <header class="sh"><p class="eyebrow"></p><h2>Where things live</h2>
+  <p class="lede">A site is a folder under <code>sites/</code>. Build output lands in <code>dist/</code>, which git ignores.</p></header>
+  <div class="sb"><svg class="dg" data-d="folders"></svg></div>
+</section>
+
+<section class="slide" data-sec="2" data-title="Resolution pipeline">
+  <header class="sh"><p class="eyebrow"></p><h2>The core idea: resolve three layers into one ResolvedSite</h2>
+  <p class="lede"><code>loadResolvedSite()</code> in <code>packages/core/src/pipeline.ts</code>. Every issue is collected into one error, so a broken site reports all its problems at once.</p></header>
+  <div class="sb"><svg class="dg" data-d="pipeline"></svg></div>
+</section>
+
+<section class="slide" data-sec="2" data-title="Precedence and merge rules">
+  <header class="sh"><p class="eyebrow"></p><h2>Later layers win, key by key</h2>
+  <p class="lede">The same <code>deepMerge</code> applies at every layer. Values below are illustrative.</p></header>
+  <div class="sb"><div class="prec">
+    <div class="layers">
+      <div class="layer l1"><div><div class="ln">Template</div><div class="ls">landing@1 defaults</div></div><pre>hero:
+  title: <span class="lv">"Launch faster"</span>
+  cta: { label: <span class="lv">"Start"</span> }</pre></div>
+      <div class="layer l2"><div><div class="ln">Site config</div><div class="ls">site.config.yaml</div></div><pre>hero:
+  title: <span class="hl">"Acme Rockets"</span></pre></div>
+      <div class="layer l3"><div><div class="ln">Content overlay</div><div class="ls">content/ or Sanity</div></div><pre>hero:
+  cta: { label: <span class="hl">"Book a demo"</span> }</pre></div>
+      <div class="prec-arrow">↓ resolved</div>
+      <div class="layer res"><div><div class="ln">ResolvedSite</div><div class="ls">what renders</div></div><pre>hero:
+  title: <span class="hl">"Acme Rockets"</span>
+  cta: { label: <span class="hl">"Book a demo"</span> }</pre></div>
+    </div>
+    <div class="rules">
+      <div class="rule"><div class="rn">Objects merge</div><div class="rr"><span class="rv">{ a: 1, b: 2 }</span><span class="op">+</span><span class="rv">{ b: 3 }</span><span class="op">→</span><span class="rv res">{ a: 1, b: 3 }</span></div></div>
+      <div class="rule"><div class="rn">Arrays replace</div><div class="rr"><span class="rv">[x, y, z]</span><span class="op">+</span><span class="rv">[w]</span><span class="op">→</span><span class="rv res">[w]</span></div></div>
+      <div class="rule"><div class="rn">null deletes</div><div class="rr"><span class="rv">{ cta: {…} }</span><span class="op">+</span><span class="rv">{ cta: null }</span><span class="op">→</span><span class="rv res">{ }</span></div></div>
+      <div class="note acc" style="margin-top:auto">Sanity documents are converted into this same overlay shape by <code>sanityToOverlay</code>, so every content source composes identically.</div>
+    </div>
+  </div></div>
+</section>
+
+<section class="slide" data-sec="2" data-title="Override semantics">
+  <header class="sh"><p class="eyebrow"></p><h2>Section overrides are keyed by id, never by position</h2>
+  <p class="lede">How the resolver treats each entry under <code>pages.&lt;slug&gt;.sections</code>.</p></header>
+  <div class="sb"><svg class="dg" data-d="overrides"></svg>
+  <div class="row">
+    <div class="note"><span class="k">Then ordering</span><code>order: [...]</code> puts the listed ids first. The rest keep template order.</div>
+    <div class="note"><span class="k">New pages</span>Pages absent from the template need a <code>title</code> and typed sections.</div>
+  </div></div>
+</section>
+
+<section class="slide" data-sec="2" data-title="Key abstractions: templates">
+  <header class="sh"><p class="eyebrow"></p><h2>Key abstractions, part 1: the template side</h2>
+  <p class="lede">A registry holds template modules. Each module declares one manifest and ships the migrations that lead to it.</p></header>
+  <div class="sb"><svg class="dg" data-d="absTpl"></svg></div>
+</section>
+
+<section class="slide" data-sec="2" data-title="Key abstractions: sites">
+  <header class="sh"><p class="eyebrow"></p><h2>Key abstractions, part 2: the site side</h2>
+  <p class="lede">A site config pins a template major. Content sources overlay it. The result is a ResolvedSite.</p></header>
+  <div class="sb"><svg class="dg" data-d="absSite"></svg>
+  <div class="note acc"><span class="k">Security boundary</span><code>ResolvedSite.integrations</code> is public only: server-side fields <code>forms.webhookUrl</code> and <code>notifyEmail</code> are stripped, so pages never render raw <code>SiteConfig</code>.</div></div>
+</section>
+
+<section class="slide" data-sec="2" data-title="Configuration map">
+  <header class="sh"><p class="eyebrow"></p><h2>Which configuration feeds which part</h2>
+  <p class="lede"><code>.env</code> is never loaded automatically: export the variables, or pass <code>npx tsx --env-file=.env</code> to the CLI.</p></header>
+  <div class="sb"><table class="matrix">
+    <thead><tr><th>Kind</th><th>Source</th><th>saito CLI</th><th>renderer</th><th>api</th><th>deploy.sh</th><th>typecheck</th></tr></thead>
+    <tbody>
+      <tr><td><span class="kind repo">repo file</span></td><td><code>site.config.yaml</code> brand, theme, nav, SEO, integrations, environments</td><td><span class="dot"></span></td><td><span class="dot"></span></td><td><span class="dot"></span></td><td></td><td></td></tr>
+      <tr><td><span class="kind repo">repo file</span></td><td><code>package.json</code> workspaces, overrides pin Vite 6</td><td></td><td><span class="dot"></span></td><td></td><td></td><td></td></tr>
+      <tr><td><span class="kind repo">repo file</span></td><td><code>tsconfig.json</code> excludes packages/components</td><td></td><td></td><td></td><td></td><td><span class="dot"></span></td></tr>
+      <tr><td><span class="kind env">env var</span></td><td><code>SAITO_SITE</code> <code>SAITO_ENV</code> <code>SAITO_ROOT</code></td><td></td><td><span class="dot"></span><span class="dsub">set by the CLI</span></td><td></td><td></td><td></td></tr>
+      <tr><td><span class="kind env">env var</span></td><td><code>SAITO_CONTENT_SOURCE</code> <code>SANITY_PROJECT_ID</code> <code>SANITY_DATASET</code> <code>SANITY_READ_TOKEN</code></td><td></td><td><span class="dot"></span></td><td></td><td></td><td></td></tr>
+      <tr><td><span class="kind env">env var</span></td><td><code>SANITY_WRITE_TOKEN</code></td><td><span class="dot"></span><span class="dsub">saito seed only</span></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td><span class="kind env">env var</span></td><td><code>API_PORT</code> <code>API_HOST</code> <code>API_DATA_DIR</code></td><td></td><td></td><td><span class="dot"></span></td><td></td><td></td></tr>
+      <tr><td><span class="kind gh">GH secret</span></td><td><code>DEPLOY_PROVIDER</code></td><td></td><td></td><td></td><td><span class="dot"></span></td><td></td></tr>
+      <tr><td><span class="kind gh">GH secret</span></td><td><code>CLOUDFLARE_*</code> <code>NETLIFY_*</code> <code>AWS_*</code> <code>S3_BUCKET_PREFIX</code> <code>CLOUDFRONT_DISTRIBUTIONS</code></td><td></td><td></td><td></td><td><span class="dot"></span></td><td></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ L3 WORKFLOWS ============ -->
+<section class="slide div-slide" data-sec="3" data-title="Workflows" data-divider="1"></section>
+
+<section class="slide" data-sec="3" data-title="Developer journey">
+  <header class="sh"><p class="eyebrow"></p><h2>The developer journey, end to end</h2>
+  <p class="lede">saito commands run as <code>npm run saito -- &lt;command&gt;</code>.</p></header>
+  <div class="sb"><div class="journey">
+    <div class="jstep"><span class="jn">Step 1</span><span class="jt">Set up</span><div class="jcmd">npm install</div><div class="jdown"></div><div class="jcmd">npm test</div></div>
+    <div class="jstep"><span class="jn">Step 2</span><span class="jt">Explore</span><div class="jcmd">saito sites</div><div class="jdown"></div><div class="jcmd">saito templates</div></div>
+    <div class="jstep"><span class="jn">Step 3</span><span class="jt">Change</span><div class="jcmd">edit site YAML or a template</div><div class="jdown"></div><div class="jcmd">saito dev &lt;site&gt;<br>live preview :4321</div></div>
+    <div class="jstep"><span class="jn">Step 4</span><span class="jt">Verify</span><div class="jcmd">saito validate</div><div class="jdown"></div><div class="jcmd">npm test<br>npm run typecheck</div></div>
+    <div class="jstep ship"><span class="jn">Step 5</span><span class="jt">Ship</span><div class="jcmd">PR: CI builds affected sites</div><div class="jdown"></div><div class="jcmd">merge → staging</div><div class="jdown"></div><div class="jcmd">manual run → production</div></div>
+  </div></div>
+</section>
+
+<section class="slide" data-sec="3" data-title="Create a website">
+  <header class="sh"><p class="eyebrow"></p><h2>Creating a new website from a template</h2>
+  <p class="lede">Site <code>id</code> must equal its directory name. Ids, tenants and section ids are kebab-case.</p></header>
+  <div class="sb"><svg class="dg" data-d="create"></svg></div>
+</section>
+
+<section class="slide" data-sec="3" data-title="Add a template">
+  <header class="sh"><p class="eyebrow"></p><h2>Adding a new template</h2>
+  <p class="lede"><code>defineTemplate</code> validates the manifest when it loads, so a broken template fails before any site uses it.</p></header>
+  <div class="sb"><svg class="dg" data-d="template"></svg></div>
+</section>
+
+<section class="slide" data-sec="3" data-title="Add a section type">
+  <header class="sh"><p class="eyebrow"></p><h2>Adding a section type touches four places</h2>
+  <p class="lede">The component map is typed <code>Record&lt;SectionType, …&gt;</code>, so a missing component is a compile error, not a runtime surprise.</p></header>
+  <div class="sb"><svg class="dg" data-d="section"></svg></div>
+</section>
+
+<section class="slide" data-sec="3" data-title="Modify a template">
+  <header class="sh"><p class="eyebrow"></p><h2>Modifying a template: is the change breaking?</h2>
+  <p class="lede">Sites pin a major. Non-breaking changes reach every pinned site on its next build. Breaking changes ship as a new major with a migration.</p></header>
+  <div class="sb"><svg class="dg" data-d="modA"></svg></div>
+</section>
+
+<section class="slide" data-sec="3" data-title="Upgrade to a new major">
+  <header class="sh"><p class="eyebrow"></p><h2>Moving a site to the new major</h2>
+  <p class="lede"><code>saito upgrade</code> runs the migration and validates the result before writing anything.</p></header>
+  <div class="sb"><svg class="dg" data-d="modB"></svg>
+  <div class="row">
+    <div class="note"><span class="k">Watch out</span>YAML comments are lost when overrides change. Review the diff before merging.</div>
+    <div class="note"><span class="k">Migration shape</span><code>TemplateMigration</code>: <code>from</code>, <code>to</code>, <code>notes</code>, <code>migrate(config)</code></div>
+  </div></div>
+</section>
+
+<section class="slide" data-sec="3" data-title="Content publishing">
+  <header class="sh"><p class="eyebrow"></p><h2>Content publishing: from Sanity to the CDN</h2>
+  <p class="lede">An editor's publish rebuilds and redeploys exactly one site.</p></header>
+  <div class="sb"><svg class="dg" data-d="sanitySeq"></svg></div>
+</section>
+
+<section class="slide" data-sec="3" data-title="Seed round trip">
+  <header class="sh"><p class="eyebrow"></p><h2>Two directions that must stay exact inverses</h2>
+  <p class="lede"><code>saito seed</code> pushes local content and images into Sanity. Builds pull it back as an overlay.</p></header>
+  <div class="sb"><svg class="dg" data-d="seed"></svg>
+  <div class="row">
+    <div class="note"><span class="k">Seeding</span>needs <code>SANITY_WRITE_TOKEN</code>. Supports <code>--dry-run</code> and <code>--overwrite</code>.</div>
+    <div class="note"><span class="k">Deploys</span>read Sanity only when the GitHub variable <code>SAITO_CONTENT_SOURCE</code> is <code>sanity</code>.</div>
+    <div class="note"><span class="k">Document ids</span>must not contain <code>.</code> (dotted ids are private).</div>
+  </div></div>
+</section>
+
+<!-- ============ L4 BUILD & DEPLOY ============ -->
+<section class="slide div-slide" data-sec="4" data-title="Build and deployment" data-divider="1"></section>
+
+<section class="slide" data-sec="4" data-title="What saito build does">
+  <header class="sh"><p class="eyebrow"></p><h2>What saito build does</h2>
+  <p class="lede">Always build through the CLI: it resolves first, so config errors come back with clear paths before Astro starts.</p></header>
+  <div class="sb"><svg class="dg" data-d="buildSeq"></svg></div>
+</section>
+
+<section class="slide" data-sec="4" data-title="Build outputs">
+  <header class="sh"><p class="eyebrow"></p><h2>Two files the CLI adds after Astro finishes</h2>
+  <p class="lede">Written next to the HTML in <code>dist/&lt;env&gt;/&lt;site&gt;/</code>. Shown for a staging build of <code>acme-corp</code>.</p></header>
+  <div class="sb"><div class="row" style="flex:1;min-height:0;gap:26px">
+    <div style="display:flex;flex-direction:column;min-width:0;flex:1.3">
+      <p class="ch">_headers <span class="pill">Cloudflare Pages · Netlify</span></p>
+<pre class="code"><span class="k">/_astro/*</span>
+  Cache-Control: public, max-age=31536000, immutable
+
+<span class="k">/*</span>
+  Cache-Control: public, max-age=0, s-maxage=3600,
+                 stale-while-revalidate=86400
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  <span class="h">X-Robots-Tag: noindex</span></pre>
+      <ul class="ann"><li>Hashed assets are cached for a year. HTML gets a short edge TTL and revalidates in the background.</li><li>The highlighted line is written outside production only.</li></ul>
+    </div>
+    <div style="display:flex;flex-direction:column;min-width:0;flex:1">
+      <p class="ch">saito-manifest.json</p>
+<pre class="code">{
+  <span class="k">"site"</span>: "acme-corp",
+  <span class="k">"tenant"</span>: "acme",
+  <span class="k">"env"</span>: "staging",
+  <span class="k">"url"</span>: <span class="c">"&lt;staging URL&gt;"</span>,
+  <span class="k">"template"</span>: <span class="c">"&lt;resolved template&gt;"</span>,
+  <span class="k">"pages"</span>: ["/", <span class="c">…</span>],
+  <span class="k">"builtAt"</span>: <span class="c">"&lt;ISO timestamp&gt;"</span>
+}</pre>
+      <ul class="ann"><li>Records which site, tenant, environment and template version a deploy contains.</li></ul>
+    </div>
+  </div></div>
+</section>
+
+<section class="slide" data-sec="4" data-title="CI pipeline">
+  <header class="sh"><p class="eyebrow"></p><h2>CI on every pull request and push</h2>
+  <p class="lede">One verify job, then a build per affected site. A docs-only change builds nothing.</p></header>
+  <div class="sb"><svg class="dg" data-d="ci"></svg></div>
+</section>
+
+<section class="slide" data-sec="4" data-title="saito affected">
+  <header class="sh"><p class="eyebrow"></p><h2>Which sites a change rebuilds</h2>
+  <p class="lede"><code>git diff --name-only main | npm run saito -- affected --json</code> applies these rules to each changed file.</p></header>
+  <div class="sb"><svg class="dg" data-d="affected"></svg>
+  <div class="row">
+    <div class="note"><span class="k">Platform code</span>Anything else counts, including <code>scripts/</code> and <code>live-sketching/</code> HTML.</div>
+    <div class="note"><span class="k">Keep in sync</span>Path rules live in <code>packages/cli/src/commands.ts</code>. Update them if directories move.</div>
+  </div></div>
+</section>
+
+<section class="slide" data-sec="4" data-title="Deploy triggers">
+  <header class="sh"><p class="eyebrow"></p><h2>Deployment, part 1: three triggers, one plan</h2>
+  <p class="lede">Each trigger decides the environment and the list of sites. The plan job turns that into a matrix.</p></header>
+  <div class="sb"><svg class="dg" data-d="triggers"></svg></div>
+</section>
+
+<section class="slide" data-sec="4" data-title="Deploy providers">
+  <header class="sh"><p class="eyebrow"></p><h2>Deployment, part 2: one script, several hosts</h2>
+  <p class="lede">Each matrix job builds its site, then <code>scripts/deploy.sh</code> uploads it to the host chosen by <code>DEPLOY_PROVIDER</code>.</p></header>
+  <div class="sb"><svg class="dg" data-d="providers"></svg></div>
+</section>
+
+<section class="slide" data-sec="4" data-title="Environments">
+  <header class="sh"><p class="eyebrow"></p><h2>Environments, from laptop to production</h2>
+  <p class="lede">Each environment has its own URL and Sanity dataset. Non-production builds are always noindex: meta robots, <code>robots.txt</code> and the <code>X-Robots-Tag</code> header.</p></header>
+  <div class="sb"><svg class="dg" data-d="envs"></svg></div>
+</section>
+
+<section class="slide" data-sec="4" data-title="Site lifecycle">
+  <header class="sh"><p class="eyebrow"></p><h2>The life of a site</h2>
+  <p class="lede">Minor template releases reach production on the next build. A new major marks the site outdated until it is upgraded.</p></header>
+  <div class="sb"><svg class="dg" data-d="lifecycle"></svg></div>
+</section>
+
+<section class="slide" data-sec="4" data-title="Prototype previews">
+  <header class="sh"><p class="eyebrow"></p><h2>Side tool: prototype previews on GitHub Pages</h2>
+  <p class="lede"><code>live-sketching/</code> is a standalone workspace for single-file HTML prototypes. It has no code link to the platform; only the publish script is shared.</p></header>
+  <div class="sb" style="justify-content:center;gap:28px"><svg class="dg" data-d="sketch" style="flex:none;height:auto"></svg>
+  <div class="note" style="align-self:flex-start">Full workflow and caveats: <code>live-sketching/README.md</code></div></div>
+</section>
+
+<!-- ============ L5 OPERATIONS ============ -->
+<section class="slide div-slide" data-sec="5" data-title="Operations" data-divider="1"></section>
+
+<section class="slide" data-sec="5" data-title="Example sites">
+  <header class="sh"><p class="eyebrow"></p><h2>Four example sites, each showing different features</h2></header>
+  <div class="sb"><div class="grid big" style="grid-template-columns:repeat(4,1fr);flex:1">
+    <div class="card"><span class="ct">Corporate site</span><div class="yml"><span class="k">id:</span> <span class="v">acme-corp</span>
+<span class="k">tenant:</span> acme
+<span class="k">template:</span> <span class="v">corporate@1</span></div><span class="sl">Shows</span><div class="chips"><span>theme overrides</span><span>removed section</span><span>extra page</span><span>content in separate files</span><span>contact form</span></div></div>
+    <div class="card"><span class="ct">Launch page</span><div class="yml"><span class="k">id:</span> <span class="v">acme-launch</span>
+<span class="k">tenant:</span> acme
+<span class="k">template:</span> <span class="v">landing@1</span></div><span class="sl">Shows</span><div class="chips"><span>dark theme</span><span>pinned to an old major</span><span>demos outdated and upgrade</span></div></div>
+    <div class="card"><span class="ct">Restaurant</span><div class="yml"><span class="k">id:</span> <span class="v">bella-trattoria</span>
+<span class="k">tenant:</span> bella
+<span class="k">template:</span> <span class="v">restaurant@1</span></div><span class="sl">Shows</span><div class="chips"><span>added gallery section</span><span>re-ordered sections</span><span>Snipcart online ordering</span></div></div>
+    <div class="card"><span class="ct">Conference</span><div class="yml"><span class="k">id:</span> <span class="v">devconf-2027</span>
+<span class="k">tenant:</span> devconf
+<span class="k">template:</span> <span class="v">event@1</span></div><span class="sl">Shows</span><div class="chips"><span>countdown Web Component</span><span>schedule</span><span>external ticket links</span></div></div>
+  </div>
+  <div class="note">Two sites share the <b>acme</b> tenant: tenants group sites, while templates are chosen per site.</div></div>
+</section>
+
+<section class="slide" data-sec="5" data-title="Contact form request">
+  <header class="sh"><p class="eyebrow"></p><h2>A contact form request through the API</h2>
+  <p class="lede">Only sites with <code>integrations.forms</code> are served. Bots that fill the honeypot get a fake success.</p></header>
+  <div class="sb"><svg class="dg" data-d="contactSeq"></svg></div>
+</section>
+
+<section class="slide" data-sec="5" data-title="Security boundaries">
+  <header class="sh"><p class="eyebrow"></p><h2>Security boundaries on the way to HTML</h2>
+  <p class="lede">Every value from configuration passes a guard before it is written into a page.</p></header>
+  <div class="sb"><svg class="dg" data-d="security"></svg>
+  <div class="row">
+    <div class="note"><span class="k">Indexing</span>Non-production builds are always noindex.</div>
+    <div class="note"><span class="k">Secrets</span>Never in site configs. CI credentials are GitHub environment secrets.</div>
+    <div class="note"><span class="k">Forms API</span>Per-site origin allow-list, honeypot, redirects only to the site's own domain.</div>
+  </div></div>
+</section>
+
+<section class="slide" data-sec="5" data-title="Gotchas">
+  <header class="sh"><p class="eyebrow"></p><h2>Gotchas worth knowing on day one</h2></header>
+  <div class="sb"><div class="grid big" style="grid-template-columns:repeat(3,1fr);flex:1">
+    <div class="card"><span class="ct">Studio is separate</span><span class="cd"><code>apps/studio</code> is deliberately not an npm workspace: <code>cd apps/studio</code> then <code>npm install</code></span></div>
+    <div class="card"><span class="ct">Version pins</span><span class="cd">Root <code>overrides</code> pins Vite 6 so Astro 5 and Vitest share one Vite. Stay on Astro 5, Vitest 3, Zod 3, TypeScript 5.</span></div>
+    <div class="card"><span class="ct">Type checking</span><span class="cd"><code>packages/components</code> is checked by <code>astro check</code> through the renderer, not by the root <code>tsconfig.json</code>.</span></div>
+    <div class="card"><span class="ct">No compile step</span><span class="cd">Package <code>exports</code> point at <code>src/*.ts</code>. TypeScript runs through <code>tsx</code> and Vite.</span></div>
+    <div class="card"><span class="ct">Build through the CLI</span><span class="cd">It resolves first (clear errors), then runs Astro, then writes the edge artifacts.</span></div>
+    <div class="card"><span class="ct">No linter</span><span class="cd">None is configured. Tests and <code>npm run typecheck</code> are the gate.</span></div>
+  </div></div>
+</section>
+
+<section class="slide" data-sec="5" data-title="Command cheat sheet">
+  <header class="sh"><p class="eyebrow"></p><h2>Command cheat sheet</h2>
+  <p class="lede">Node 20.11 or later. Prefix saito commands with <code>npm run saito --</code>.</p></header>
+  <div class="sb"><div class="cheat">
+    <div class="cg"><h3>Set up and check</h3><div class="cl">
+      <code>npm install</code><span>npm workspaces</span>
+      <code>npm test</code><span>unit + API tests (vitest)</span>
+      <code>npm run typecheck</code><span>tsc + astro check</span>
+      <code>validate --all</code><span>resolve + schema-check every site</span></div></div>
+    <div class="cg"><h3>Explore</h3><div class="cl">
+      <code>sites</code><span>list sites</span>
+      <code>templates</code><span>browse the template marketplace</span>
+      <code>dev acme-corp</code><span>live preview on :4321</span></div></div>
+    <div class="cg"><h3>Create and build</h3><div class="cl">
+      <code>create globex --template corporate --tenant globex</code><span>scaffold</span>
+      <code>build --all</code><span>→ dist/development/&lt;site&gt;</span>
+      <code>build &lt;site&gt; --env staging</code><span>one site, one env</span>
+      <code>build --tenant &lt;t&gt;</code><span>every site of a tenant</span></div></div>
+    <div class="cg"><h3>Templates and content</h3><div class="cl">
+      <code>outdated</code><span>sites ready for a new major</span>
+      <code>upgrade acme-launch --dry-run</code><span>preview a migration</span>
+      <code>seed &lt;site&gt; --dry-run</code><span>local content → Sanity</span>
+      <code>npm run api</code><span>forms backend on :8787</span></div></div>
+  </div>
+  <div class="row" style="margin-top:auto">
+    <div class="note"><span class="k">Further reading</span><code>docs/ARCHITECTURE.md</code> · <code>docs/CONFIGURATION.md</code> · <code>live-sketching/README.md</code> · <code>STORY.md</code></div>
+  </div></div>
+</section>
+
+</div></div></main>
+
+<nav class="bar" aria-label="Slide navigation">
+  <button class="btn" id="prev" aria-label="Previous slide">‹</button>
+  <span class="count" id="count">1 / 1</span>
+  <div class="prog" id="prog"></div>
+  <span class="secname" id="secname"></span>
+  <span class="hint">Rotate for a larger view</span>
+  <button class="btn" id="outline" aria-label="Show all slides">Outline</button>
+  <button class="btn" id="next" aria-label="Next slide">›</button>
+</nav>
+</div>
+
+<div class="ov" id="ov" hidden><div class="ov-in">
+  <div class="ov-head"><h2>All slides</h2><button class="btn" id="ovclose">Close</button></div>
+  <div class="ov-grid" id="ovgrid"></div>
+</div></div>
+
+<script>
+(function(){
+const SECTIONS=[
+  {n:0,t:'Saito Builder',q:''},
+  {n:1,t:'Overview',q:'What is this, who uses it, what does it talk to?'},
+  {n:2,t:'Architecture',q:'What are the parts, and how does a site get resolved?'},
+  {n:3,t:'Workflows',q:'How do I create sites, add templates and change them?'},
+  {n:4,t:'Build and deployment',q:'How does a site reach the CDN?'},
+  {n:5,t:'Operations',q:'Commands, environments, security, reference'}
+];
+
+/* ---------------- diagram specs ---------------- */
+const D={
+idea:{h:400,groups:[{id:'sites',x:0,y:0,w:260,h:270,t:'Sites · YAML files'}],
+ nodes:[
+  {id:'s1',x:16,y:40,w:228,h:62,t:'`acme-corp`',s:['corporate@1'],k:'in'},
+  {id:'s2',x:16,y:116,w:228,h:62,t:'`bella-trattoria`',s:['restaurant@1'],k:'in'},
+  {id:'s3',x:16,y:192,w:228,h:62,t:'`devconf-2027`',s:['event@1'],k:'in'},
+  {id:'tpl',x:0,y:305,w:260,h:90,t:'Versioned templates',s:['landing v1 · v2','corporate · restaurant · event'],k:'in'},
+  {id:'res',x:340,y:150,w:210,h:96,t:'Resolve',s:['merge overrides','validate sections']},
+  {id:'ren',x:620,y:150,w:210,h:96,t:'Astro renderer',s:['one project','for every site']},
+  {id:'out',x:900,y:150,w:260,h:96,t:'Static HTML',s:['`dist/<env>/<site>/`'],k:'out'},
+  {id:'cdn',x:900,y:305,w:260,h:90,t:'CDN',s:['Cloudflare · Netlify · S3'],k:'out'}],
+ edges:[{a:'sites',b:'res'},{a:'tpl',b:'res',as:'r',bs:'b'},{a:'res',b:'ren'},{a:'ren',b:'out'},{a:'out',b:'cdn'}]},
+
+context:{h:340,groups:[{x:210,y:0,w:480,h:340,t:'Build side'},{x:720,y:0,w:300,h:340,t:'Run side',g2:1}],
+ nodes:[
+  {id:'dev',x:0,y:40,w:160,h:80,t:'Developer',s:['templates, site YAML'],k:'in'},
+  {id:'ed',x:0,y:220,w:160,h:80,t:'Editor',s:['copy and images'],k:'in'},
+  {id:'repo',x:230,y:40,w:170,h:80,t:'Saito Builder repo',s:['templates · sites','CLI · renderer']},
+  {id:'gha',x:480,y:40,w:180,h:80,t:'GitHub Actions',s:['CI + Deploy workflows']},
+  {id:'san',x:480,y:220,w:180,h:80,t:'Sanity',s:['Studio + Content Lake']},
+  {id:'cdn',x:740,y:40,w:260,h:80,t:'CDN host',s:['Cloudflare Pages · Netlify','S3 + CloudFront'],k:'out'},
+  {id:'api',x:740,y:220,w:122,h:80,t:'Forms API',s:['optional'],k:'in'},
+  {id:'th',x:878,y:220,w:122,h:80,t:'Third parties',s:['analytics','commerce'],k:'in'},
+  {id:'vis',x:1040,y:220,w:120,h:80,t:'Visitor',s:['browser'],k:'in'}],
+ edges:[{a:'dev',b:'repo',l:'PR'},{a:'ed',b:'san',l:'publish'},{a:'repo',b:'gha',l:'push, PR'},
+  {a:'san',b:'gha',as:'t',ao:-45,bs:'b',bo:-45,l:'webhook',c:'dash',ly:-14},
+  {a:'gha',b:'san',as:'b',ao:45,bs:'t',bo:45,l:'reads content',ly:14},
+  {a:'gha',b:'cdn',l:'deploy'},{a:'vis',b:'cdn',as:'t',bs:'r',l:'HTTPS'},
+  {a:'cdn',b:'api',as:'b',ao:-69,bs:'t',l:'form post',c:'dash'},
+  {a:'cdn',b:'th',as:'b',ao:69,bs:'t',l:'scripts',c:'dash'}]},
+
+components:{h:500,groups:[
+  {x:0,y:0,w:1160,h:110,t:'Entry points',s:'runnables',side:1},
+  {x:0,y:130,w:1160,h:110,t:'Building',s:'blocks',side:1},
+  {x:0,y:260,w:1160,h:110,t:'Foundation',s:'shared core',side:1},
+  {x:0,y:390,w:1160,h:110,t:'Data',s:'and libraries',side:1,g2:1}],
+ nodes:[
+  {id:'cli',x:150,y:30,w:190,h:70,t:'@saito/cli',s:['saito command']},
+  {id:'ren',x:440,y:30,w:200,h:70,t:'@saito/renderer',s:['Astro SSG + Tailwind']},
+  {id:'api',x:720,y:30,w:200,h:70,t:'@saito/api',s:['Fastify forms backend']},
+  {id:'tpl',x:260,y:160,w:240,h:70,t:'@saito/templates',s:['versioned template registry']},
+  {id:'cmp',x:590,y:160,w:240,h:70,t:'@saito/components',s:['Astro sections · Web Components']},
+  {id:'stu',x:920,y:160,w:230,h:70,t:'apps/studio',s:['Sanity Studio · not a workspace'],k:'ghost'},
+  {id:'core',x:380,y:290,w:500,h:70,t:'@saito/core',s:['schemas · resolver · merge · semver · theme · content sources']},
+  {id:'sites',x:490,y:420,w:280,h:70,t:'`sites/<id>/`',s:['config · content · public'],k:'in'},
+  {id:'ext',x:880,y:420,w:270,h:70,t:'External libraries',s:['zod · yaml · @sanity/client','astro · tailwind · fastify'],k:'in'}],
+ edges:[{a:'cli',b:'ren',l:'spawns astro'},
+  {a:'cli',b:'tpl',as:'b',ao:45,bs:'t',bo:-90},
+  {a:'cli',b:'core',as:'b',ao:-50,bs:'l'},
+  {a:'ren',b:'tpl',as:'b',ao:-60,bs:'t',bo:100},
+  {a:'ren',b:'core',as:'b',ao:0,bs:'t',bo:-90},
+  {a:'ren',b:'cmp',as:'b',ao:60,bs:'t',bo:-110},
+  {a:'api',b:'core',as:'b',ao:50,bs:'t',bo:240},
+  {a:'tpl',b:'core',as:'b',bs:'t',bo:-210},
+  {a:'cmp',b:'core',as:'b',bs:'t',bo:120},
+  {a:'stu',b:'core',as:'b',bs:'r',bo:-15,l:'mirrors schemas',c:'dash'},
+  {a:'core',b:'sites',as:'b',bs:'t',l:'reads'},
+  {a:'core',b:'ext',as:'r',ao:20,bs:'t',c:'dash'}]},
+
+folders:{h:516,groups:[
+  {id:'pg',x:470,y:0,w:690,h:110},{id:'ag',x:470,y:126,w:690,h:54},{id:'sg',x:470,y:196,w:690,h:110,g2:1},
+  {id:'scg',x:470,y:322,w:690,h:54},{id:'wg',x:470,y:392,w:690,h:54},{id:'dg',x:470,y:462,w:690,h:54}],
+ nodes:[
+  {id:'root',x:0,y:228,w:170,h:60,t:'`saito-builder/`',k:'in'},
+  {id:'dist',x:0,y:60,w:170,h:70,t:'`dist/<env>/<site>/`',s:['build output, ignored'],k:'end'},
+  {id:'ls',x:0,y:380,w:170,h:60,t:'`live-sketching/`',s:['standalone POC'],k:'ghost'},
+  {id:'p',x:240,y:0,w:180,h:110,t:'`packages/`'},
+  {id:'a',x:240,y:126,w:180,h:54,t:'`apps/`'},
+  {id:'s',x:240,y:196,w:180,h:110,t:'`sites/`',s:['one folder per site'],k:'out'},
+  {id:'sc',x:240,y:322,w:180,h:54,t:'`scripts/`'},
+  {id:'w',x:240,y:392,w:180,h:54,t:'`.github/workflows/`'},
+  {id:'d',x:240,y:462,w:180,h:54,t:'`docs/`'},
+  {id:'p1',x:486,y:8,w:320,h:44,t:'`core/src`',s:['schema/ · content/ · resolve.ts · pipeline.ts'],k:'in'},
+  {id:'p2',x:822,y:8,w:322,h:44,t:'`templates/src`',s:['<id>/vN.ts + index.ts'],k:'in'},
+  {id:'p3',x:486,y:58,w:320,h:44,t:'`components/src`',s:['sections/ · layout/ · web/'],k:'in'},
+  {id:'p4',x:822,y:58,w:322,h:44,t:'`cli/src`',s:['commands.ts · build.ts'],k:'in'},
+  {id:'a1',x:486,y:132,w:320,h:42,t:'`renderer`',s:['astro.config.ts · src/pages/'],k:'in'},
+  {id:'a2',x:822,y:132,w:150,h:42,t:'`api/src`',k:'in'},
+  {id:'a3',x:984,y:132,w:160,h:42,t:'`studio`',s:['schemaTypes/'],k:'in'},
+  {id:'s1',x:486,y:204,w:658,h:28,t:'`<id>/site.config.yaml`',k:'out'},
+  {id:'s2',x:486,y:238,w:658,h:28,t:'`<id>/content/pages/*.yaml`',k:'out'},
+  {id:'s3',x:486,y:272,w:658,h:28,t:'`<id>/public/`',k:'out'},
+  {id:'sc1',x:486,y:328,w:320,h:42,t:'`deploy.sh`',k:'in'},
+  {id:'sc2',x:822,y:328,w:322,h:42,t:'`live_template.py`',k:'in'},
+  {id:'w1',x:486,y:398,w:320,h:42,t:'`ci.yml`',k:'in'},
+  {id:'w2',x:822,y:398,w:322,h:42,t:'`deploy.yml`',k:'in'},
+  {id:'d1',x:486,y:468,w:658,h:42,t:'`ARCHITECTURE.md · CONFIGURATION.md`',k:'in'}],
+ edges:[
+  {a:'root',b:'p',as:'r',bs:'l',mx:205},{a:'root',b:'a',as:'r',bs:'l',mx:205},{a:'root',b:'s',as:'r',bs:'l',mx:205},
+  {a:'root',b:'sc',as:'r',bs:'l',mx:205},{a:'root',b:'w',as:'r',bs:'l',mx:205},{a:'root',b:'d',as:'r',bs:'l',mx:205},
+  {a:'root',b:'ls',as:'b',bs:'t',c:'dash'},{a:'root',b:'dist',as:'t',bs:'b',c:'dash'},
+  {a:'p',b:'pg'},{a:'a',b:'ag'},{a:'s',b:'sg'},{a:'sc',b:'scg'},{a:'w',b:'wg'},{a:'d',b:'dg'}]},
+
+pipeline:{h:500,groups:[{x:0,y:0,w:280,h:430,t:'Inputs'}],
+ nodes:[
+  {id:'i1',x:16,y:34,w:248,h:76,t:'`site.config.yaml`',s:['`sites/<id>/`'],k:'in'},
+  {id:'i2',x:16,y:134,w:248,h:76,t:'`content/pages/*.yaml`',s:['local content files'],k:'in'},
+  {id:'i3',x:16,y:234,w:248,h:76,t:'Sanity documents',s:['only when','`SAITO_CONTENT_SOURCE=sanity`'],k:'in'},
+  {id:'i4',x:16,y:334,w:248,h:76,t:'Template registry',s:['landing@1, corporate@1 …'],k:'in'},
+  {id:'l1',x:340,y:34,w:240,h:76,t:'1 · Load config',s:['`siteConfigSchema`']},
+  {id:'l2',x:340,y:184,w:240,h:76,t:'2 · Deep-merge overlay',s:['content over config']},
+  {id:'l3',x:340,y:334,w:240,h:76,t:'3 · Resolve template',s:['the pinned major']},
+  {id:'l4',x:660,y:184,w:240,h:76,t:'4 · resolveSite()',s:['apply overrides,','validate every section']},
+  {id:'err',x:660,y:334,w:240,h:76,t:'SiteConfigError',s:['all issues, with paths'],k:'err'},
+  {id:'rs',x:960,y:184,w:200,h:76,t:'ResolvedSite',s:['what everything renders'],k:'out'},
+  {id:'astro',x:960,y:304,w:200,h:76,t:'`[...slug].astro`',s:['one route, every page'],k:'out'},
+  {id:'sc',x:960,y:424,w:200,h:76,t:'`sectionComponents`',s:['type → component'],k:'out'}],
+ edges:[{a:'i1',b:'l1'},{a:'i2',b:'l2',mx:302},{a:'i3',b:'l2',mx:302},{a:'i4',b:'l3'},
+  {a:'l1',b:'l2'},{a:'l2',b:'l3'},{a:'l3',b:'l4',mx:620},
+  {a:'l4',b:'err',l:'invalid',c:'err'},{a:'l4',b:'rs',l:'valid',c:'ok'},{a:'rs',b:'astro'},{a:'astro',b:'sc'}]},
+
+overrides:{h:360,nodes:[
+  {id:'o0',x:0,y:140,w:240,h:80,t:'Each override entry',s:['`sections.<id>: …`'],k:'in'},
+  {id:'o1',x:300,y:140,w:200,h:80,t:'Value is false?',k:'dec'},
+  {id:'o2',x:580,y:140,w:220,h:80,t:'Id in template?',k:'dec'},
+  {id:'o3',x:880,y:140,w:200,h:80,t:'Has a type?',k:'dec'},
+  {id:'r1',x:300,y:0,w:200,h:80,t:'Remove section',s:['`faq: false`'],k:'out'},
+  {id:'r2',x:580,y:0,w:220,h:80,t:'Deep-merge into it',s:['`hero: { title: … }`'],k:'out'},
+  {id:'r3',x:880,y:0,w:200,h:80,t:'Add a new section',s:['`promo: { type: cta }`'],k:'out'},
+  {id:'r4',x:880,y:280,w:200,h:80,t:'Validation error',s:['unknown id, no type'],k:'err'}],
+ edges:[{a:'o0',b:'o1'},{a:'o1',b:'r1',l:'yes',c:'ok'},{a:'o1',b:'o2',l:'no'},{a:'o2',b:'r2',l:'yes',c:'ok'},
+  {a:'o2',b:'o3',l:'no'},{a:'o3',b:'r3',l:'yes',c:'ok'},{a:'o3',b:'r4',l:'no',c:'err'}]},
+
+absTpl:{h:420,nodes:[
+  {id:'reg',x:0,y:150,w:240,k:'cls',t:'TemplateRegistry',f:['resolve(ref)','latest(id)','migrationPath(id, from, to)']},
+  {id:'mod',x:330,y:161,w:200,k:'cls',t:'TemplateModule',f:['manifest','migrations']},
+  {id:'man',x:620,y:20,w:230,k:'cls',t:'TemplateManifest',f:['id','version (semver)','websiteTypes','changelog']},
+  {id:'mig',x:620,y:250,w:230,k:'cls',t:'TemplateMigration',f:['from (major)','to (major)','migrate(config)']},
+  {id:'page',x:960,y:0,w:200,k:'cls',t:'Page',f:['slug','title'],c:'in'},
+  {id:'sec',x:960,y:130,w:200,k:'cls',t:'Section',f:['id','type (one of 16)','background'],c:'in'},
+  {id:'theme',x:960,y:280,w:200,k:'cls',t:'Theme',f:['colors','fonts','radius','mode'],c:'in'}],
+ edges:[{a:'reg',b:'mod',l:'registers'},
+  {a:'mod',b:'man',as:'r',ao:-20,bs:'l',l:'declares'},
+  {a:'mod',b:'mig',as:'r',ao:20,bs:'l',l:'ships 0..*'},
+  {a:'man',b:'page',as:'r',ao:-42,bs:'l',l:'defines 1..*'},
+  {a:'man',b:'theme',as:'r',ao:42,bs:'l',l:'defaults'},
+  {a:'page',b:'sec',l:'contains 0..*'}]},
+
+absSite:{h:290,nodes:[
+  {id:'cs',x:0,y:110,w:240,k:'cls',t:'ContentSource',f:['getOverlay(config, env)'],c:'in'},
+  {id:'cfg',x:370,y:60,w:250,k:'cls',t:'SiteConfig',f:['id','tenant','template (id@range)','pages (overrides)']},
+  {id:'man',x:860,y:0,w:300,k:'cls',t:'TemplateManifest',f:['pages · theme · navigation']},
+  {id:'rs',x:860,y:170,w:300,k:'cls',t:'ResolvedSite',f:['pages','theme','integrations (public only)'],c:'out'}],
+ edges:[{a:'cs',b:'cfg',l:'overlays',c:'dash'},
+  {a:'cfg',b:'man',as:'r',ao:-40,bs:'l',l:'pins a major'},
+  {a:'rs',b:'cfg',as:'l',bs:'r',bo:40,l:'resolved from',c:'dash'},
+  {a:'rs',b:'man',as:'t',bs:'b',l:'resolved from',c:'dash'}]},
+
+create:{h:460,nodes:[
+  {id:'w1',x:0,y:0,w:330,h:80,t:'Pick a template',s:['`saito templates`']},
+  {id:'w2',x:415,y:0,w:330,h:80,t:'Scaffold the site',s:['`saito create <id> --template t --tenant t`']},
+  {id:'w3',x:830,y:0,w:330,h:80,t:'Files written',s:['site.config.yaml pinned to the current major','+ empty public/ and content/pages/'],k:'in'},
+  {id:'w4',x:0,y:170,w:245,h:80,t:'Customize config',s:['brand · theme · nav','page overrides']},
+  {id:'w5',x:305,y:170,w:245,h:80,t:'Add content',s:['`content/pages/*.yaml`','or Sanity · optional']},
+  {id:'w6',x:610,y:170,w:245,h:80,t:'Add assets',s:['`public/`']},
+  {id:'w7',x:915,y:170,w:245,h:80,t:'Preview',s:['`saito dev <id>`']},
+  {id:'w8',x:610,y:340,w:245,h:80,t:'Valid?',s:['`saito validate <id>`'],k:'dec'},
+  {id:'w9',x:915,y:340,w:245,h:80,t:'Ship',s:['PR → merge → deploy'],k:'out'}],
+ edges:[{a:'w1',b:'w2'},{a:'w2',b:'w3'},{a:'w3',b:'w4',as:'b',bs:'t'},{a:'w4',b:'w5'},{a:'w5',b:'w6'},{a:'w6',b:'w7'},
+  {a:'w7',b:'w8',as:'b',bs:'t'},{a:'w8',b:'w9',l:'yes',c:'ok'},
+  {a:'w8',b:'w4',as:'b',bs:'b',via:[[732,450],[122,450]],l:'no: fix the paths in the error',c:'err'}]},
+
+template:{h:400,nodes:[
+  {id:'t1',x:0,y:0,w:220,h:90,t:'Create the file',s:['`templates/src/<id>/v1.ts`']},
+  {id:'t2',x:280,y:0,w:320,h:90,t:'`defineTemplate(manifest)`',s:['id · version 1.0.0 · websiteTypes · tags','theme · navigation · footer · pages · changelog']},
+  {id:'t3',x:660,y:0,w:220,h:90,t:'New section type?',k:'dec'},
+  {id:'t5',x:940,y:0,w:220,h:90,t:'Register it',s:['`templates/src/index.ts`']},
+  {id:'t4',x:660,y:150,w:220,h:80,t:'Add the section type',s:['4 touchpoints, next slide']},
+  {id:'t6',x:0,y:310,w:240,h:90,t:'Valid on load?',s:['defineTemplate validates'],k:'dec'},
+  {id:'t7',x:300,y:310,w:240,h:90,t:'Listed',s:['`saito templates`'],k:'out'},
+  {id:'t8',x:600,y:310,w:260,h:90,t:'Demo site',s:['`saito create · dev · validate`']},
+  {id:'t9',x:920,y:310,w:240,h:90,t:'Open a PR',s:['npm test + typecheck'],k:'out'}],
+ edges:[{a:'t1',b:'t2'},{a:'t2',b:'t3'},{a:'t3',b:'t5',l:'no'},{a:'t3',b:'t4',l:'yes'},
+  {a:'t4',b:'t5',as:'r',bs:'b',bo:-40},{a:'t5',b:'t6',as:'b',ao:40,bs:'t',my:270},
+  {a:'t6',b:'t7',l:'valid',c:'ok'},{a:'t7',b:'t8'},{a:'t8',b:'t9'},
+  {a:'t6',b:'t2',as:'t',ao:-60,bs:'b',via:[[60,200],[440,200]],l:'invalid: fix the manifest',c:'err'}]},
+
+section:{h:420,nodes:[
+  {id:'n',x:0,y:165,w:220,h:90,t:'New section type',s:['e.g. a pricing table'],k:'in'},
+  {id:'s1',x:320,y:0,w:440,h:86,t:'1 · Schema',s:['`core/src/schema/sections.ts`','add it to the discriminated union']},
+  {id:'s2',x:320,y:110,w:440,h:86,t:'2 · Component',s:['`components/src/sections/`','register it in sectionComponents']},
+  {id:'s3',x:320,y:220,w:440,h:86,t:'3 · CMS schema',s:['`apps/studio/schemaTypes/index.ts`']},
+  {id:'s4',x:320,y:330,w:440,h:86,t:'4 · Docs',s:['`docs/CONFIGURATION.md`','the section type table']},
+  {id:'v',x:880,y:165,w:280,h:90,t:'Verify',s:['`npm run typecheck + npm test`'],k:'out'}],
+ edges:[{a:'n',b:'s1',mx:270},{a:'n',b:'s2',mx:270},{a:'n',b:'s3',mx:270},{a:'n',b:'s4',mx:270},
+  {a:'s1',b:'v',mx:820},{a:'s2',b:'v',mx:820},{a:'s3',b:'v',mx:820},{a:'s4',b:'v',mx:820}]},
+
+modA:{h:470,nodes:[
+  {id:'m1',x:330,y:0,w:500,h:90,t:'Does the change break site overrides?',k:'dec'},
+  {id:'m2',x:40,y:170,w:480,h:80,t:'Edit vN.ts',s:['bump minor or patch · add a changelog entry']},
+  {id:'m3',x:40,y:280,w:480,h:80,t:'PR rebuilds only affected sites',s:['saito affected → sites using this template']},
+  {id:'m4',x:40,y:390,w:480,h:80,t:'Every site on @N picks it up',s:['on its next build, no site edits'],k:'out'},
+  {id:'m5',x:640,y:170,w:480,h:80,t:'Add v(N+1).ts with a TemplateMigration',s:['`from · to · notes · migrate(config)`']},
+  {id:'m6',x:640,y:280,w:480,h:80,t:'Register both majors',s:['`packages/templates/src/index.ts`']},
+  {id:'m7',x:640,y:390,w:480,h:80,t:'Upgrade each site',s:['outdated → dry-run → upgrade (next slide)'],k:'out'}],
+ edges:[{a:'m1',b:'m2',as:'l',bs:'t',l:'no: copy, style, new optional section'},
+  {a:'m1',b:'m5',as:'r',bs:'t',l:'yes: renamed or removed section ids'},
+  {a:'m2',b:'m3'},{a:'m3',b:'m4'},{a:'m5',b:'m6'},{a:'m6',b:'m7'}]},
+
+modB:{h:280,nodes:[
+  {id:'a',x:0,y:0,w:200,h:90,t:'List candidates',s:['`saito outdated`']},
+  {id:'b',x:240,y:0,w:200,h:90,t:'Preview',s:['`upgrade <site> --dry-run`']},
+  {id:'c',x:480,y:0,w:200,h:90,t:'Valid on new major?',k:'dec'},
+  {id:'d',x:720,y:0,w:200,h:90,t:'Apply',s:['`saito upgrade <site>`','rewrites site.config.yaml']},
+  {id:'e',x:960,y:0,w:200,h:90,t:'Re-pinned to @N+1',s:['review the YAML diff'],k:'out'},
+  {id:'f',x:240,y:190,w:440,h:80,t:'Fix the migration in v(N+1).ts',s:['then preview again']}],
+ edges:[{a:'a',b:'b'},{a:'b',b:'c'},{a:'c',b:'d',l:'yes',c:'ok'},{a:'d',b:'e'},
+  {a:'c',b:'f',as:'b',bs:'t',bo:120,l:'no',c:'err'},{a:'f',b:'b',as:'t',ao:-120,bs:'b',l:'retry'}]},
+
+seed:{h:290,nodes:[
+  {id:'loc',x:0,y:90,w:300,h:110,t:'Local content',s:['`site.config.yaml`','`content/pages/*.yaml` + images'],k:'in'},
+  {id:'san',x:860,y:90,w:300,h:110,t:'Sanity Content Lake',s:['one dataset per environment'],k:'in'},
+  {id:'t',x:400,y:105,w:360,h:80,t:'`packages/core/test/seed.test.ts`',s:['round-trips every site to prove it'],k:'out'}],
+ edges:[{a:'loc',b:'san',as:'t',bs:'t',via:[[150,20],[1010,20]],l:'saito seed · siteToSanityDocuments',c:'acc'},
+  {a:'san',b:'loc',as:'b',bs:'b',via:[[1010,270],[150,270]],l:'sanityToOverlay · at build time'}]},
+
+ci:{h:340,groups:[{x:0,y:0,w:600,h:340,t:'Job: verify'},{x:700,y:0,w:460,h:230,t:'Job: build · one per site',g2:1}],
+ nodes:[
+  {id:'v1',x:20,y:36,w:560,h:46,t:'`npm ci`'},
+  {id:'v2',x:20,y:96,w:560,h:46,t:'`npm test`'},
+  {id:'v3',x:20,y:156,w:560,h:46,t:'`tsc --noEmit`'},
+  {id:'v4',x:20,y:216,w:560,h:46,t:'`saito validate --all --env production`'},
+  {id:'v5',x:20,y:276,w:560,h:46,t:'`git diff | saito affected`'},
+  {id:'b1',x:720,y:50,w:420,h:70,t:'`saito build <site> --env staging`'},
+  {id:'b2',x:720,y:145,w:420,h:70,t:'Upload artifact',s:['kept 7 days'],k:'out'},
+  {id:'skip',x:720,y:269,w:420,h:60,t:'No builds',s:['nothing affected'],k:'end'}],
+ edges:[{a:'v1',b:'v2'},{a:'v2',b:'v3'},{a:'v3',b:'v4'},{a:'v4',b:'v5'},
+  {a:'v5',b:'b1',mx:650,l:'site list'},{a:'v5',b:'skip',l:'empty',lp:[685,299]},{a:'b1',b:'b2'}]},
+
+affected:{h:270,nodes:[
+  {id:'f',x:0,y:30,w:130,h:80,t:'Changed file',k:'in'},
+  {id:'q1',x:170,y:30,w:230,h:80,t:'Docs only?',s:['`docs/ · apps/studio/`','`or *.md`'],k:'dec'},
+  {id:'q2',x:440,y:30,w:200,h:80,t:'Site files?',s:['`sites/<id>/…`'],k:'dec'},
+  {id:'q3',x:680,y:30,w:240,h:80,t:'Template files?',s:['`templates/src/<t>/…`'],k:'dec'},
+  {id:'r3',x:960,y:30,w:200,h:80,t:'Every site',s:['platform code'],k:'err'},
+  {id:'r0',x:170,y:190,w:230,h:80,t:'Nothing rebuilds',k:'end'},
+  {id:'r1',x:440,y:190,w:200,h:80,t:'That one site',k:'out'},
+  {id:'r2',x:680,y:190,w:240,h:80,t:'Sites using template t',k:'out'}],
+ edges:[{a:'f',b:'q1'},{a:'q1',b:'q2',l:'no'},{a:'q2',b:'q3',l:'no'},{a:'q3',b:'r3',l:'no'},
+  {a:'q1',b:'r0',l:'yes'},{a:'q2',b:'r1',l:'yes'},{a:'q3',b:'r2',l:'yes'}]},
+
+triggers:{h:360,nodes:[
+  {id:'t1',x:0,y:0,w:320,h:90,t:'push to main',s:['→ staging · affected sites'],k:'in'},
+  {id:'t2',x:0,y:135,w:320,h:90,t:'`workflow_dispatch`',s:['→ chosen env · listed or all sites'],k:'in'},
+  {id:'t3',x:0,y:270,w:320,h:90,t:'`repository_dispatch`',s:['content-published → one site','env from payload, default production'],k:'in'},
+  {id:'p',x:400,y:135,w:200,h:90,t:'Job: plan',s:['env + site list']},
+  {id:'q',x:660,y:135,w:200,h:90,t:'Any sites?',k:'dec'},
+  {id:'g',x:920,y:120,w:240,h:120,t:'Job: deploy',s:['matrix, one job per site','max 8 in parallel','GitHub environment gate'],k:'out'},
+  {id:'stop',x:660,y:290,w:200,h:70,t:'Nothing to deploy',k:'end'}],
+ edges:[{a:'t1',b:'p',mx:360},{a:'t2',b:'p'},{a:'t3',b:'p',mx:360},{a:'p',b:'q'},{a:'q',b:'g',l:'yes',c:'ok'},{a:'q',b:'stop',l:'no'}]},
+
+providers:{h:450,nodes:[
+  {id:'b',x:0,y:185,w:220,h:80,t:'`saito build <site>`',s:['one matrix job']},
+  {id:'d',x:290,y:175,w:260,h:100,t:'scripts/deploy.sh',s:['`$DEPLOY_PROVIDER`'],k:'dec'},
+  {id:'c1',x:640,y:0,w:520,h:78,t:'`cloudflare-pages`',s:['wrangler pages deploy · project saito-<site> · branch main or env'],k:'out'},
+  {id:'c2',x:640,y:93,w:520,h:78,t:'`netlify`',s:['netlify deploy --prod, or --alias=<env> outside production'],k:'out'},
+  {id:'c3',x:640,y:186,w:520,h:78,t:'`s3-cloudfront`',s:['S3 sync: assets immutable, HTML revalidated','then a CloudFront invalidation'],k:'out'},
+  {id:'c4',x:640,y:279,w:520,h:78,t:'`none`',s:['build only, no upload'],k:'end'},
+  {id:'c5',x:640,y:372,w:520,h:78,t:'anything else',s:['exit 1'],k:'err'}],
+ edges:[{a:'b',b:'d'},{a:'d',b:'c1',mx:595},{a:'d',b:'c2',mx:595},{a:'d',b:'c3',mx:595},{a:'d',b:'c4',mx:595},{a:'d',b:'c5',mx:595,c:'err'}]},
+
+envs:{h:300,groups:[{x:0,y:0,w:540,h:200,t:'Build phase'},{x:620,y:0,w:540,h:200,t:'Release phase',g2:1}],
+ nodes:[
+  {id:'l1',x:20,y:45,w:220,h:135,t:'development',s:['saito dev · saito build','on your machine'],badge:'noindex'},
+  {id:'l2',x:300,y:45,w:220,h:135,t:'pull request',s:['CI: test, validate,','build affected sites'],badge:'noindex'},
+  {id:'r1',x:640,y:45,w:220,h:135,t:'staging',s:['automatic on merge','to main'],k:'out',badge:'noindex'},
+  {id:'r2',x:920,y:45,w:220,h:135,t:'production',s:['manual run','with reviewers'],k:'end',badge:'indexable',bk:'ok'},
+  {id:'cms',x:920,y:234,w:220,h:62,t:'Sanity publish',k:'in'}],
+ edges:[{a:'l1',b:'l2'},{a:'l2',b:'r1',l:'merge'},{a:'r1',b:'r2',l:'manual'},{a:'cms',b:'r2',l:'rebuilds one site',c:'dash'}]},
+
+lifecycle:{h:390,y0:90,nodes:[
+  {id:'start',x:0,y:180,w:24,h:24,k:'start'},
+  {id:'sc',x:50,y:160,w:160,h:64,t:'Scaffolded',s:['saito create']},
+  {id:'cf',x:300,y:160,w:180,h:64,t:'Configured',s:['YAML + content']},
+  {id:'inv',x:300,y:320,w:180,h:64,t:'Invalid',s:['validation failed'],k:'err'},
+  {id:'st',x:590,y:160,w:170,h:64,t:'Staging',s:['auto on merge'],k:'out'},
+  {id:'pr',x:860,y:160,w:170,h:64,t:'Production',s:['manual deploy'],k:'end'},
+  {id:'od',x:860,y:320,w:170,h:64,t:'Outdated',s:['new major exists'],k:'in'},
+  {id:'up',x:590,y:320,w:170,h:64,t:'Upgraded',s:['migrated YAML']}],
+ edges:[{a:'start',b:'sc'},{a:'sc',b:'cf',l:'edit'},
+  {a:'cf',b:'inv',as:'b',ao:-40,bs:'t',bo:-40,l:'fails',c:'err'},
+  {a:'inv',b:'cf',as:'t',ao:30,bs:'b',bo:30,l:'fix paths'},
+  {a:'cf',b:'st',l:'merge'},{a:'st',b:'pr',l:'deploy'},
+  {a:'pr',b:'st',as:'t',ao:-45,bs:'t',via:[[900,100],[675,100]],l:'next change merged'},
+  {a:'pr',b:'pr',as:'r',ao:-14,bs:'t',bo:45,via:[[1090,178],[1090,120],[990,120]],l:'minor release',lp:[1080,120]},
+  {a:'pr',b:'od',l:'new major'},{a:'od',b:'up',l:'upgrade'},
+  {a:'up',b:'cf',as:'t',ao:-40,bs:'b',bo:75,via:[[635,290],[465,290]],l:'review YAML',lp:[550,290]}]},
+
+sketch:{h:100,nodes:[
+  {id:'h',x:0,y:0,w:250,h:96,t:'Prototype HTML',s:['`live-sketching/…/index.html`'],k:'in'},
+  {id:'s',x:290,y:0,w:250,h:96,t:'Publish script',s:['`npm run live-template`','`-- <folder>`']},
+  {id:'a',x:580,y:0,w:180,h:96,t:'Account',s:['owner of this','repo’s git origin']},
+  {id:'r',x:800,y:0,w:170,h:96,t:'Public repo',s:['one per folder','topic live-template'],k:'out'},
+  {id:'gp',x:1010,y:0,w:150,h:96,t:'GitHub Pages',s:['owner.github.io','/<folder>'],k:'out'}],
+ edges:[{a:'h',b:'s'},{a:'s',b:'a'},{a:'a',b:'r'},{a:'r',b:'gp'}]},
+
+security:{h:360,nodes:[
+  {id:'cfg',x:0,y:145,w:170,h:80,t:'SiteConfig',s:['raw, holds secrets'],k:'in'},
+  {id:'g1',x:220,y:135,w:230,h:100,t:'integrations filter',s:['drops forms.webhookUrl','and notifyEmail'],k:'guard'},
+  {id:'rs',x:500,y:145,w:170,h:80,t:'ResolvedSite',s:['public data only']},
+  {id:'ga',x:740,y:0,w:270,h:75,t:'`safeHref`',s:['user links; blocks javascript:'],k:'guard'},
+  {id:'gb',x:740,y:95,w:270,h:75,t:'`renderRichText`',s:['escapes first, then markup subset'],k:'guard'},
+  {id:'gc',x:740,y:190,w:270,h:75,t:'`jsonForScript`',s:['JSON-LD, analytics snippets'],k:'guard'},
+  {id:'gd',x:740,y:285,w:270,h:75,t:'Theme → CSS',s:['hex colours, regex-checked fonts'],k:'guard'},
+  {id:'html',x:1060,y:110,w:100,h:150,t:'HTML',s:['static','output'],k:'out'}],
+ edges:[{a:'cfg',b:'g1'},{a:'g1',b:'rs'},
+  {a:'rs',b:'ga',mx:705},{a:'rs',b:'gb',mx:705},{a:'rs',b:'gc',mx:705},{a:'rs',b:'gd',mx:705},
+  {a:'ga',b:'html',mx:1035},{a:'gb',b:'html',mx:1035},{a:'gc',b:'html',mx:1035},{a:'gd',b:'html',mx:1035}]},
+
+sanitySeq:{seq:1,p:[{id:'ed',t:'Editor',a:1},{id:'stu',t:'Sanity Studio'},{id:'lake',t:'Content Lake'},{id:'gh',t:'GitHub',s:'repository_dispatch'},{id:'dep',t:'deploy.yml'},{id:'cli',t:'saito build'},{id:'cdn',t:'CDN host'}],
+ m:[['ed','stu','edit page or siteSettings'],['stu','lake','publish document'],['lake','stu','published','r'],
+  ['lake','gh','webhook: content-published'],['gh','dep','trigger'],
+  ['dep','dep','plan: one site, env defaults to production'],
+  ['dep','cli','build with SAITO_CONTENT_SOURCE=sanity'],['cli','lake','GROQ query, dataset = env'],['lake','cli','documents','r'],
+  ['cli','cli','sanityToOverlay → merge over local → render'],['cli','dep','dist folder','r'],
+  ['dep','cdn','scripts/deploy.sh'],['cdn','dep','deployed','r','ok']]},
+
+buildSeq:{seq:1,p:[{id:'dev',t:'Developer or CI',a:1},{id:'cli',t:'saito build'},{id:'core',t:'core pipeline'},{id:'astro',t:'Astro renderer'},{id:'fs',t:'dist/<env>/<site>/'}],
+ m:[['dev','cli','saito build <site> --env staging'],['cli','core','loadResolvedSite(site)'],
+  ['core','core','load · merge · resolve · validate'],
+  {f:'alt',t:'config invalid'},
+  ['core','cli','SiteConfigError, every issue path','r','err'],['cli','dev','site failed, exit 1','r','err'],
+  {else:'config valid'},
+  ['core','cli','ResolvedSite','r'],
+  ['cli','astro','spawn astro build · SAITO_SITE, SAITO_ENV, SAITO_ROOT'],
+  ['astro','astro','per-site dirs; [...slug].astro maps type → component'],
+  ['astro','fs','HTML, assets, sitemap.xml, robots.txt'],['astro','cli','exit 0','r'],
+  ['cli','fs','_headers + saito-manifest.json'],['cli','dev','site built','r','ok'],
+  {end:1}]},
+
+contactSeq:{seq:1,p:[{id:'vis',t:'Visitor',a:1},{id:'page',t:'Static page'},{id:'api',t:'apps/api'},{id:'sink',t:'SubmissionSink'},{id:'hook',t:'Site webhook'}],
+ m:[['vis','page','submit contact form'],['page','api','POST /v1/sites/<siteId>/contact'],
+  {f:'alt',t:'unknown site or origin not allowed'},['api','page','404 or 403','r','err'],
+  {else:'invalid body, over 32 KB, or rate limit hit'},['api','page','400, 413 or 429','r','err'],
+  {else:'accepted'},
+  {f:'opt',t:'honeypot company_website is empty'},
+  ['api','sink','save to data/<tenant>/<site>.jsonl'],['sink','api','saved','r'],
+  ['api','hook','forward, if forms.webhookUrl is set','a'],
+  {end:1},
+  ['api','page','303 to the site’s own domain, or 202 JSON','r','ok'],
+  {end:1},
+  ['page','vis','thank-you state','r']]}
+};
+
+/* ---------------- drawing engine ---------------- */
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+const ctx=document.createElement('canvas').getContext('2d');
+const CSSV=getComputedStyle(document.documentElement);
+const FB=(CSSV.getPropertyValue('--f-body')||'sans-serif').trim(),FM=(CSSV.getPropertyValue('--f-mono')||'monospace').trim();
+function measure(s,size,weight,mono){ctx.font=(weight||400)+' '+size+'px '+(mono?FM:FB);return ctx.measureText(s).width*1.03;}
+function text(parent,x,y,s,cls,size,weight,maxW,anchor){
+  let mono=false; if(s.indexOf('`')>=0){mono=true;s=s.replace(/`/g,'');}
+  let fs=mono?size*0.92:size; const w=measure(s,fs,weight,mono);
+  if(maxW&&w>maxW)fs=Math.max(fs*maxW/w,9);
+  const t=el('text',{x:x,y:y,'text-anchor':anchor||'middle',class:cls+(mono?' mono':''),style:'font-size:'+fs.toFixed(2)+'px'},parent);
+  t.textContent=s; return t;
+}
+function drawNode(g,n){
+  const k=n.k||'step';
+  if(k==='start'){const gg=el('g',{class:'node k-start'},g);el('circle',{cx:n.x+n.w/2,cy:n.y+n.h/2,r:n.w/2,class:'shape'},gg);return;}
+  if(k==='cls'){
+    const c=n.c||'step'; const gg=el('g',{class:'node k-'+c},g);
+    el('rect',{x:n.x,y:n.y,width:n.w,height:n.h,rx:8,class:'shape'},gg);
+    el('line',{x1:n.x,x2:n.x+n.w,y1:n.y+36,y2:n.y+36,class:'sep'},gg);
+    text(gg,n.x+n.w/2,n.y+24,n.t,'nt',16.5,600,n.w-20);
+    n.f.forEach((f,i)=>{const t=el('text',{x:n.x+16,y:n.y+36+22*i+22,class:'fl'},gg);t.textContent='+ '+f;});
+    return;
+  }
+  const gg=el('g',{class:'node k-'+k},g);
+  if(k==='dec'){const i=18;el('path',{d:`M${n.x+i},${n.y} H${n.x+n.w-i} L${n.x+n.w},${n.y+n.h/2} L${n.x+n.w-i},${n.y+n.h} H${n.x+i} L${n.x},${n.y+n.h/2} Z`,class:'shape'},gg);}
+  else el('rect',{x:n.x,y:n.y,width:n.w,height:n.h,rx:8,class:'shape'},gg);
+  if(!n.t)return;
+  const subs=n.s||[]; const cx=n.x+n.w/2, cy=n.y+n.h/2+(n.badge?10:0); const maxW=n.w-(k==='dec'?52:24);
+  const H=20+19*subs.length; const t0=cy-H/2;
+  text(gg,cx,t0+15,n.t,'nt',17,600,maxW);
+  subs.forEach((s,i)=>text(gg,cx,t0+20+19*i+15,s,'ns',14,400,maxW));
+  if(n.badge){const bw=measure(n.badge,11.5,600,true)+16;const bg=el('g',{class:'badge b-'+(n.bk||'warn')},gg);
+    el('rect',{x:n.x+n.w/2-bw/2,y:n.y+14,width:bw,height:20,rx:10},bg);
+    const t=el('text',{x:n.x+n.w/2,y:n.y+28,'text-anchor':'middle',class:'bt'},bg);t.textContent=n.badge;}
+}
+function anchor(n,side,off){off=off||0;const cx=n.x+n.w/2,cy=n.y+n.h/2;
+  if(side==='r')return[n.x+n.w,cy+off]; if(side==='l')return[n.x,cy+off]; if(side==='t')return[cx+off,n.y]; return[cx+off,n.y+n.h];}
+function sides(a,b){if(b.x>=a.x+a.w)return['r','l'];if(b.x+b.w<=a.x)return['l','r'];if(b.y>=a.y+a.h)return['b','t'];return['t','b'];}
+function roundPath(pts,r){
+  const p=pts.filter((q,i)=>i===0||q[0]!==pts[i-1][0]||q[1]!==pts[i-1][1]);
+  let d=`M${p[0][0]},${p[0][1]}`;
+  for(let i=1;i<p.length-1;i++){const[x0,y0]=p[i-1],[x1,y1]=p[i],[x2,y2]=p[i+1];
+    const d1=Math.hypot(x1-x0,y1-y0),d2=Math.hypot(x2-x1,y2-y1),rr=Math.min(r,d1/2,d2/2);
+    d+=` L${x1-(x1-x0)/d1*rr},${y1-(y1-y0)/d1*rr} Q${x1},${y1} ${x1+(x2-x1)/d2*rr},${y1+(y2-y1)/d2*rr}`;}
+  const l=p[p.length-1]; return d+` L${l[0]},${l[1]}`;
+}
+function chip(g,x,y,s,size){size=size||13;const w=measure(s,size,500)+12;el('rect',{x:x-w/2,y:y-11,width:w,height:22,rx:5,class:'chip'},g);const t=el('text',{x:x,y:y+4.5,'text-anchor':'middle',class:'el',style:'font-size:'+size+'px'},g);t.textContent=s;}
+function drawEdge(g,lg,e,N){
+  const A=N[e.a],B=N[e.b]; if(!A||!B)return; let[as,bs]=sides(A,B); if(e.as)as=e.as; if(e.bs)bs=e.bs;
+  const pA=anchor(A,as,e.ao),pB=anchor(B,bs,e.bo); const pts=[pA]; const h=s=>s==='l'||s==='r';
+  if(e.via)pts.push(...e.via);
+  else if(h(as)&&h(bs)){if(pA[1]!==pB[1]){const mx=e.mx!=null?e.mx:(pA[0]+pB[0])/2;pts.push([mx,pA[1]],[mx,pB[1]]);}}
+  else if(!h(as)&&!h(bs)){if(pA[0]!==pB[0]){const my=e.my!=null?e.my:(pA[1]+pB[1])/2;pts.push([pA[0],my],[pB[0],my]);}}
+  else if(h(as))pts.push([pB[0],pA[1]]); else pts.push([pA[0],pB[1]]);
+  pts.push(pB);
+  el('path',{d:roundPath(pts,10),class:'e '+(e.c||'')},g);
+  if(e.l){let lp=e.lp;
+    if(!lp){let best=-1,bi=0;for(let i=0;i<pts.length-1;i++){const L=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);if(L>best){best=L;bi=i;}}
+      lp=[(pts[bi][0]+pts[bi+1][0])/2+(e.lx||0),(pts[bi][1]+pts[bi+1][1])/2+(e.ly||0)];}
+    chip(lg,lp[0],lp[1],e.l);}
+}
+function flow(svg,sp){
+  const W=sp.w||1160,y0=sp.y0||0; svg.setAttribute('viewBox',`-12 ${y0-12} ${W+24} ${sp.h-y0+24}`);
+  const N={}; const gG=el('g',{},svg),eG=el('g',{},svg),nG=el('g',{},svg),lG=el('g',{},svg);
+  (sp.groups||[]).forEach(gr=>{if(gr.id)N[gr.id]=gr;const g=el('g',{class:'grp'+(gr.g2?' g2':'')},gG);
+    el('rect',{x:gr.x,y:gr.y,width:gr.w,height:gr.h,rx:12},g);
+    if(!gr.t)return;
+    if(gr.side){const t=el('text',{x:gr.x+18,y:gr.y+gr.h/2-(gr.s?2:-4),class:'gl'},g);t.textContent=gr.t;
+      if(gr.s){const s=el('text',{x:gr.x+18,y:gr.y+gr.h/2+16,class:'gs'},g);s.textContent=gr.s;}}
+    else{const t=el('text',{x:gr.x+14,y:gr.y+20,class:'gl'},g);t.textContent=gr.t;}});
+  sp.nodes.forEach(n=>{if(n.k==='cls'&&!n.h)n.h=36+22*n.f.length+12;N[n.id]=n;drawNode(nG,n);});
+  (sp.edges||[]).forEach(e=>drawEdge(eG,lG,e,N));
+}
+function seq(svg,sp){
+  const FS=15,W=1160,n=sp.p.length,cw=W/n,xs=sp.p.map((_,i)=>cw*i+cw/2),ix={};sp.p.forEach((p,i)=>ix[p.id]=i);
+  const frG=el('g',{},svg),lifeG=el('g',{},svg),mG=el('g',{},svg),hG=el('g',{},svg);
+  const bw=Math.min(cw-18,200),bh=sp.p.some(p=>p.s)?56:46;
+  sp.p.forEach((p,i)=>{const g=el('g',{class:'node '+(p.a?'k-in':'k-step')},hG);
+    el('rect',{x:xs[i]-bw/2,y:0,width:bw,height:bh,rx:p.a?bh/2:8,class:'shape'},g);
+    text(g,xs[i],p.s?24:bh/2+6,(p.t.indexOf('/')>=0&&!p.a)?'`'+p.t+'`':p.t,'nt',15.5,600,bw-16);
+    if(p.s)text(g,xs[i],43,'`'+p.s+'`','ns',13,400,bw-16);});
+  let y=bh+10,num=0;const stack=[],frames=[];
+  const drawNum=(x,yy)=>{num++;el('circle',{cx:x,cy:yy,r:9.5,class:'numc'},mG);const t=el('text',{x:x,y:yy+4,'text-anchor':'middle',class:'numt'},mG);t.textContent=num;};
+  sp.m.forEach(m=>{
+    if(Array.isArray(m)){const a=m[0],b=m[1],t=m[2],r=m[3],c=m[4];const cls='e '+(r==='r'?'dash ':'')+(r==='a'?'async ':'')+(c||'');
+      if(a===b){y+=38;const x=xs[ix[a]];el('path',{d:`M${x},${y-24} H${x+30} Q${x+36},${y-24} ${x+36},${y-18} V${y-10} Q${x+36},${y-4} ${x+30},${y-4} H${x+3}`,class:cls},mG);
+        const tw=measure(t,FS,500);
+        if(x+70+tw+10<W){drawNum(x+54,y-14);const lab=el('text',{x:x+70,y:y-9,'text-anchor':'start',class:'el',style:'font-size:'+FS+'px;fill:var(--ink)'},mG);lab.textContent=t;}
+        else{drawNum(x-16,y-14);const lab=el('text',{x:x-32,y:y-9,'text-anchor':'end',class:'el',style:'font-size:'+FS+'px;fill:var(--ink)'},mG);lab.textContent=t;}
+      } else {y+=32;const x1=xs[ix[a]],x2=xs[ix[b]];const dir=x2>x1?1:-1;
+        el('path',{d:`M${x1},${y} H${x2-dir*2}`,class:cls},mG);
+        const mx=(x1+x2)/2,tw=measure(t,FS,500)+12;
+        el('rect',{x:mx-tw/2,y:y-23,width:tw,height:20,rx:4,class:'chip'},mG);
+        const lab=el('text',{x:mx,y:y-8,'text-anchor':'middle',class:'el',style:'font-size:'+FS+'px;fill:var(--ink)'},mG);lab.textContent=t;
+        drawNum(mx-tw/2-14,y-13);}
+    } else if(m.f){stack.push({k:m.f,t:m.t,y0:y+10,divs:[],d:stack.length});y+=34;}
+    else if(m.else){stack[stack.length-1].divs.push({y:y+14,t:m.else});y+=34;}
+    else if(m.end){const fr=stack.pop();fr.y1=y+12;frames.push(fr);y+=18;}
+  });
+  const H=y+14;
+  frames.sort((p,q)=>p.d-q.d).forEach(fr=>{const x0=6+fr.d*14,x1=W-6-fr.d*14;
+    el('rect',{x:x0,y:fr.y0,width:x1-x0,height:fr.y1-fr.y0,rx:6,class:'fr'},frG);
+    const tw=measure(fr.k,12,600,true)+20;
+    el('path',{d:`M${x0},${fr.y0+6} Q${x0},${fr.y0} ${x0+6},${fr.y0} H${x0+tw} V${fr.y0+12} L${x0+tw-8},${fr.y0+20} H${x0} Z`,class:'frtab'},frG);
+    const k=el('text',{x:x0+9,y:fr.y0+15,class:'frk'},frG);k.textContent=fr.k;
+    const c=el('text',{x:x0+tw+10,y:fr.y0+15,class:'frc'},frG);c.textContent='['+fr.t+']';
+    fr.divs.forEach(dv=>{el('line',{x1:x0,x2:x1,y1:dv.y,y2:dv.y,class:'frdiv'},frG);const t=el('text',{x:x0+12,y:dv.y+16,class:'frc'},frG);t.textContent='[else: '+dv.t+']';});
+  });
+  xs.forEach(x=>el('line',{x1:x,x2:x,y1:bh,y2:H,class:'life'},lifeG));
+  svg.setAttribute('viewBox',`-8 -8 ${W+16} ${H+16}`);
+}
+function renderAll(){document.querySelectorAll('svg.dg').forEach(svg=>{const sp=D[svg.dataset.d];if(!sp)return;while(svg.firstChild)svg.removeChild(svg.firstChild);(sp.seq?seq:flow)(svg,sp);});}
+
+/* ---------------- deck ---------------- */
+const slides=[...document.querySelectorAll('.slide')];
+const total=slides.length;
+function ladder(container,cur,compact){SECTIONS.slice(1).forEach(s=>{const d=document.createElement('div');d.className='rung'+(cur?(s.n===cur?' on':' dim'):'');
+  d.innerHTML='<b>'+s.n+'</b><div><div class="rt"></div>'+(compact&&s.n!==cur?'':'<div class="rq"></div>')+'</div>';
+  d.querySelector('.rt').textContent=s.t; const q=d.querySelector('.rq'); if(q)q.textContent=s.q; container.appendChild(d);});}
+ladder(document.getElementById('ladder-title'),0,false);
+slides.forEach((s,i)=>{
+  const sec=+s.dataset.sec; const S=SECTIONS[sec];
+  const eb=s.querySelector('.eyebrow'); if(eb&&!eb.textContent)eb.textContent='Level '+sec+' · '+S.t;
+  if(s.dataset.divider!=null){
+    const items=slides.filter(x=>+x.dataset.sec===sec&&x.dataset.divider==null);
+    s.innerHTML='<div class="d-left"><div class="d-num">'+sec+'</div><h2></h2><p class="q"></p><ol class="d-list"></ol></div><div class="d-right"></div>';
+    s.querySelector('h2').textContent=S.t; s.querySelector('.q').textContent=S.q;
+    const ol=s.querySelector('.d-list'); items.forEach(x=>{const li=document.createElement('li');li.innerHTML='<span>'+String(slides.indexOf(x)+1).padStart(2,'0')+'</span>';li.appendChild(document.createTextNode(x.dataset.title));ol.appendChild(li);});
+    ladder(s.querySelector('.d-right'),sec,true);
+  }
+  if(i>0){const f=document.createElement('div');f.className='foot';f.innerHTML='<span>Saito Builder</span><span>'+(i+1)+' / '+total+'</span>';s.appendChild(f);}
+});
+const prog=document.getElementById('prog'),count=document.getElementById('count'),secname=document.getElementById('secname');
+const segs=SECTIONS.map(S=>{const idx=slides.map((s,i)=>+s.dataset.sec===S.n?i:-1).filter(i=>i>=0);
+  const b=document.createElement('button');b.className='seg';b.style.flex=idx.length;b.title=S.n?('Level '+S.n+': '+S.t):'Title';b.setAttribute('aria-label',b.title);
+  b.innerHTML='<i></i>';b.onclick=()=>go(idx[0]);prog.appendChild(b);return{b:b,idx:idx};});
+let cur=0;
+function go(i){cur=Math.max(0,Math.min(total-1,i));slides.forEach((s,j)=>s.hidden=j!==cur);
+  count.textContent=(cur+1)+' / '+total; const sec=+slides[cur].dataset.sec;
+  secname.textContent=sec?('Level '+sec+' · '+SECTIONS[sec].t):'';
+  segs.forEach(sg=>{const done=sg.idx.filter(k=>k<=cur).length;sg.b.querySelector('i').style.width=(100*done/sg.idx.length)+'%';});
+  try{history.replaceState(null,'','#s'+(cur+1));}catch(e){}
+  document.querySelectorAll('#ovgrid button').forEach(b=>b.classList.toggle('cur',+b.dataset.i===cur));
+}
+const canvas=document.getElementById('canvas'),fitEl=document.getElementById('fit');
+function fit(){const r=fitEl.getBoundingClientRect();const s=Math.min(r.width/1280,r.height/720);canvas.style.transform='translate(-50%,-50%) scale('+s+')';}
+window.addEventListener('resize',fit);
+document.getElementById('prev').onclick=()=>go(cur-1);
+document.getElementById('next').onclick=()=>go(cur+1);
+const ov=document.getElementById('ov'),ovgrid=document.getElementById('ovgrid');
+SECTIONS.forEach(S=>{const d=document.createElement('div');d.className='ov-sec';d.innerHTML='<h3></h3><ol></ol>';d.querySelector('h3').textContent=S.n?('Level '+S.n+' · '+S.t):'Start';
+  slides.forEach((s,i)=>{if(+s.dataset.sec!==S.n)return;const li=document.createElement('li');const b=document.createElement('button');b.dataset.i=i;
+    b.innerHTML='<span>'+(i+1)+'</span>';b.appendChild(document.createTextNode(s.dataset.title));b.onclick=()=>{go(i);ov.hidden=true;};li.appendChild(b);d.querySelector('ol').appendChild(li);});
+  ovgrid.appendChild(d);});
+document.getElementById('outline').onclick=()=>{ov.hidden=false;const c=ovgrid.querySelector('button.cur');if(c)c.focus();};
+document.getElementById('ovclose').onclick=()=>{ov.hidden=true;};
+document.addEventListener('keydown',e=>{
+  if(!ov.hidden){if(e.key==='Escape'||e.key==='o'){ov.hidden=true;}return;}
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1);}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(cur-1);}
+  else if(e.key==='Home')go(0); else if(e.key==='End')go(total-1);
+  else if(e.key==='o')ov.hidden=false;
+});
+let tx=null,ty=null;
+fitEl.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+fitEl.addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))go(cur+(dx<0?1:-1));tx=null;});
+
+renderAll(); fit();
+const mh=/^#s(\d+)$/.exec(location.hash||''); go(mh?(+mh[1]-1):0);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(renderAll);
+})();
+</script>
+
+</body>
+</html>

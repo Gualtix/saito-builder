@@ -66,4 +66,21 @@ export const themes = {
     fonts: { heading: 'Space Grotesk', body: 'Inter', googleFonts: true },
     radius: 'lg',
   },
+  // Cream canvas, apricot fills, espresso ink; rounded display type. Dark text on primary (9.8:1).
+  apricot: {
+    mode: 'light',
+    colors: {
+      primary: '#f6b46a',
+      primaryContrast: '#241510',
+      secondary: '#241510',
+      accent: '#f29e45',
+      background: '#fcebdd',
+      surface: '#f5d9c4',
+      text: '#3b2a22',
+      muted: '#6b5144',
+      border: '#8a6d5e',
+    },
+    fonts: { heading: 'Fredoka', body: 'Nunito', googleFonts: true },
+    radius: 'lg',
+  },
 } satisfies Record<string, Theme>;

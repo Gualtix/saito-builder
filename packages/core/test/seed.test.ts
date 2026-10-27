@@ -61,8 +61,9 @@ describe('seed round trip (local → Sanity documents → overlay → site)', ()
       if (!isPlainObject(value)) return value;
       const out: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(value)) out[k] = canonical(v);
-      if (typeof out.src === 'string' && urlToSrc.has(out.src)) {
-        out.src = urlToSrc.get(out.src);
+      if (typeof out.src === 'string' && (urlToSrc.has(out.src) || assets.has(out.src))) {
+        // Seeded images take their dimensions from the Sanity asset, so declared width/height are not compared.
+        out.src = urlToSrc.get(out.src) ?? out.src;
         delete out.width;
         delete out.height;
       }

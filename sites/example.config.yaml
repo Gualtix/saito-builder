@@ -1,0 +1,1058 @@
+# =============================================================================
+#  example.config.yaml — MASTER REFERENCE for site configurations
+# =============================================================================
+#
+#  What this file is
+#    The canonical, fully annotated example of a site configuration. Use it as:
+#      - a reference implementation of every supported field
+#      - a blueprint when creating a new site or extracting a new template
+#      - a schema example: the supported part is validated by a test
+#        (packages/core/test/example-config.test.ts), so it cannot drift
+#      - a placeholder model: every value is realistic sample content to replace
+#      - a taxonomy reference for template extraction and generation tools
+#
+#  What it is NOT
+#    A live site. Sites are discovered as sites/<id>/site.config.yaml, so this
+#    file is never built or deployed. To start a real site, prefer
+#      npm run saito -- create <id> --template <t> --tenant <tenant>
+#    and copy only the sections you need from here.
+#
+#  Source of truth
+#    packages/core/src/schema/site.ts       site fields (siteConfigSchema)
+#    packages/core/src/schema/sections.ts   the 16 section types
+#    packages/core/src/schema/theme.ts      theme tokens the renderer uses
+#    packages/core/src/schema/template.ts   template manifest + website types
+#    docs/CONFIGURATION.md                  human-readable reference
+#    If this file and the schema disagree, the schema wins: fix this file.
+#
+# -----------------------------------------------------------------------------
+#  FIELD LEGEND (used in the comments throughout)
+# -----------------------------------------------------------------------------
+#    [REQUIRED]      Validation fails without it.
+#    [REQUIRED-IF]   Required only when its parent object is present.
+#    [OPTIONAL]      May be omitted. The default is given as "default: …".
+#    [COMPUTED]      Derived by the platform at build time. Never set by hand;
+#                    listed in comments so tools know it exists.
+#    [REUSABLE]      Defined once with a YAML anchor (&name) and referenced with
+#                    an alias (*name). Plain anchors only: the parser is YAML 1.2
+#                    and does not support "<<" merge keys.
+#    [EXTENSION]     Lives in an "x-" block. Not read by the renderer; the loader
+#                    silently drops unknown top-level keys. Used by designers,
+#                    generators and documentation tools.
+#
+# -----------------------------------------------------------------------------
+#  NAMING CONVENTIONS
+# -----------------------------------------------------------------------------
+#    Site id, tenant, section ids     kebab-case        meridian-partners, hero
+#    Page slugs                       kebab-case segments joined by "/"
+#                                     "index" is the homepage   about/team
+#    Field names                      camelCase         primaryAction, logoText
+#    Section type values              camelCase         richText, logoCloud
+#    Extension blocks                 "x-" + kebab-case x-tokens, x-taxonomy
+#    YAML anchors                     kebab-case, prefixed by kind
+#                                     &link-…, &action-…, &image-…, &section-…
+#    Asset files                      kebab-case, lowercase extensions
+#                                     /images/team-ana-lopez.webp
+#    Template references              <template-id>@<range>    corporate@1
+#
+# -----------------------------------------------------------------------------
+#  COMPUTED VALUES (never set; produced from this file)
+# -----------------------------------------------------------------------------
+#    Page path               "index" → "/", "about/team" → "/about/team/"
+#    Canonical URL           environments.<env>.url + page path
+#    Indexing                seo.noindex is forced to true outside production
+#                            (meta robots, robots.txt, X-Robots-Tag header)
+#    Theme CSS               theme → --saito-* CSS custom properties
+#    Section anchor          defaults to the section id
+#    Logo text               brand.logoText defaults to `name`
+#    Form action             <integrations.forms.endpoint>/v1/sites/<id>/contact
+#    Public integrations     webhookUrl and notifyEmail are stripped before
+#                            rendering; they never reach HTML
+#    Build artifacts         dist/<env>/<id>/: HTML, sitemap.xml, robots.txt,
+#                            _headers (cache + security), saito-manifest.json
+#    CMS document ids        saito-<id>-settings, saito-<id>-page-<slug>
+#
+#  Layer precedence: template defaults < this file < content overlay
+#  (sites/<id>/content/pages/*.yaml, then Sanity when enabled).
+#  Merge rules: objects merge recursively, arrays replace, null deletes a key.
+# =============================================================================
+
+
+# =============================================================================
+#  x-meta  [EXTENSION]
+#  Metadata about this configuration document itself (not about the website).
+# =============================================================================
+x-meta:
+  documentType: site-config            # site-config | template-blueprint
+  referenceVersion: 1.2.0              # semver of this reference file's structure
+  status: reference                    # draft | active | deprecated | reference
+  maintainers:
+    - platform-team@meridian.example
+  lastReviewed: 2026-10-26             # ISO 8601 date
+
+
+# =============================================================================
+#  x-taxonomy  [EXTENSION]
+#  Classification used by template extraction and generation workflows.
+#  Mirrors live-sketching/taxonomy-template.md so a classified reference design
+#  maps straight onto a configuration.
+# =============================================================================
+x-taxonomy:
+  industry: professional-services      # free text, kebab-case
+  subIndustry: management-consulting
+  # One or more of the platform's website types (schema/template.ts):
+  # landing-page, homepage, corporate, marketing, product-showcase,
+  # service-business, restaurant, real-estate, portfolio, event, microsite,
+  # campaign, brand
+  websiteTypes: [corporate, service-business]
+  visualStyle:
+    primary: modern-minimal
+    secondary: [editorial, trustworthy]
+    notStyles: [brutalist, dark-moody]  # explicit exclusions help generators
+  tone: [confident, clear, warm]
+  audience:
+    - mid-size company executives
+    - operations and finance leaders
+  conversion:
+    primary: book-consultation
+    secondary: [download-guide, newsletter-signup]
+  positioning: premium-accessible      # budget | mid-market | premium-accessible | luxury
+  maturity: established-brand          # startup | growing | established-brand
+
+
+# =============================================================================
+#  x-vocabulary  [EXTENSION]
+#  Allowed values for x-taxonomy. Extend when an extraction needs a new value;
+#  reuse before adding. Values are kebab-case. websiteTypes is not here: it is
+#  the platform's fixed list in packages/core/src/schema/template.ts.
+# =============================================================================
+x-vocabulary:
+  industries: [professional-services, food-and-beverage]
+  subIndustries: [management-consulting, family-restaurant, casual-eatery, cafe]
+  visualStyles:            # also used for visualStyle.notStyles
+    - modern-minimal
+    - editorial
+    - trustworthy
+    - brutalist
+    - dark-moody
+    - corporate
+    - luxury
+    - warm-food-photography
+    - friendly-script-casual
+    - soft-rounded-modern
+    - playful-illustrated
+    - organic
+  tones: [confident, clear, warm, homey, cheerful, appetizing, casual]
+  conversionGoals:
+    - book-consultation
+    - download-guide
+    - newsletter-signup
+    - order-online
+    - reserve-table
+    - view-menu
+    - catering-inquiry
+    - promotional-offer
+  positioning: [budget, mid-market, premium-accessible, luxury]
+  maturity: [startup, growing, established-brand]
+
+
+# =============================================================================
+#  x-components  [EXTENSION] [REUSABLE]
+#  Shared fragments defined once and referenced below with aliases.
+#  Anchors must be defined before they are used, so this block stays near the
+#  top. The values themselves follow the real schema shapes:
+#    link   { label [REQUIRED], href [REQUIRED] }
+#    image  { src [REQUIRED], alt [OPTIONAL, default ""], width?, height? }
+# =============================================================================
+x-components:
+  links:
+    book: &action-book
+      label: Book a consultation
+      href: /contact/
+    services: &link-services
+      label: Services
+      href: /#services
+    about: &link-about
+      label: About
+      href: /about/
+    careers: &link-careers
+      label: Careers
+      href: /careers/
+    contact: &link-contact
+      label: Contact
+      href: /contact/
+    guide: &action-guide
+      label: Download the 2027 operations guide
+      href: /guides/operations-2027.pdf
+
+  # Business identity (name, address, phone) reused by contact, footer and SEO.
+  business:
+    email: &business-email hello@meridian.example
+    phone: &business-phone "+1 (415) 555-0142"   # quote values with special characters
+    address: &business-address 500 Market Street, Suite 1200, San Francisco, CA 94105
+
+  images:
+    hero: &image-hero
+      src: /images/hero-team-workshop.webp
+      alt: Consultants and client team mapping a process on a whiteboard
+      width: 1600
+      height: 1067
+    share: &image-share
+      src: /images/share-card.png
+      alt: Meridian Partners logo on a navy background
+      width: 1200
+      height: 630
+
+  # A whole section can be reused too: the same CTA closes several pages.
+  sections:
+    closing-cta: &section-closing-cta
+      type: cta
+      heading: Ready to simplify how your company runs?
+      body: A 30-minute call is enough to see where we can help.
+      primaryAction: *action-book
+      secondaryAction: *action-guide
+      background: primary
+
+
+# =============================================================================
+#  x-patterns  [EXTENSION]
+#  Template capabilities seen in extracted designs that the schema cannot fully
+#  express: the backlog of candidate section types and components.
+#  kind:   section | component | decoration | interaction | layout
+#  status: proposed (seen, not built) | planned | implemented (now a real type)
+#  seenIn lists website types or industries, never business names.
+# =============================================================================
+x-patterns:
+  media-text-split:
+    kind: section
+    status: proposed
+    description: Heading, paragraphs and a button beside a large photo, alternating sides down the page (zig-zag).
+    fields:
+      heading: string
+      body: richText
+      image: image
+      imagePosition: "start | end"
+      action: link?
+    nearestType: richText
+    fallback: richText (photo lost), or hero with layout split when the photo is essential
+    seenIn: [restaurant, cafe]
+    occurrences: 2
+  image-marquee:
+    kind: interaction
+    status: proposed
+    description: Horizontally auto-scrolling, looping row of small captioned photos.
+    fields:
+      images: "{ image, caption?: string }[]"
+      speed: "slow | normal"
+    nearestType: gallery
+    fallback: static gallery with captions, 4 columns
+    seenIn: [restaurant]
+    occurrences: 1
+  svg-icon-badges:
+    kind: component
+    status: proposed
+    description: Feature items led by an SVG icon inside a colored circular badge, each badge a different accent color.
+    fields:
+      icon: "icon name or SVG asset"
+      badgeColor: "primary | accent | <theme color>"
+    nearestType: features
+    fallback: features with emoji icons
+    seenIn: [restaurant]
+    occurrences: 1
+  category-tiles:
+    kind: section
+    status: proposed
+    description: Grid of photo tiles, each with a title, optional subtitle and optional link (menu categories, service or event types).
+    fields:
+      heading: string
+      intro: string?
+      tiles: "{ image, title: string, subtitle?: string, href?: link }[]"
+      action: link?
+    nearestType: gallery
+    fallback: gallery with the title and subtitle in each caption (links lost)
+    seenIn: [restaurant]
+    occurrences: 1
+  table-reservation:
+    kind: section
+    status: proposed
+    description: Booking widget with date, time and party-size inputs that checks availability.
+    fields:
+      heading: string
+      provider: "opentable | resy | custom"
+      providerUrl: url
+      times: string[]
+      maxPartySize: number
+    nearestType: cta
+    fallback: cta linking to the booking page or a tel link
+    seenIn: [restaurant, cafe]
+    occurrences: 2
+  masonry-gallery:
+    kind: layout
+    status: proposed
+    description: Photo grid with mixed tile heights (some tiles span two rows) instead of uniform crops.
+    fields:
+      images: "{ image, span?: \"tall | wide\" }[]"
+    nearestType: gallery
+    fallback: gallery (uniform 4:3 crops)
+    seenIn: [restaurant]
+    occurrences: 1
+  review-rating:
+    kind: component
+    status: proposed
+    description: Testimonial with a star rating and the review source (Google, Facebook…), often with an initials avatar.
+    fields:
+      rating: "number 1–5"
+      source: string
+    nearestType: testimonials
+    fallback: testimonials with the source in role; rating lost
+    seenIn: [restaurant, cafe]
+    occurrences: 2
+  carousel:
+    kind: interaction
+    status: proposed
+    description: Horizontally scrollable row of cards with previous and next controls.
+    fields:
+      controls: boolean
+      autoplay: boolean
+    nearestType: testimonials
+    fallback: static grid of cards
+    seenIn: [restaurant]
+    occurrences: 1
+  photo-band-card:
+    kind: layout
+    status: proposed
+    description: Full-width darkened photo background with a floating white card holding the heading, text and button.
+    fields:
+      backgroundImage: image
+      cardPosition: "center | start | end"
+    nearestType: cta
+    fallback: cta with background dark
+    seenIn: [restaurant]
+    occurrences: 1
+  daily-specials:
+    kind: section
+    status: proposed
+    description: Highlighted panel for a fixed-price offer, with a list of included items, a price badge, a photo collage and a button.
+    fields:
+      heading: string
+      intro: string?
+      price: "display string"
+      priceNote: string?
+      availability: string?
+      items: string[]
+      images: image[]
+      action: link?
+      label: string?
+      originalPrice: "display string?"
+    nearestType: menu
+    fallback: menu with one category, every item at the offer price
+    seenIn: [restaurant, cafe]
+    occurrences: 2
+  section-header-action:
+    kind: component
+    status: proposed
+    description: Button aligned with a section heading ("View full menu", "Follow us") on sections that have no action field.
+    fields:
+      headerAction: link
+      placement: "heading | after-content"
+    nearestType: gallery
+    fallback: none (action lost) or a following cta
+    seenIn: [restaurant, cafe]
+    occurrences: 2
+  header-icon-links:
+    kind: component
+    status: proposed
+    description: Circular outlined icon buttons (email, social profiles) in the top navigation.
+    fields:
+      iconLinks: "{ platform | email, href }[]"
+    nearestType: none
+    fallback: footer.social
+    seenIn: [restaurant]
+    occurrences: 1
+  transparent-header:
+    kind: interaction
+    status: proposed
+    description: Header transparent over a full-bleed hero, turning solid after scrolling.
+    fields:
+      transparentOverHero: boolean
+    nearestType: none
+    fallback: standard solid header
+    seenIn: [restaurant, cafe]
+    occurrences: 2
+  line-doodles:
+    kind: decoration
+    status: proposed
+    description: Low-contrast line drawings related to the business (food, tools) scattered in section margins.
+    fields:
+      doodles: "SVG asset[]"
+    nearestType: none
+    fallback: omitted
+    seenIn: [restaurant, cafe]
+    occurrences: 2
+  offset-color-slab:
+    kind: decoration
+    status: proposed
+    description: Flat accent-colored block with one large rounded corner, offset behind a photo to add depth.
+    fields:
+      slabColor: "<theme color>"
+    nearestType: none
+    fallback: omitted
+    seenIn: [restaurant]
+    occurrences: 1
+  heading-accent-bar:
+    kind: decoration
+    status: proposed
+    description: Short accent-colored bar under every section heading.
+    fields:
+      color: "<theme color>"
+    nearestType: none
+    fallback: omitted
+    seenIn: [restaurant]
+    occurrences: 1
+  scroll-reveal:
+    kind: interaction
+    status: proposed
+    description: Blocks fade or slide in as they enter the viewport (respecting reduced motion).
+    fields:
+      enabled: boolean
+    nearestType: none
+    fallback: omitted
+    seenIn: [restaurant, cafe]
+    occurrences: 2
+
+  promo-badge:
+    kind: decoration
+    status: proposed
+    description: Round discount badge or edge ribbon ("-50%", "Today's special") overlapping a photo or section edge.
+    fields:
+      text: string
+      shape: "circle | ribbon"
+    nearestType: none
+    fallback: fold the offer into the heading text
+    seenIn: [restaurant, cafe]
+    occurrences: 1
+  menu-category-tabs:
+    kind: interaction
+    status: proposed
+    description: Row of pill links above a menu that jump to (or filter) each category.
+    fields:
+      tabs: "category names (derived from menu categories)"
+    nearestType: menu
+    fallback: menu with all categories listed (tabs lost)
+    seenIn: [restaurant, cafe]
+    occurrences: 1
+  menu-search:
+    kind: interaction
+    status: proposed
+    description: Search box in the header that highlights matching menu items.
+    fields:
+      placeholder: string
+      target: "section id of the menu"
+    nearestType: none
+    fallback: omitted
+    seenIn: [restaurant, cafe]
+    occurrences: 1
+  menu-dot-leaders:
+    kind: decoration
+    status: proposed
+    description: Dotted leader line between a menu item's name and its price.
+    fields:
+      style: "dotted | dashed"
+    nearestType: menu
+    fallback: menu default row layout
+    seenIn: [restaurant, cafe]
+    occurrences: 1
+  location-card:
+    kind: component
+    status: proposed
+    description: Address, hours and phone beside a stylized illustrated map with a directions button.
+    fields:
+      directionsUrl: url
+      mapStyle: "illustrated | embed"
+    nearestType: contact
+    fallback: contact with address, hours and phone (map illustration and directions button lost)
+    seenIn: [restaurant, cafe]
+    occurrences: 1
+  organic-blobs:
+    kind: decoration
+    status: proposed
+    description: Large soft free-form shapes one shade darker than the background, behind photos and in section corners.
+    fields:
+      color: "<theme color>"
+    nearestType: none
+    fallback: omitted
+    seenIn: [restaurant, cafe]
+    occurrences: 1
+  plate-photo-frame:
+    kind: decoration
+    status: proposed
+    description: Food photos cropped to circles (plates seen from above) with a soft drop shadow, sometimes overlapping section edges.
+    fields:
+      shape: "circle | half-circle"
+    nearestType: none
+    fallback: standard rectangular images, or no image
+    seenIn: [restaurant, cafe]
+    occurrences: 1
+  vertical-side-label:
+    kind: decoration
+    status: proposed
+    description: Dark full-height bar on one edge of a section with a rotated label and an icon.
+    fields:
+      label: string
+    nearestType: none
+    fallback: omitted
+    seenIn: [restaurant, cafe]
+    occurrences: 1
+
+# =============================================================================
+#  IDENTITY  (validated by siteConfigSchema)
+# =============================================================================
+
+id: meridian-partners        # [REQUIRED] kebab-case; must equal the directory name sites/<id>/
+tenant: meridian             # [REQUIRED] kebab-case customer id; groups sites for builds, CMS and form storage
+name: Meridian Partners      # [REQUIRED] site name: <title>, JSON-LD, logo text fallback
+description: >-              # [OPTIONAL] default "" — default meta description (aim for 120–160 characters)
+  Operations consulting for growing companies: clearer processes, faster
+  decisions and teams that scale without the chaos.
+locale: en-US                # [OPTIONAL] default "en" — BCP 47 tag; also drives price and date formatting
+
+# [REQUIRED] Template reference "<template-id>@<range>":
+#   corporate@1        any 1.x.y (recommended: minor/patch updates arrive automatically)
+#   landing@^2.1.0     2.1.0 or later within major 2
+#   event@latest       newest version (avoid in production: majors can break overrides)
+# Breaking (major) upgrades are opt-in: `saito outdated`, then `saito upgrade <id>`.
+template: corporate@1
+
+
+# =============================================================================
+#  ENVIRONMENTS  [OPTIONAL] default {}
+#  One URL per environment; sets canonical URLs and the sitemap.
+#  Keys: development | staging | production. Value: { url [REQUIRED-IF] (absolute URL) }
+#  Deployment credentials never go here: they are GitHub environment secrets.
+# =============================================================================
+environments:
+  development:
+    url: http://localhost:4321
+  staging:
+    url: https://meridian-partners.staging.saito.example
+  production:
+    url: https://www.meridian.example
+
+
+# =============================================================================
+#  BRAND  [OPTIONAL] default {}
+#  Files are served from sites/<id>/public/ at the site root.
+# =============================================================================
+brand:
+  logo:                      # [OPTIONAL] image; when absent, logoText is shown
+    src: /logo.svg           # [REQUIRED-IF] prefer SVG for logos
+    alt: Meridian Partners   # [OPTIONAL] default "" — describe the brand, not "logo"
+    width: 160               # [OPTIONAL] positive integer, prevents layout shift
+    height: 40
+  logoText: Meridian         # [OPTIONAL] [COMPUTED default: name]
+  favicon: /favicon.svg      # [OPTIONAL] path under public/
+
+
+# =============================================================================
+#  THEME (design tokens the renderer uses)  [OPTIONAL] default {}
+#  A partial theme deep-merged over the template's theme: set only what changes.
+#  The full shape is shown here for reference. In a TEMPLATE manifest every
+#  color and both fonts are [REQUIRED]; in a site config they are all optional.
+#  Additional tokens (spacing, type scale, motion) live in x-tokens below.
+# =============================================================================
+theme:
+  mode: light                # [OPTIONAL] default light — light | dark
+  colors:                    # hex only (#rgb or #rrggbb), always quoted in YAML
+    primary: "#1d4ed8"           # brand color: buttons, links, "primary" section backgrounds
+    primaryContrast: "#ffffff"   # text on primary; keep WCAG AA contrast (4.5:1) with primary
+    secondary: "#0f172a"         # "dark" section backgrounds
+    accent: "#f59e0b"            # highlights, badges
+    background: "#ffffff"        # page background
+    surface: "#f8fafc"           # "surface" sections, cards, footer
+    text: "#0f172a"              # body text
+    muted: "#475569"             # secondary text; keep AA contrast with background
+    border: "#e2e8f0"            # dividers, inputs
+  fonts:
+    heading: Fraunces        # letters, digits and spaces only (written into CSS)
+    body: Inter
+    googleFonts: true        # [OPTIONAL] default true — false for system or self-hosted fonts
+  radius: md                 # [OPTIONAL] default md — none | sm | md | lg | full
+
+
+# =============================================================================
+#  NAVIGATION  [OPTIONAL] — replaces the template navigation when present
+#  links: [link] default []   cta: link [OPTIONAL]
+#  Keep 3–6 top-level links; the cta is the primary conversion.
+# =============================================================================
+navigation:
+  links:
+    - *link-services
+    - *link-about
+    - *link-careers
+    - *link-contact
+  cta: *action-book
+
+
+# =============================================================================
+#  FOOTER  [OPTIONAL] — every key optional; merged over the template footer
+# =============================================================================
+footer:
+  tagline: Operations consulting for companies that are growing fast.
+  columns:                   # [OPTIONAL] each column: { title [REQUIRED-IF], links [REQUIRED-IF] }
+    - title: Company
+      links:
+        - *link-about
+        - *link-careers
+    - title: Get in touch
+      links:
+        - *link-contact
+        - label: hello@meridian.example
+          href: mailto:hello@meridian.example
+  social:                    # platform: x | facebook | instagram | linkedin | youtube | github | tiktok
+    - platform: linkedin
+      href: https://www.linkedin.com/company/meridian-partners-example
+    - platform: youtube
+      href: https://www.youtube.com/@meridian-partners-example
+  legal: All rights reserved.   # rendered after "© <year> <name>." — do not repeat the © or the name
+
+
+# =============================================================================
+#  SEO  [OPTIONAL] — every key optional; merged over the template SEO settings
+# =============================================================================
+seo:
+  titleTemplate: "%s | Meridian Partners"   # "%s" = page title; keep the result under ~60 characters
+  defaultImage: /images/share-card.png      # share image (Open Graph / social cards), 1200×630
+  twitterHandle: "@meridianpartners"
+  noindex: false             # default false; [COMPUTED] forced true outside production
+  schemaType: Organization   # JSON-LD type: Organization | LocalBusiness | Restaurant | Event | Person
+
+
+# =============================================================================
+#  INTEGRATIONS  [OPTIONAL] default {} — third-party services, each optional
+# =============================================================================
+integrations:
+  analytics:                 # [OPTIONAL]
+    provider: plausible      # [REQUIRED-IF] plausible | ga4
+    id: meridian.example     # [REQUIRED-IF] Plausible domain or GA4 measurement id (G-XXXXXXX)
+
+  # [OPTIONAL] Light commerce; checkout is always delegated. One provider:
+  #   snipcart        { publicKey [REQUIRED-IF], currency [OPTIONAL] default USD (ISO 4217) }
+  #   shopify         { storeDomain, storefrontToken }  — products link to their `url`
+  #   commerce-layer  { organization, clientId }        — products link to their `url`
+  commerce:
+    provider: snipcart
+    publicKey: pk_test_placeholder_0000000000   # public by design; never put secret keys here
+    currency: USD
+
+  forms:                     # [OPTIONAL] enables contact forms through apps/api
+    endpoint: https://api.meridian.example          # [REQUIRED-IF] absolute URL of the forms API
+    webhookUrl: https://hooks.meridian.example/leads # [OPTIONAL] server-side only, never rendered
+    notifyEmail: leads@meridian.example              # [OPTIONAL] server-side only, never rendered
+
+
+# =============================================================================
+#  PAGES  [OPTIONAL] default {} — per-page overrides, keyed by page slug
+# -----------------------------------------------------------------------------
+#  Page fields:
+#    enabled      [OPTIONAL] default true — false drops a template page
+#    title        [OPTIONAL] for template pages; [REQUIRED] for new pages
+#    description  [OPTIONAL] page meta description
+#    sections     [OPTIONAL] map keyed by SECTION ID (never array position):
+#                   <id>: { … }              deep-merge into the template section
+#                   <id>: false              remove the template section
+#                   <new-id>: { type, … }    add a section (type is [REQUIRED])
+#    order        [OPTIONAL] section ids to put first; the rest keep template order
+#
+#  Every section accepts:
+#    id           [COMPUTED] taken from the map key
+#    type         [REQUIRED] for new sections; inherited for template sections
+#    anchor       [OPTIONAL] HTML anchor, default: the section id
+#    background   [OPTIONAL] default — default | surface | primary | dark
+#
+#  The corporate@1 template provides these pages and section ids:
+#    index: hero, stats, services, testimonials, cta
+#    about: intro, team     services: list, faq     contact: contact
+# =============================================================================
+pages:
+
+  # --- Template page: merge, remove, add and reorder ---------------------------
+  index:
+    title: Home
+    description: Operations consulting that makes growing companies simpler to run.
+    sections:
+      hero:                                  # merge into the template's "hero"
+        layout: split                        # centered | split | image-background
+        eyebrow: Operations consulting
+        heading: Grow without the growing pains
+        subheading: >-
+          We redesign the processes, tools and team structures that slow
+          fast-growing companies down.
+        primaryAction: *action-book
+        secondaryAction: *link-services
+        image: *image-hero
+      stats:
+        items:                               # arrays REPLACE the template list entirely
+          - { value: "120+", label: Companies supported }
+          - { value: "32%", label: Average cost reduction }
+          - { value: "9 weeks", label: Typical engagement }
+      testimonials: false                    # remove: no approved client quotes yet
+      clients:                               # new id + type → new section
+        type: logoCloud
+        heading: Trusted by teams at
+        logos:
+          - { name: Harbor Logistics, src: /images/clients/harbor-logistics.svg }
+          - { name: Pinecrest Health, src: /images/clients/pinecrest-health.svg }
+          - { name: Atlas Robotics, src: /images/clients/atlas-robotics.svg }
+      cta: *section-closing-cta              # [REUSABLE] whole section from x-components
+    order: [hero, clients, stats]            # these first; the rest keep template order
+
+  # --- Template page: light touch -----------------------------------------------
+  about:
+    enabled: true                            # set to false to drop this template page
+    sections:
+      intro:
+        heading: Why we started Meridian
+        body: |-
+          We spent a decade inside companies that grew faster than their
+          processes. **Meridian exists so growth feels like progress, not chaos.**
+
+          Read about our approach in the [operations guide](/guides/operations-2027.pdf).
+
+  # --- New page (not in the template): title and typed sections required ---------
+  careers:
+    title: Careers
+    description: Join a small team that helps companies run better.
+    sections:
+      intro:
+        type: hero
+        heading: Do the best work of your career
+        subheading: Remote-first, four-day weeks in August, and clients who listen.
+        primaryAction: { label: See open roles, href: "#roles" }
+      roles:
+        type: richText
+        anchor: roles
+        heading: Open roles
+        body: |-
+          **Senior Operations Consultant** — Remote (US), full time.
+
+          **Process Analyst** — San Francisco or remote, full time.
+      closing: *section-closing-cta
+
+  # --- REFERENCE ONLY: section catalog --------------------------------------------
+  # One example of every section type, with every field. Delete this page when
+  # copying the file into a real site. The test checks that it covers every
+  # section type in the schema, so it grows when a new type is added.
+  reference/section-catalog:
+    title: Section catalog
+    description: Reference examples of every section type.
+    sections:
+
+      catalog-hero:
+        type: hero
+        layout: centered                     # centered | split | image-background
+        eyebrow: Section catalog             # [OPTIONAL]
+        heading: Every section type, one page  # [REQUIRED]
+        subheading: Copy any block below into a page override.
+        primaryAction: *action-book          # [OPTIONAL] link
+        secondaryAction: *link-services      # [OPTIONAL] link
+        image: *image-hero                   # [OPTIONAL] image
+
+      catalog-features:
+        type: features
+        heading: What we do
+        intro: "Three services, one goal: a company that runs itself."   # quote text containing ": "
+        columns: 3                           # 2 | 3 | 4, default 3
+        items:                               # [REQUIRED] at least 1
+          - icon: "🧭"                       # [OPTIONAL] short glyph rendered as text (emoji or symbol), decorative
+            title: Process design            # [REQUIRED]
+            description: Map how work really flows, then remove the friction.
+          - icon: "🧩"
+            title: Systems and tooling
+            description: Pick and connect the tools your team will actually use.
+          - icon: "👥"
+            title: Team structure
+            description: Clear roles and handoffs as you scale past 50 people.
+
+      catalog-stats:
+        type: stats
+        heading: Results
+        items:                               # [REQUIRED] each { value, label }, quote numeric-looking values
+          - { value: "4.9/5", label: Client satisfaction }
+          - { value: "2016", label: Founded }
+
+      catalog-logos:
+        type: logoCloud
+        heading: Featured in
+        logos:                               # [REQUIRED] each { name [REQUIRED], src?, href? }
+          - { name: Operations Weekly, href: https://example.com/ops-weekly }
+          - { name: Growth Review, src: /images/press/growth-review.svg }
+
+      catalog-testimonials:
+        type: testimonials
+        heading: What clients say
+        items:                               # [REQUIRED] each { quote, author, role?, avatar? }
+          - quote: They found three weeks of waste in our monthly close.
+            author: Dana Whitfield
+            role: CFO, Harbor Logistics
+            avatar: { src: /images/avatars/dana-whitfield.webp, alt: Dana Whitfield }
+
+      catalog-pricing:
+        type: pricing
+        heading: Engagements
+        intro: Fixed fees, agreed before we start.
+        plans:                               # [REQUIRED] at least 1
+          - name: Diagnostic                 # [REQUIRED]
+            price: $4,500                    # [REQUIRED] display string (formatted by you)
+            period: one-off                  # [OPTIONAL]
+            description: Two-week assessment with a prioritized roadmap.
+            features: [Stakeholder interviews, Process maps, Roadmap workshop]
+            action: *action-book             # [REQUIRED] link
+          - name: Transformation
+            price: $18,000
+            period: per quarter
+            features: [Everything in Diagnostic, Hands-on implementation, Weekly check-ins]
+            action: *action-book
+            highlighted: true                # [OPTIONAL] default false — visually emphasized plan
+
+      catalog-faq:
+        type: faq
+        heading: Questions
+        items:                               # [REQUIRED] each { question, answer }
+          - question: How long is a typical engagement?
+            answer: Most projects run eight to twelve weeks.
+
+      catalog-cta:
+        type: cta
+        heading: Let's talk                  # [REQUIRED]
+        body: No slides, no sales pitch.     # [OPTIONAL]
+        primaryAction: *action-book          # [REQUIRED]
+        secondaryAction: *action-guide       # [OPTIONAL]
+
+      catalog-rich-text:
+        type: richText
+        heading: Our approach
+        width: narrow                        # narrow | wide, default narrow
+        # [REQUIRED] paragraphs separated by blank lines; supports **bold**,
+        # *italic* and [links](https://…). Raw HTML is escaped.
+        body: |-
+          We start with **how work actually happens**, not the org chart.
+
+          Then we change *one thing at a time* and measure it.
+
+      catalog-gallery:
+        type: gallery
+        heading: Workshops
+        columns: 3                           # 2 | 3 | 4, default 3
+        images:                              # [REQUIRED] image + caption?
+          - { src: /images/gallery/workshop-01.webp, alt: Team sorting sticky notes, caption: Discovery workshop }
+          - { src: /images/gallery/workshop-02.webp, alt: Consultant presenting a process map }
+
+      catalog-team:
+        type: team
+        heading: Leadership
+        intro: Operators first, consultants second.
+        members:                             # [REQUIRED] each { name, role?, photo?, bio? }
+          - name: Ana López
+            role: Managing Partner
+            photo: { src: /images/team/ana-lopez.webp, alt: Ana López }
+            bio: Former COO of two venture-backed logistics companies.
+
+      catalog-menu:                          # for restaurants and cafés
+        type: menu
+        heading: Workshop catering
+        intro: Served at all on-site sessions.
+        currency: USD                        # ISO 4217, default USD
+        categories:                          # [REQUIRED] each { name, items }
+          - name: Breakfast
+            items:
+              - id: granola-bowl             # [OPTIONAL] stable id; required for online ordering
+                name: Granola bowl           # [REQUIRED]
+                description: Yogurt, seasonal fruit, honey.
+                price: 9.5                   # [REQUIRED] number, not a string
+                tags: [vegetarian]           # [OPTIONAL] default []
+                orderable: false             # [OPTIONAL] default false; true adds a cart button (commerce)
+
+      catalog-products:                      # catalogue items; checkout via commerce provider or url
+        type: products
+        heading: Guides and templates
+        currency: USD
+        items:                               # [REQUIRED] each { id, name, price, … }
+          - id: ops-playbook                 # [REQUIRED] stable id
+            name: Operations playbook        # [REQUIRED]
+            description: 80 pages of templates and checklists.
+            price: 49                        # [REQUIRED] number
+            image: { src: /images/products/ops-playbook.webp, alt: Cover of the operations playbook }
+            url: https://shop.meridian.example/ops-playbook   # [OPTIONAL] used without a cart provider
+
+      catalog-contact:
+        type: contact
+        heading: Contact us
+        intro: We reply within one business day.
+        email: *business-email               # [OPTIONAL] valid email
+        phone: *business-phone               # [OPTIONAL]
+        address: *business-address           # [OPTIONAL]
+        hours:                               # [OPTIONAL] default [] — each { days, hours }
+          - { days: Monday–Friday, hours: 8:00–18:00 PT }
+        mapEmbedUrl: https://www.google.com/maps/embed?pb=placeholder   # [OPTIONAL] absolute URL
+        form:                                # [OPTIONAL] needs integrations.forms to submit
+          enabled: true                      # default true
+          submitLabel: Send message          # default "Send message"
+          successMessage: Thanks, we will reply within one business day.
+
+      catalog-schedule:                      # for events and programs
+        type: schedule
+        heading: Operations Summit agenda
+        intro: One day, three tracks.
+        days:                                # [REQUIRED] each { label, items }
+          - label: Thursday, March 11
+            items:                           # each { time, title, speaker?, description? }
+              - time: "09:00"
+                title: Keynote — Scaling without chaos
+                speaker: Ana López
+                description: What breaks first when a company doubles.
+
+      catalog-countdown:                     # for launches and events
+        type: countdown
+        heading: Operations Summit starts in # [REQUIRED]
+        target: 2027-03-11T09:00:00-08:00    # [REQUIRED] ISO 8601 date-time WITH offset
+        expiredText: The summit is live!     # [OPTIONAL] default "It has started!"
+        action: { label: Get tickets, href: https://tickets.meridian.example }   # [OPTIONAL]
+        background: dark
+
+
+# =============================================================================
+#  x-tokens  [EXTENSION]
+#  Design tokens beyond `theme`, in the Design Tokens Community Group (DTCG)
+#  format ($type / $value) so design tools and token pipelines can read them.
+#  The renderer only uses `theme`; keep these consistent with it.
+# =============================================================================
+x-tokens:
+  spacing:
+    xs:  { $type: dimension, $value: 0.25rem }
+    sm:  { $type: dimension, $value: 0.5rem }
+    md:  { $type: dimension, $value: 1rem }
+    lg:  { $type: dimension, $value: 2rem }
+    xl:  { $type: dimension, $value: 4rem }
+    section: { $type: dimension, $value: 6rem }   # vertical rhythm between sections
+  fontSize:
+    body:    { $type: dimension, $value: 1rem }
+    lead:    { $type: dimension, $value: 1.25rem }
+    h3:      { $type: dimension, $value: 1.5rem }
+    h2:      { $type: dimension, $value: 2.25rem }
+    h1:      { $type: dimension, $value: 3.5rem }
+  lineHeight:
+    body:    { $type: number, $value: 1.6 }
+    heading: { $type: number, $value: 1.15 }
+  shadow:
+    card:
+      $type: shadow
+      $value: { color: "#0f172a1a", offsetX: 0px, offsetY: 4px, blur: 16px, spread: 0px }
+  motion:
+    fast:   { $type: duration, $value: 150ms }
+    base:   { $type: duration, $value: 250ms }
+    easing: { $type: cubicBezier, $value: [0.2, 0, 0, 1] }
+  radius:                           # per-role radii; theme.radius is one global value
+    button: { $type: dimension, $value: 9999px }   # pill buttons
+    card:   { $type: dimension, $value: 1.25rem }
+    image:  { $type: dimension, $value: 1.875rem }
+    panel:  { $type: dimension, $value: 2.5rem }
+  colorAccents:                     # extra accent colors beyond theme.accent (badges, color blocks)
+    accent2: { $type: color, $value: "#10b981" }
+    accent3: { $type: color, $value: "#f43f5e" }
+  breakpoint:                       # mobile-first min-widths
+    sm: { $type: dimension, $value: 640px }
+    md: { $type: dimension, $value: 768px }
+    lg: { $type: dimension, $value: 1024px }
+    xl: { $type: dimension, $value: 1280px }
+
+
+# =============================================================================
+#  x-assets  [EXTENSION]
+#  Conventions for files in sites/<id>/public/ (served at the site root).
+# =============================================================================
+x-assets:
+  root: public/                      # maps to "/" on the live site
+  directories:
+    images: /images/                 # photos, illustrations, section images
+    clients: /images/clients/        # logo cloud
+    team: /images/team/
+    downloads: /guides/              # PDFs and other files
+  formats:
+    logo: svg                        # vector for crisp scaling
+    photo: [avif, webp]              # modern formats; keep a JPEG only if required
+    favicon: svg
+  imageSizes:                        # recommended pixel sizes
+    hero: 1600x1067
+    share: 1200x630                  # Open Graph / social cards
+    avatar: 256x256
+    gallery: 1200x800
+  rules:
+    - every content image needs meaningful alt text; decorative images use alt ""
+    - always set width and height to prevent layout shift
+    - no text baked into images (not translatable, not accessible)
+    - only assets you have rights to; record the source of stock images
+
+
+# =============================================================================
+#  x-content  [EXTENSION]
+#  Where content lives and who owns it — guidance for editors and generators.
+# =============================================================================
+x-content:
+  sources:                           # merged in this order; later wins
+    - template defaults              # packages/templates/src/<template>/vN.ts
+    - this file                      # settings and structure, reviewed in PRs
+    - content/pages/*.yaml           # long-form copy, same shape as pages.<slug>
+    - sanity                         # editor-managed copy when SAITO_CONTENT_SOURCE=sanity
+  ownership:
+    developers: [template, theme, integrations, environments, page structure]
+    editors: [section copy, images, navigation labels, SEO text]
+  placeholderPolicy: replace every sample value before production; keep ids stable
+
+
+# =============================================================================
+#  x-deployment  [EXTENSION] — documentation only
+#  Deployment is configured in GitHub (vars + environment secrets) and run by
+#  .github/workflows/deploy.yml with scripts/deploy.sh. Nothing here is read by
+#  the CLI; it records the intended setup for this site.
+# =============================================================================
+x-deployment:
+  provider: cloudflare-pages         # GitHub var DEPLOY_PROVIDER: cloudflare-pages | netlify | s3-cloudfront | none
+  environments:
+    staging:
+      trigger: push to main (affected sites only)
+      approval: none
+      indexable: false
+    production:
+      trigger: manual "Deploy" workflow run, or Sanity publish webhook
+      approval: required reviewers on the GitHub "production" environment
+      indexable: true
+  contentSource: local               # GitHub var SAITO_CONTENT_SOURCE: local | sanity (dataset = environment name)
+  caching:                           # [COMPUTED] written to _headers by `saito build`
+    assets: public, max-age=31536000, immutable
+    html: public, max-age=0, s-maxage=3600, stale-while-revalidate=86400
+
+
+# =============================================================================
+#  x-extensions  [EXTENSION]
+#  How to extend the configuration without breaking validation.
+# =============================================================================
+x-extensions:
+  customKeys: >-
+    Add tool-specific data only in top-level "x-" blocks (kebab-case). They are
+    ignored by the renderer and dropped by the loader, so they can never break
+    a build. Never add unknown fields inside sections or other schema objects:
+    they are silently dropped (a misspelled field is lost without an error).
+    Unknown section types and unknown section ids without a type do fail.
+  newSectionType: >-
+    Requires development in four places: the zod schema
+    (packages/core/src/schema/sections.ts), an Astro component registered in
+    sectionComponents, the Sanity schema (apps/studio/schemaTypes) and the
+    table in docs/CONFIGURATION.md. Then add an example to the section catalog
+    above.
+  newTemplate: >-
+    defineTemplate(manifest) in packages/templates/src/<id>/v1.ts, registered
+    in packages/templates/src/index.ts. Use x-taxonomy from this file to
+    describe the template's industry and style.
+  breakingChanges: >-
+    Ship a new template major with a TemplateMigration; sites move with
+    `saito upgrade <id>`, which validates before writing.
