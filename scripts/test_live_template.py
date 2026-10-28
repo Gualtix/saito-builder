@@ -55,11 +55,15 @@ class StageTreeTest(unittest.TestCase):
         (src / ".DS_Store").write_text("junk")
         (src / "css").mkdir()
         (src / "css" / "a.css").write_text("body{}")
-        (src / ".gitignore").write_text("*.css\n")  # ignored files must still publish
+        (src / "docs").mkdir()
+        (src / "docs" / "notes.md").write_text("draft")
+        (src / ".gitignore").write_text("docs/\n")  # ignored files must not publish
+        (src / "css" / ".gitignore").write_text("*.map\n")  # nested rules apply too
+        (src / "css" / "a.css.map").write_text("{}")
         with tempfile.TemporaryDirectory() as t1, tempfile.TemporaryDirectory() as t2:
             work = lt.stage(src, Path(t1))
             files = lt.git(["ls-files"], work).stdout.split()
-            self.assertEqual(sorted(files), [".gitignore", ".nojekyll", "css/a.css", "index.html"])
+            self.assertEqual(sorted(files), [".gitignore", ".nojekyll", "css/.gitignore", "css/a.css", "index.html"])
             first = lt.git(["write-tree"], work).stdout.strip()
             (src / "index.html").touch()
             again = lt.git(["write-tree"], lt.stage(src, Path(t2))).stdout.strip()

@@ -12,3 +12,6 @@ apps/api/data/
 .sanity/
 
 trash/
+
+
+environments/

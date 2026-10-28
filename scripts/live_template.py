@@ -79,7 +79,8 @@ def stage(folder, tmp):
     shutil.copytree(folder, work, symlinks=True, ignore=shutil.ignore_patterns(".git", ".DS_Store"))
     (work / ".nojekyll").write_text("")
     git(["init", "-q", "-b", "main"], work, "prepare content")
-    git(["add", "-A", "-f"], work, "prepare content")  # -f: publish the exact files, ignore rules too
+    # Honor only the folder's own .gitignore files, not the machine's global excludes.
+    git(["-c", "core.excludesFile=", "add", "-A"], work, "prepare content")
     return work
 
 
