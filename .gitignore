@@ -13,5 +13,8 @@ apps/api/data/
 
 trash/
 
+# Local HTML prototypes: kept on disk, never committed (removed from history)
+live-sketching/
+
 
 environments/
