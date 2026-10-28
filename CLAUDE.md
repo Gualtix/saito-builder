@@ -20,6 +20,7 @@ npm run saito -- create <site> --template <t> --tenant <t>
 npm run saito -- outdated | upgrade <site> [--dry-run]
 git diff --name-only main | npm run saito -- affected --json   # sites a change must rebuild
 npm run saito -- seed <site>|--all [--dry-run] [--overwrite]   # local content + images → Sanity (SANITY_WRITE_TOKEN)
+./deploy.sh local|staging|production <site...>|--all [--yes]   # build + preview (local) or upload; env from environments/<site>/.<local|staging|prod>.env
 npm run api                                    # Fastify form API on :8787
 npm run live-template -- <folder>              # publish a static folder (needs index.html) as a public GitHub Pages repo via gh
 ```

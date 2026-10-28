@@ -1,5 +1,7 @@
 # Acme Corporation — corporate website (tenant: acme)
 # Settings live here; long-form page copy lives in content/pages/*.yaml.
+# Sample content: Acme, its clients, people and quotes are fictional. Photos are hotlinked from
+# Unsplash; `saito seed` uploads them as Sanity image assets so editors can replace them in the Studio.
 
 id: acme-corp
 tenant: acme
@@ -28,9 +30,22 @@ theme:
 seo:
   titleTemplate: "%s — Acme Corporation"
   twitterHandle: "@acme"
+  defaultImage: https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=1200&h=630&q=75
 
 footer:
   tagline: Engineering that lasts.
+  columns:
+    - title: Company
+      links:
+        - { label: About, href: /about/ }
+        - { label: Services, href: /services/ }
+        - { label: Careers, href: /careers/ }
+    - title: Get in touch
+      links:
+        - { label: Contact, href: /contact/ }
+        - { label: hello@acme.example, href: "mailto:hello@acme.example" }
+        - { label: "+1 (555) 010-2000", href: "tel:+15550102000" }
+  legal: Sample site with fictional content.
   social:
     - platform: linkedin
       href: https://www.linkedin.com/company/acme
@@ -63,29 +78,206 @@ pages:
   index:
     sections:
       hero:
+        layout: image-background
         heading: Engineering solutions built to last
         subheading: From feasibility studies to commissioning, Acme delivers complex industrial projects on time.
         image:
-          src: /images/hero.svg
-          alt: Abstract illustration of an industrial plant
+          src: https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=1920&h=1080&q=75
+          alt: Stainless steel pipework and a pump inside an industrial plant
+          width: 1920
+          height: 1080
+      clients:
+        type: logoCloud
+        heading: Trusted by operators in 18 countries
+        logos:
+          - name: Northwind Energy
+          - name: Contoso Water
+          - name: Fabrikam Steel
+          - name: Tailspin Logistics
+          - name: Litware Chemicals
       stats:
+        heading: Acme in numbers
         items:
           - value: "1998"
             label: Founded
           - value: "650+"
             label: Projects delivered
+          - value: "300"
+            label: Specialists
           - value: "18"
             label: Countries
-      testimonials: false # removed: Acme has no approved quotes yet
+      services:
+        heading: What we do
+        intro: Three sectors, one engineering standard.
+        items:
+          - icon: "⚡"
+            title: Energy
+            description: Wind, solar and grid connections, from site survey to commissioning.
+          - icon: "💧"
+            title: Water
+            description: Treatment plants and pumping stations designed for decades of service.
+          - icon: "🏭"
+            title: Manufacturing
+            description: Process lines, automation and plant upgrades with minimal downtime.
+      projects:
+        type: gallery
+        heading: Recent projects
+        columns: 3
+        images:
+          - src: https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=800&h=600&q=75
+            alt: Wind turbines on farmland at sunset
+            caption: North Sea onshore wind farm, 42 MW
+            width: 800
+            height: 600
+          - src: https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=800&h=600&q=75
+            alt: Aerial view of rows of solar panels on green fields
+            caption: Valley solar park, 120 MW
+            width: 800
+            height: 600
+          - src: https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&h=600&q=75
+            alt: High-voltage transmission towers at sunset
+            caption: 220 kV grid connection
+            width: 800
+            height: 600
+          - src: https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=800&h=600&q=75
+            alt: Glass high-rise under construction with tower cranes
+            caption: District cooling plant, city centre
+            width: 800
+            height: 600
+          - src: https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&h=600&q=75
+            alt: Engineers in high-visibility vests on a large construction site
+            caption: Water treatment works expansion
+            width: 800
+            height: 600
+          - src: https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=800&h=600&q=75
+            alt: Welder in a protective mask working with bright sparks
+            caption: Steel mill line refurbishment
+            width: 800
+            height: 600
+      testimonials:
+        heading: What clients say
+        items:
+          - quote: Acme brought our treatment plant online three weeks early, with zero safety incidents.
+            author: Elena Ruiz
+            role: Operations Director, Contoso Water
+            avatar:
+              src: https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&h=160&q=75
+              alt: ""
+          - quote: Their engineers understood our plant better than we did after the first site visit.
+            author: Tom Becker
+            role: Plant Manager, Fabrikam Steel
+            avatar:
+              src: https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=160&h=160&q=75
+              alt: ""
+          - quote: Clear reporting, honest estimates and a team that answers the phone. A dependable partner.
+            author: Aoife Byrne
+            role: Head of Projects, Northwind Energy
+            avatar:
+              src: https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=160&h=160&q=75
+              alt: ""
+      cta:
+        heading: Planning a new plant or an upgrade?
+        body: Tell us about your project and get a feasibility estimate within five working days.
+        primaryAction:
+          label: Request a quote
+          href: /contact/
+        secondaryAction:
+          label: See our services
+          href: /services/
+    order: [hero, clients, stats, services, projects, testimonials, cta]
+
+  services:
+    sections:
+      intro:
+        type: hero
+        layout: split
+        eyebrow: Services
+        heading: One partner from first sketch to handover
+        subheading: Pick a single phase or hand us the whole project lifecycle.
+        primaryAction:
+          label: Request a quote
+          href: /contact/
+        image:
+          src: https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=1200&h=900&q=75
+          alt: Engineer drawing technical plans at a desk
+          width: 1200
+          height: 900
+      list:
+        heading: What we deliver
+        columns: 2
+        items:
+          - icon: "📐"
+            title: Feasibility and design
+            description: Site surveys, concept studies, permits and detailed engineering.
+          - icon: "🏗️"
+            title: Construction management
+            description: Procurement, contractor coordination and on-site supervision.
+          - icon: "⚙️"
+            title: Commissioning
+            description: Testing, start-up and performance verification against the contract.
+          - icon: "🛠️"
+            title: Operations support
+            description: Maintenance planning, remote monitoring and 24/7 incident response.
+      engagement:
+        type: pricing
+        heading: Ways to work with us
+        intro: Indicative starting points; every proposal is priced against your scope.
+        plans:
+          - name: Feasibility study
+            price: From $25k
+            description: A go / no-go answer backed by data.
+            features: [Site survey, Concept design, Cost and schedule estimate]
+            action:
+              label: Start a study
+              href: /contact/
+          - name: Design and build
+            price: Fixed price
+            description: One contract, one accountable team.
+            features: [Detailed engineering, Construction management, Commissioning]
+            action:
+              label: Request a proposal
+              href: /contact/
+            highlighted: true
+          - name: Operations support
+            price: From $8k
+            period: /month
+            description: Keep the plant at peak performance.
+            features: [Preventive maintenance, Remote monitoring, 24/7 hotline]
+            action:
+              label: Talk to us
+              href: /contact/
+      faq:
+        heading: Common questions
+        items:
+          - question: How do engagements start?
+            answer: With a free 30-minute discovery call, followed by a site visit if the project is a fit.
+          - question: Do you work outside your 18 countries?
+            answer: Yes. We partner with local contractors and send a core team from our nearest office.
+          - question: Which standards do you design to?
+            answer: ISO 9001 and ISO 45001 certified processes, plus the local codes of each project's country.
+      quote:
+        type: cta
+        heading: Have a project in mind?
+        primaryAction:
+          label: Request a quote
+          href: /contact/
+        background: dark
+    order: [intro, list, engagement, faq, quote]
 
   contact:
     sections:
       contact:
+        intro: Tell us about your project. We reply within one working day.
         email: hello@acme.example
         phone: "+1 (555) 010-2000"
         address: |
           100 Industrial Way
           Springfield, ST 12345
+        hours:
+          - days: Monday – Friday
+            hours: 08:00 – 18:00
+          - days: 24/7 support line
+            hours: Operations clients only
 
   # A page the template does not have: needs a title and sections with a "type".
   careers:
@@ -94,20 +286,63 @@ pages:
     sections:
       intro:
         type: hero
+        layout: split
         heading: Build the infrastructure of tomorrow
         subheading: We're hiring engineers, project managers and apprentices.
         primaryAction:
           label: See open roles
           href: "#roles"
+        image:
+          src: https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&h=900&q=75
+          alt: Colleagues working together on laptops around a table
+          width: 1200
+          height: 900
       roles:
         type: features
         heading: Open roles
         columns: 2
         items:
-          - title: Senior Process Engineer
+          - icon: "🧪"
+            title: Senior Process Engineer
             description: Springfield · Full-time
-          - title: Project Manager
+          - icon: "📋"
+            title: Project Manager
             description: Remote (EU) · Full-time
+          - icon: "🔌"
+            title: Electrical Commissioning Engineer
+            description: Springfield · Full-time · Travel 30%
+          - icon: "🎓"
+            title: Engineering Apprentice
+            description: Springfield · 3-year programme
+      life:
+        type: gallery
+        heading: Life at Acme
+        columns: 4
+        images:
+          - src: https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&h=600&q=75
+            alt: Engineer working at a laptop in a test lab
+            width: 600
+            height: 600
+          - src: https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=600&h=600&q=75
+            alt: Two colleagues high-fiving across a meeting table
+            width: 600
+            height: 600
+          - src: https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&h=600&q=75
+            alt: Team presentation in a brick-walled office
+            width: 600
+            height: 600
+          - src: https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&h=600&q=75
+            alt: Two engineers reviewing work on a laptop together
+            width: 600
+            height: 600
+      benefits:
+        type: faq
+        heading: Working here
+        items:
+          - question: Do you offer remote work?
+            answer: Office and project-based roles are hybrid; some roles are fully remote, as noted in the listing.
+          - question: How does training work?
+            answer: Every engineer gets a yearly training budget and a mentor for their first year.
       apply:
         type: cta
         heading: Don't see your role?
