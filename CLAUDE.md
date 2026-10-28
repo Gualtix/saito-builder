@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Saito Builder is a configuration-driven, multi-tenant static website factory (product brief: `STORY.md`). Sites are YAML files that override versioned templates; one Astro renderer turns each site into static HTML for a CDN.
+Saito Builder is a configuration-driven, multi-tenant static website factory. Sites are YAML files that override versioned templates; one Astro renderer turns each site into static HTML for a CDN.
 
 ## Commands
 
