@@ -498,7 +498,7 @@ export const templateExtensions = {
   ],
 
   // Templates are not deployed on their own: a version ships when it is merged to
-  // main, and CI rebuilds only the sites that pin this template (saito affected).
+  // main and the sites that pin this template are redeployed (saito affected lists them).
   deployment: {
     publishedBy: 'merge to main',
     rebuilds: 'sites pinning this template, on their next build',

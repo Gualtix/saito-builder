@@ -528,7 +528,7 @@ template: corporate@1
 #  ENVIRONMENTS  [OPTIONAL] default {}
 #  One URL per environment; sets canonical URLs and the sitemap.
 #  Keys: development | staging | production. Value: { url [REQUIRED-IF] (absolute URL) }
-#  Deployment credentials never go here: they are GitHub environment secrets.
+#  Deployment credentials never go here: they live in git-ignored environments/<site>/.<env>.env files.
 # =============================================================================
 environments:
   development:
@@ -1011,22 +1011,23 @@ x-content:
 
 # =============================================================================
 #  x-deployment  [EXTENSION] — documentation only
-#  Deployment is configured in GitHub (vars + environment secrets) and run by
-#  .github/workflows/deploy.yml with scripts/deploy.sh. Nothing here is read by
-#  the CLI; it records the intended setup for this site.
+#  Code and YAML changes deploy from a machine: ./deploy.sh loads
+#  environments/<site>/.<env>.env and uploads with scripts/deploy.sh. Sanity
+#  publishes rebuild the site through its Cloudflare Pages deploy hook.
+#  Nothing here is read by the CLI; it records the intended setup for this site.
 # =============================================================================
 x-deployment:
-  provider: cloudflare-pages         # GitHub var DEPLOY_PROVIDER: cloudflare-pages | netlify | s3-cloudfront | none
+  provider: cloudflare-pages         # DEPLOY_PROVIDER in the env file: cloudflare-pages | netlify | s3-cloudfront
   environments:
     staging:
-      trigger: push to main (affected sites only)
+      trigger: ./deploy.sh staging <site>, or Sanity publish to the staging dataset (deploy hook, branch staging)
       approval: none
       indexable: false
     production:
-      trigger: manual "Deploy" workflow run, or Sanity publish webhook
-      approval: required reviewers on the GitHub "production" environment
+      trigger: ./deploy.sh production <site>, or Sanity publish to the production dataset (deploy hook, branch main)
+      approval: typed confirmation in ./deploy.sh (or --yes)
       indexable: true
-  contentSource: local               # GitHub var SAITO_CONTENT_SOURCE: local | sanity (dataset = environment name)
+  contentSource: local               # SAITO_CONTENT_SOURCE: local | sanity (dataset = environment name); Pages projects use sanity
   caching:                           # [COMPUTED] written to _headers by `saito build`
     assets: public, max-age=31536000, immutable
     html: public, max-age=0, s-maxage=3600, stale-while-revalidate=86400

@@ -37,7 +37,7 @@ There is no linter configured. TypeScript runs directly through `tsx`/Vite — p
 
 Precedence: template < site config < content overlay. `deepMerge` (`merge.ts`): objects merge, arrays replace, `null` deletes.
 
-**Override semantics are keyed by section id**, not array position: `sections.<id>: {...}` merges into the template section; `sections.<id>: false` removes it; an unknown id *with* `type` adds a new section; `order: [...]` puts listed ids first. Pages absent from the template need `title` + typed sections. Sanity documents are converted into this same shape (`sanityToOverlay`), so all sources compose identically. The reverse direction, `siteToSanityDocuments` (`content/sanity-seed.ts`, used by `saito seed`), must stay its exact inverse — `packages/core/test/seed.test.ts` round-trips every site to enforce this. Sanity document ids must not contain `.` (dotted ids are private).
+**Override semantics are keyed by section id**, not array position: `sections.<id>: {...}` merges into the template section; `sections.<id>: false` removes it; an unknown id *with* `type` adds a new section; `order: [...]` puts listed ids first. Pages absent from the template need `title` + typed sections. Sanity documents are converted into this same shape (`sanityToOverlay`), so all sources compose identically. The reverse direction, `siteToSanityDocuments` (`content/sanity-seed.ts`, used by `saito seed`), must stay its exact inverse — `packages/core/test/seed.test.ts` round-trips every site to enforce this. Sanity document ids must not contain `.` (dotted ids are private). **Golden rule (README, "Content publishing"):** every field has one owner; builds never write to Sanity (no `seed --overwrite` in builds or CI).
 
 `.env` is never loaded automatically; use exported vars or `npx tsx --env-file=.env packages/cli/src/index.ts …`.
 
@@ -61,4 +61,4 @@ Touch all of: the zod schema in `packages/core/src/schema/sections.ts` (add to t
 - Root `package.json` `overrides` pins Vite 6 so Astro 5 and Vitest share one Vite (otherwise `astro check` fails on plugin types). Versions are intentionally pinned to Astro 5 / Vitest 3 / Zod 3 / TypeScript 5.
 - `packages/components` is excluded from the root `tsconfig.json` (it imports `.astro`); it is type-checked by `astro check` via the renderer's tsconfig.
 - Site `id` must equal its directory name; ids, tenants and section ids are kebab-case.
-- CI/deploy (`.github/workflows`) build only the sites returned by `saito affected`; keep its path rules in `packages/cli/src/commands.ts` in sync if you move directories.
+- There is no CI (proof of concept): run tests by hand and deploy code/YAML changes with `./deploy.sh`. Sanity publishes call a Cloudflare Pages deploy hook per site, which runs `scripts/pages-build.sh <site>` (output `dist/pages`). `saito affected` lists the sites a change touches; keep its path rules in `packages/cli/src/commands.ts` in sync if you move directories.

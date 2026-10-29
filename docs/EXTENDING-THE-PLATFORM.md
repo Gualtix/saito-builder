@@ -150,7 +150,7 @@ npm run saito -- validate --all
 npm run saito -- dev <site>       # check in a browser
 ```
 
-CI rebuilds every site when shared code changes (`saito affected`).
+Shared code touches every site: `saito affected` lists them all, so redeploy with `./deploy.sh <env> --all`.
 
 ### Step 12: Close the loop
 

@@ -54,12 +54,12 @@ pages:
 **What is the process for configuring and publishing a new website?**
 1. Edit `site.config.yaml` (brand, theme, environments, integrations, page overrides).
 2. `saito dev <id>` gives a live preview; `saito validate <id>` checks the config.
-3. Open a PR. CI runs the tests and validation, then builds only the affected sites.
-4. Merging to `main` deploys the affected sites to **staging** automatically.
-5. A manual `Deploy` workflow run promotes to **production**; the GitHub environment can require reviewers.
+3. Run the checks by hand (`npm test`, `npm run typecheck`, `saito validate --all`); there is no CI. `git diff --name-only main | saito affected` lists the sites the change touches.
+4. `./deploy.sh staging <site...>` builds and uploads them to **staging** from your machine.
+5. `./deploy.sh production <site...>` promotes to **production** after a typed confirmation.
 
 **How are site-specific settings managed?**
-In `site.config.yaml`, validated by `siteConfigSchema` (`packages/core/src/schema/site.ts`). Per-environment values (URLs) live under `environments`. Secrets never go in site configs: CI credentials are GitHub environment secrets. Server-only values such as `forms.webhookUrl` are stripped from the resolved site, so they cannot leak into HTML.
+In `site.config.yaml`, validated by `siteConfigSchema` (`packages/core/src/schema/site.ts`). Per-environment values (URLs) live under `environments`. Secrets never go in site configs: deploy credentials live in git-ignored `environments/<site>/.<local|staging|prod>.env` files. Server-only values such as `forms.webhookUrl` are stripped from the resolved site, so they cannot leak into HTML.
 
 ## Template lifecycle
 
@@ -70,7 +70,7 @@ A template is a TypeScript module that calls `defineTemplate({...})`. It declare
 With semantic versioning. Several majors can coexist in the registry (`landing/v1.ts` and `landing/v2.ts`), so sites upgrade on their own schedule. Each version carries a `changelog`.
 
 **How are template updates propagated to existing websites?**
-Sites pin a **major** version (`landing@1`). Minor and patch releases (copy tweaks, new optional sections, style fixes) reach every site on its next build. `saito affected` maps a change in `packages/templates/src/<id>/` to exactly the sites that use that template, so CI rebuilds only those. Major releases are opt-in: `saito outdated` lists the sites that can upgrade.
+Sites pin a **major** version (`landing@1`). Minor and patch releases (copy tweaks, new optional sections, style fixes) reach every site on its next build. `saito affected` maps a change in `packages/templates/src/<id>/` to exactly the sites that use that template, so only those need redeploying. Major releases are opt-in: `saito outdated` lists the sites that can upgrade.
 
 **How can customisations be preserved when a template is upgraded?**
 - Sites store only *overrides*, never a copy of the template. A new template version therefore keeps every customisation that still applies.
@@ -113,7 +113,7 @@ The schema enforces this boundary: an unknown section type or field fails valida
 - In Sanity: datasets `development`, `staging` and `production`, with `page` and `siteSettings` documents scoped by `site` id. Media lives in Sanity's asset CDN.
 
 **How is content edited and published?**
-Developers and power users edit YAML. Editors use the Sanity Studio (`apps/studio`), which mirrors the core section schemas. Each CMS section carries a `sectionId`: one that matches a template section overrides it, and a new id adds a section. On publish, a Sanity webhook sends a GitHub `repository_dispatch` (`content-published`, payload `{ site, environment }`), and `deploy.yml` rebuilds just that site.
+Developers and power users edit YAML. Editors use the Sanity Studio (`apps/studio`), which mirrors the core section schemas. Each CMS section carries a `sectionId`: one that matches a template section overrides it, and a new id adds a section. On publish, a Sanity webhook calls the site's Cloudflare Pages deploy hook (one per site and dataset), and the Git-connected Pages project `saito-<site>` rebuilds just that site with `scripts/pages-build.sh`. The build still runs Astro because content is rendered into static HTML; one hook re-renders one site and leaves the others untouched.
 
 **How are media assets managed?**
 Site-specific static assets go in `sites/<id>/public/`, which Astro uses as that site's `publicDir`. CMS images go through Sanity's image CDN; `content/sanity.ts` turns image references into CDN URLs.
@@ -147,7 +147,7 @@ Section order, section variants (hero `centered`/`split`/`image-background`, col
 - `_headers`: immutable caching for fingerprinted `/_astro/*` assets; short edge TTL with `stale-while-revalidate` for HTML; security headers. Cloudflare Pages and Netlify read it natively.
 - `saito-manifest.json`: site, tenant, environment, template version and page list, for deploy tooling and audits.
 
-`scripts/deploy.sh` keeps hosting pluggable (`DEPLOY_PROVIDER` = `cloudflare-pages` | `netlify` | `s3-cloudfront`), so no part of the platform depends on a single cloud.
+`scripts/deploy.sh`, called by `./deploy.sh`, keeps manual deploys pluggable (`DEPLOY_PROVIDER` = `cloudflare-pages` | `netlify` | `s3-cloudfront`), so no part of the platform depends on a single cloud. Content publishes rebuild through Cloudflare Pages deploy hooks.
 
 ## Security notes
 

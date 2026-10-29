@@ -6,8 +6,8 @@
 #   production  build for production and upload it (Cloudflare branch "main"); asks for confirmation
 #
 # Each site loads its own settings from environments/<site>/.<local|staging|prod>.env (git-ignored).
-# The file is optional for local and required for staging and production. CI does not use these files:
-# it reads GitHub variables and secrets (.github/workflows/deploy.yml).
+# The file is optional for local and required for staging and production. Sanity publishes do not use
+# this script: they trigger Cloudflare deploy hooks, which run scripts/pages-build.sh.
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

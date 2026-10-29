@@ -2,7 +2,7 @@
 # Hosting-agnostic deploy of one built site directory.
 # Usage: scripts/deploy.sh <provider> <dist-dir> <site-id>
 # Providers: cloudflare-pages | netlify | s3-cloudfront | none
-# Credentials are read from the environment (see .github/workflows/deploy.yml); nothing is hard-coded.
+# Credentials are read from the environment (./deploy.sh loads environments/<site>/.<env>.env); nothing is hard-coded.
 set -euo pipefail
 
 provider="${1:?provider required}"

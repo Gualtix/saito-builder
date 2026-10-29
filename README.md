@@ -42,7 +42,8 @@ flowchart LR
   subgraph Build["Build side"]
     direction TB
     Repo["Saito Builder repo<br>templates, sites, CLI, renderer"]
-    GHA["GitHub Actions<br>CI + Deploy workflows"]
+    Mach["Developer machine<br>./deploy.sh"]
+    CFB["Cloudflare Pages build<br>scripts/pages-build.sh"]
     Sanity["Sanity<br>Studio + Content Lake"]
   end
 
@@ -53,18 +54,21 @@ flowchart LR
     Third["Third parties<br>analytics, commerce"]
   end
 
-  Dev -->|"PR"| Repo
+  Dev -->|"commit"| Repo
+  Dev -->|"code, YAML change"| Mach
   Ed -->|"publish"| Sanity
-  Repo -->|"push, PR"| GHA
-  Sanity -.->|"webhook:<br>content-published"| GHA
-  GHA -->|"reads content<br>at build time"| Sanity
-  GHA -->|"scripts/deploy.sh"| CDN
+  Sanity -.->|"webhook:<br>deploy hook"| CFB
+  Repo -->|"clone"| CFB
+  Mach -->|"reads content<br>at build time"| Sanity
+  CFB -->|"reads content<br>at build time"| Sanity
+  Mach -->|"scripts/deploy.sh"| CDN
+  CFB -->|"publish"| CDN
   Vis -->|"HTTPS"| CDN
   CDN -.->|"contact form post"| API
   CDN -.->|"scripts"| Third
 
   class Dev,Ed,Vis gray
-  class Repo,GHA,Sanity blue
+  class Repo,Mach,CFB,Sanity blue
   class CDN green
   class API,Third gray
   style Build fill:#1e1e38,stroke:#3b82f6,stroke-width:2px,color:#ffffff,filter:none
@@ -164,7 +168,6 @@ flowchart LR
   A["apps/"]
   S["sites/"]
   Sc["scripts/"]
-  W[".github/workflows/"]
   D["docs/"]
   LS["live-sketching/<br>standalone POC"]
   Out["dist/&lt;env&gt;/&lt;site&gt;/<br>build output, ignored"]
@@ -181,21 +184,19 @@ flowchart LR
   S --> S3["&lt;id&gt;/public/"]
   Sc --> Sc1["deploy.sh"]
   Sc --> Sc2["live_template.py"]
-  W --> W1["ci.yml"]
-  W --> W2["deploy.yml"]
+  Sc --> Sc3["pages-build.sh"]
   D --> D1["ARCHITECTURE.md<br>CONFIGURATION.md"]
 
   Root --> P
   Root --> A
   Root --> S
   Root --> Sc
-  Root --> W
   Root --> D
   Root --> LS
   Root --> Out
 
-  class Root,P,A,S,Sc,W,D blue
-  class P1,P2,P3,P4,A1,A2,A3,Sc1,Sc2,W1,W2,D1 gray
+  class Root,P,A,S,Sc,D blue
+  class P1,P2,P3,P4,A1,A2,A3,Sc1,Sc2,Sc3,D1 gray
   class S1,S2,S3 blue
   class Out green
   class LS gray
@@ -384,7 +385,7 @@ flowchart LR
     E4["API_PORT, API_HOST,<br>API_DATA_DIR"]
   end
 
-  subgraph GHEnv["GitHub secrets"]
+  subgraph GHEnv["environments/&lt;site&gt;/.&lt;env&gt;.env<br>git-ignored, ./deploy.sh only"]
     direction TB
     G1["DEPLOY_PROVIDER"]
     G2["CLOUDFLARE_*, NETLIFY_*,<br>AWS_*, S3_BUCKET_PREFIX,<br>CLOUDFRONT_DISTRIBUTIONS"]
@@ -416,7 +417,7 @@ flowchart LR
   style GHEnv fill:#142824,stroke:#10b981,stroke-width:2px,color:#ffffff,filter:none
 ```
 
-`.env` is never loaded automatically: export the variables, or run `npx tsx --env-file=.env packages/cli/src/index.ts <command>`. Field-by-field reference: [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
+`.env` is never loaded automatically: export the variables, or run `npx tsx --env-file=.env packages/cli/src/index.ts <command>`. `./deploy.sh` loads `environments/<site>/.<local|staging|prod>.env` per site; Cloudflare Pages hook builds take theirs from the project settings ([setup](#cloudflare-pages-setup-per-site)). Field-by-field reference: [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 
 ---
 
@@ -445,14 +446,13 @@ flowchart LR
     D1["saito validate"] --> D2["npm test,<br>npm run typecheck"]
   end
   subgraph J5["Step 5: Ship"]
-    E1["PR: CI builds<br>affected sites"] --> E2["Merge: staging"]
-    E2 --> E3["Manual run:<br>production"]
+    E1["./deploy.sh staging<br>affected sites"] --> E2["./deploy.sh production<br>typed confirmation"]
   end
 
   J1 --> J2 --> J3 --> J4 --> J5
 
   class A1,A2,B1,B2,C1,C2,D1,D2 blue
-  class E1,E2,E3 green
+  class E1,E2 green
   style J1 fill:#1e1e38,stroke:#3b82f6,stroke-width:2px,color:#ffffff,filter:none
   style J2 fill:#1e1e38,stroke:#3b82f6,stroke-width:2px,color:#ffffff,filter:none
   style J3 fill:#1e1e38,stroke:#3b82f6,stroke-width:2px,color:#ffffff,filter:none
@@ -554,7 +554,7 @@ flowchart TD
 
   M0["Template change"] --> M1{"Breaks existing<br>site overrides?"}
   M1 -->|"no: copy, style,<br>new optional section"| M2["Edit vN.ts, bump minor or patch,<br>add a changelog entry"]
-  M2 --> M3["PR: saito affected rebuilds<br>only sites using this template"]
+  M2 --> M3["saito affected lists only<br>sites using this template"]
   M3 --> M4["Every site on @N picks it up<br>on its next build"]
   M1 -->|"yes: renamed or<br>removed section ids"| M5["Add v(N+1).ts with a TemplateMigration<br>from, to, notes, migrate(config)"]
   M5 --> M6["Register both versions<br>in index.ts"]
@@ -579,30 +579,39 @@ sequenceDiagram
   actor Ed as Editor
   participant Stu as Sanity Studio
   participant Lake as Sanity Content Lake
-  participant GH as GitHub repository_dispatch
-  participant Dep as deploy.yml
+  participant Hook as Deploy hook, main or staging
+  participant Pages as Pages project saito-site
   participant CLI as saito build
-  participant CDN as CDN host
+  participant CDN as Cloudflare Pages CDN
 
   Ed->>+Stu: edit page or siteSettings for one site
   Stu->>+Lake: publish document
   Lake-->>-Stu: published
   deactivate Stu
-  Lake->>+GH: webhook content-published, payload site + environment
-  GH->>+Dep: trigger
-  deactivate GH
-  Dep->>Dep: plan: keep only that site, environment defaults to production
-  Dep->>+CLI: build site with SAITO_CONTENT_SOURCE=sanity
-  CLI->>+Lake: GROQ query, dataset = environment
+  Lake->>+Hook: webhook POST, filter matches site and dataset
+  Hook->>+Pages: build the hook's branch
+  deactivate Hook
+  Pages->>Pages: clone repo, install dependencies
+  Pages->>+CLI: scripts/pages-build.sh site, SAITO_ENV from project variables
+  CLI->>+Lake: GROQ query, dataset = SAITO_ENV
   Lake-->>-CLI: documents
   CLI->>CLI: sanityToOverlay, merge over local content, render
-  CLI-->>-Dep: dist folder
-  Dep->>+CDN: scripts/deploy.sh
-  CDN-->>-Dep: deployed
-  deactivate Dep
+  CLI-->>-Pages: dist/pages
+  Pages->>+CDN: publish deployment
+  CDN-->>-Pages: live
+  deactivate Pages
 ```
 
-`saito seed` runs the opposite direction (local content → Sanity) and must stay the exact inverse of `sanityToOverlay`; `packages/core/test/seed.test.ts` round-trips every site to enforce it. Deploys read Sanity only when the GitHub variable `SAITO_CONTENT_SOURCE` is `sanity`.
+`saito seed` runs the opposite direction (local content → Sanity) and must stay the exact inverse of `sanityToOverlay`; `packages/core/test/seed.test.ts` round-trips every site to enforce it. Builds read Sanity only when `SAITO_CONTENT_SOURCE` is `sanity`: set in the Pages project variables for hook builds, and in `environments/<site>/.<env>.env` for `./deploy.sh`. Setup: [Cloudflare Pages setup (per site)](#cloudflare-pages-setup-per-site).
+
+A publish still runs Astro: pages are static HTML with the content rendered into them, so new content means new HTML. One deploy hook belongs to one Pages project, which builds one site, so only that site is re-rendered and the others are untouched. Patching `dist` without Astro would mean maintaining a second renderer.
+
+> [!IMPORTANT]
+> **Golden rule: every field has exactly one owner.** Builds only *read* Sanity and never write to it; a YAML edit never reaches Sanity, and where both define a field, Sanity wins. Never make builds run `saito seed --overwrite`: it would wipe editors' work, revert each publish on the next build, loop through the publish webhook, and put a Sanity write token in the build environment.
+>
+> 1. **YAML only:** set `SAITO_CONTENT_SOURCE=local` and don't use Sanity, if editors don't need it.
+> 2. **Split ownership (the current model):** Sanity owns content; YAML owns structure, theme and integrations. Seed once, then edit content only in the Studio.
+> 3. **Optional safety net:** a check that only *warns* when YAML and Sanity disagree. It reports the drift and never writes. (Not implemented yet.)
 
 ---
 
@@ -613,7 +622,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Dev as Developer or CI
+  actor Dev as Developer or Pages build
   participant CLI as saito build
   participant Core as core pipeline
   participant Astro as Astro renderer
@@ -644,7 +653,15 @@ sequenceDiagram
 | `_headers` | Immutable caching for `/_astro/*`, short edge TTL + `stale-while-revalidate` for HTML, security headers, `X-Robots-Tag: noindex` outside production |
 | `saito-manifest.json` | Site, tenant, environment, URL, template version, pages, build time |
 
-### CI on every PR and push
+### Checks before a deploy
+
+There is no CI: run the checks by hand, then redeploy the sites the change touches.
+
+```bash
+npm test && npm run typecheck && npm run saito -- validate --all
+git diff --name-only main | npm run saito -- affected                          # sites this change touches
+./deploy.sh staging $(git diff --name-only main | npm run -s saito -- affected)   # redeploy them to staging
+```
 
 ```mermaid
 flowchart LR
@@ -654,26 +671,26 @@ flowchart LR
   classDef teal  fill:#0f2d2d,stroke:#14b8a6,stroke-width:2px,color:#ffffff,filter:none
   classDef gray  fill:#1f1f1f,stroke:#6b7280,stroke-width:2px,color:#ffffff,filter:none
 
-  subgraph Verify["Job: verify"]
+  subgraph Verify["Run by hand"]
     direction TB
-    V1["npm ci"] --> V2["npm test"] --> V3["tsc --noEmit"] --> V4["saito validate --all<br>--env production"] --> V5["git diff | saito affected"]
+    V1["npm test"] --> V2["npm run typecheck"] --> V3["saito validate --all"] --> V4["git diff | saito affected"]
   end
-  subgraph Matrix["Job: build per site"]
+  subgraph Ship["From your machine"]
     direction TB
-    B1["saito build site<br>--env staging"] --> B2["Upload artifact<br>kept 7 days"]
+    B1["./deploy.sh staging<br>listed sites"] --> B2["./deploy.sh production<br>listed sites"]
   end
-  V5 -->|"sites list"| B1
-  V5 -->|"empty list"| Skip["No builds"]
+  V4 -->|"sites list"| B1
+  V4 -->|"empty list"| Skip["Nothing to redeploy"]
 
-  class V1,V2,V3,V4,V5 blue
+  class V1,V2,V3,V4 blue
   class B1 blue
   class B2 green
   class Skip teal
   style Verify fill:#1e1e38,stroke:#3b82f6,stroke-width:2px,color:#ffffff,filter:none
-  style Matrix fill:#142824,stroke:#10b981,stroke-width:2px,color:#ffffff,filter:none
+  style Ship fill:#142824,stroke:#10b981,stroke-width:2px,color:#ffffff,filter:none
 ```
 
-### Which sites a change rebuilds (`saito affected`)
+### Which sites a change touches (`saito affected`)
 
 ```mermaid
 flowchart TD
@@ -698,9 +715,11 @@ flowchart TD
   class R3 red
 ```
 
-Keep these path rules in sync with `packages/cli/src/commands.ts` if directories move. Anything else counts as platform code, including `scripts/` and `live-sketching/` HTML.
+Use it to choose what to redeploy. Keep these path rules in sync with `packages/cli/src/commands.ts` if directories move. Anything else counts as platform code, including `scripts/` and `live-sketching/` HTML.
 
 ### Deployment flow
+
+Two paths reach the CDN: `./deploy.sh` from a machine for code and YAML changes, and a Cloudflare Pages deploy hook for Sanity publishes. GitHub runs nothing.
 
 ```mermaid
 flowchart TD
@@ -712,35 +731,44 @@ flowchart TD
 
   subgraph Triggers["Triggers"]
     direction LR
-    T1["push to main"]
-    T2["workflow_dispatch<br>environment + sites"]
-    T3["repository_dispatch<br>content-published"]
+    T1["./deploy.sh staging or production<br>code or YAML change"]
+    T0["./deploy.sh local"]
+    T2["Sanity publish<br>webhook to deploy hook"]
   end
 
-  P["Job: plan"]
-  T1 -->|"staging,<br>affected sites"| P
-  T2 -->|"chosen env,<br>listed or all sites"| P
-  T3 -->|"payload env, default production,<br>one site"| P
-
-  P --> Q{"Any sites?"}
-  Q -->|"no"| Stop["Nothing to deploy"]
-  Q -->|"yes"| G["Job: deploy, matrix per site<br>max 8 in parallel<br>GitHub environment gate"]
-  G --> B["saito build site"]
-  B --> D{"scripts/deploy.sh<br>DEPLOY_PROVIDER"}
-  D -->|"cloudflare-pages"| C1["wrangler pages deploy<br>project saito-site,<br>branch main or env"]
+  T0 --> L["saito build, then astro preview<br>on :4321, no upload"]
+  T1 --> M["Load environments/site/.staging.env<br>or .prod.env, saito build site"]
+  M --> D{"scripts/deploy.sh<br>DEPLOY_PROVIDER"}
+  D -->|"cloudflare-pages"| C1["wrangler pages deploy<br>project saito-site,<br>branch main or staging"]
   D -->|"netlify"| C2["netlify deploy<br>--prod or --alias=env"]
   D -->|"s3-cloudfront"| C3["S3 sync: assets immutable,<br>HTML revalidated,<br>CloudFront invalidation"]
-  D -->|"none"| C4["Build only, no upload"]
-  D -->|"unknown"| C5["Exit 1"]
+  D -->|"unset, none or unknown"| C5["Exit 1"]
+  T2 --> P["Pages project saito-site<br>scripts/pages-build.sh site"]
+  P --> C4["Cloudflare Pages deployment<br>main: production, staging: preview"]
 
-  class T1,T2,T3 gray
-  class P,G,B blue
-  class Q,D gray
-  class C1,C2,C3 green
-  class C4,Stop teal
+  class T0,T1,T2 gray
+  class M,P blue
+  class D gray
+  class C1,C2,C3,C4 green
+  class L teal
   class C5 red
   style Triggers fill:#1e1e38,stroke:#3b82f6,stroke-width:2px,color:#ffffff,filter:none
 ```
+
+`./deploy.sh <local|staging|production> <site...|--all> [--yes]` builds each site with the CLI into `dist/<env>/<site>/`, then uploads it. `production` asks you to type `production` (or pass `--yes`). Wrangler Direct Upload also works against the Git-connected Pages projects below.
+
+### Cloudflare Pages setup (per site)
+
+Each site has one Pages project, `saito-<site>`, **connected to the GitHub repo**: deploy hooks exist only with Git integration, and a Direct Upload project cannot be converted. Delete and recreate a Direct Upload project (such as the existing `saito-acme-corp`) as Git-connected.
+
+1. **Build settings:** build command `./scripts/pages-build.sh <site>`, output directory `dist/pages`, root directory `/`. The script requires `SAITO_ENV`, runs the normal CLI build for that site and copies `dist/$SAITO_ENV/<site>` to `dist/pages`.
+2. **Variables:** Production `SAITO_ENV=production`; Preview `SAITO_ENV=staging`; both `SAITO_CONTENT_SOURCE=sanity`, `SANITY_PROJECT_ID=<project-id>`, `NODE_VERSION=22`. No tokens: the datasets are public and `SANITY_DATASET` defaults to the environment name. Add `SANITY_READ_TOKEN` as a secret only if a dataset becomes private.
+3. **Automatic deployments off:** Settings → Builds → Branch control: uncheck automatic production deployments and set preview branches to None, so pushes to GitHub deploy nothing.
+4. **Two deploy hooks:** one on branch `main` (production), one on branch `staging` (preview, served at `staging.saito-<site>.pages.dev`). The `staging` git branch must exist. Hook builds use the code on that branch, so run `git push origin main:staging` when staging content builds should pick up new code.
+5. **Sanity webhooks** (sanity.io/manage → API → Webhooks), one per site and dataset: URL = the matching deploy hook (`staging` dataset → `staging` hook, `production` dataset → `main` hook), Dataset `staging` or `production`, trigger on create, update and delete, filter `_type in ["page","siteSettings"] && site == "<site-id>"`, HTTP method POST, no projection, drafts off.
+
+> [!WARNING]
+> A deploy hook URL is a secret: anyone who has it can trigger builds. Keep it only in Cloudflare and in the Sanity webhook, never in git.
 
 ### Build and deployment lifecycle
 
@@ -754,14 +782,15 @@ flowchart LR
 
   subgraph Build["Build phase"]
     direction LR
-    L1["development<br>saito dev / build,<br>noindex"] --> L2["PR<br>CI: test, validate,<br>build affected"]
+    L1["development<br>saito dev, ./deploy.sh local,<br>noindex"] --> L2["checks by hand<br>test, typecheck, validate,<br>saito affected"]
   end
   subgraph Prod["Release phase"]
     direction LR
-    R1["staging<br>auto on merge,<br>noindex"] --> R2["production<br>manual, reviewers,<br>indexable"]
+    R1["staging<br>./deploy.sh staging,<br>noindex"] --> R2["production<br>./deploy.sh production,<br>typed confirmation, indexable"]
   end
-  L2 -->|"merge to main"| R1
-  CMS["Sanity publish"] -.->|"rebuild one site"| R2
+  L2 -->|"./deploy.sh staging"| R1
+  CMS["Sanity publish"] -.->|"staging dataset:<br>staging hook, one site"| R1
+  CMS -.->|"production dataset:<br>main hook, one site"| R2
 
   class L1,L2 blue
   class R1 green
@@ -787,9 +816,9 @@ stateDiagram-v2
   Scaffolded --> Configured : edit YAML, content
   Configured --> Invalid : validation fails
   Invalid --> Configured : fix reported paths
-  Configured --> Staging : merge to main
-  Staging --> Production : manual deploy
-  Production --> Staging : next change merged
+  Configured --> Staging : ./deploy.sh staging
+  Staging --> Production : ./deploy.sh production
+  Production --> Staging : next change deployed
   Production --> Outdated : template ships a new major
   Outdated --> Upgraded : saito upgrade
   Upgraded --> Configured : review migrated YAML
@@ -878,7 +907,7 @@ Only sites with `integrations.forms` are served. Bots that fill the honeypot get
 | Inline JSON | JSON-LD and analytics snippets use `jsonForScript` |
 | CSS | Theme colours are hex only; font names are regex-restricted |
 | Indexing | Non-production builds are always `noindex` |
-| Secrets | Never in site configs: CI credentials are GitHub environment secrets |
+| Secrets | Never in site configs or git: deploy credentials live in git-ignored `environments/<site>/.<env>.env`; deploy hook URLs live only in Cloudflare and the Sanity webhook |
 | Sanity ids | Must not contain `.` (dotted ids are private) |
 
 ### Gotchas
