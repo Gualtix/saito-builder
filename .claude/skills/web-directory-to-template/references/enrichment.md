@@ -8,7 +8,8 @@ What the project teaches goes back into the shared references, so the next templ
 |---|---|---|
 | A colour scheme no preset covers | `packages/templates/src/themes.ts` | New named preset (below) |
 | A design token the theme cannot hold (per-role radii, shadows, gradients, spacing rhythm, breakpoints, motion) | `template.example.ts` → `templateExtensions.tokens` | New generic DTCG token group or token |
-| A section, component, interaction, layout, decoration or app-shell feature the schema cannot express | `sites/example.config.yaml` → `x-patterns` (the shared catalog) | Add or update an entry (below); reference its key in the new template's `templateExtensions.patterns` |
+| A section, component, interaction, layout, decoration or app-shell feature the schema cannot express | `sites/example.config.yaml` → `x-patterns` (the shared catalog) | Add or update an entry (below); flag it in the new template's `templateExtensions.unsupportedCapabilities` (`template-guide.md` section 9) |
+| A capability no template has flagged before | `template.example.ts` → `templateExtensions.capabilities` | Add `'<key>': { support: 'unsupported', requirement: '<one line: what the platform must add>', firstSeenIn: '<template id>' }`, same key as `x-patterns` |
 | A new taxonomy value (industry, style, tone, conversion goal) | `sites/example.config.yaml` → `x-vocabulary` | Append, kebab-case, reuse first |
 | A template-authoring convention worth repeating (an abstraction, a naming rule, a placeholder policy) | `template.example.ts` → header comments or `templateExtensions` (`assets`, `extensibility`) | Short, generic rule with its reason |
 
@@ -44,6 +45,7 @@ Merge rules:
 
 - One entry per capability, keyed in kebab-case by what it **is**, not where it was seen (`appointment-booking`, not `smile-studio-booking`).
 - Look for an existing entry that means the same thing before adding one. If you find one, increment `occurrences` once per extraction, add new `seenIn` values, and add any new `fields`. Do not create near-duplicates (`booking-form` next to `appointment-booking`).
+- `occurrences` counts distinct source designs. A source that was already extracted (for example as a site, then again as a template) does not add to it: compare the entry's history or the other templates' `source` before counting.
 - A behaviour spread over several components (a cart bar, a cart dialog and a location picker forming one ordering flow) is **one** pattern when visitors experience it as one capability, and you list its parts in `description`. A part that other designs reuse on its own (a location picker) can also get its own entry.
 - Note the browser capabilities and third-party services a pattern depends on (geolocation, service worker, a map library) in `description`. The platform must allow or load them when it builds the pattern.
 - Quote any value containing `: ` (common in `fallback` and `description`), or the example stops parsing.

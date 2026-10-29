@@ -44,7 +44,7 @@ Record one of these for every visible block and every behaviour, in the plan and
 | `unmapped` | No section type can carry it without distorting its meaning | Reservation widget with date, time and party size; a client-side cart |
 | `decorative` | Pure decoration, no content | Doodles, blobs, background textures |
 
-Prefer `lossy` over `unmapped` when the visitor still gets the same information and action. Prefer `unmapped` over a misleading mapping: a reservation widget forced into `contact` would promise a booking flow that does not exist. Every `lossy`, `unmapped` and reusable `decorative` entry is a candidate for `x-patterns`. The platform's fidelity targets and what happens to these rows are in `docs/EXTENDING-THE-PLATFORM.md`.
+Prefer `lossy` over `unmapped` when the visitor still gets the same information and action. Prefer `unmapped` over a misleading mapping: a reservation widget forced into `contact` would promise a booking flow that does not exist. Every `lossy`, `unmapped` and reusable `decorative` entry is an unsupported capability: flag it (`template-guide.md` section 9) and catalog it in `x-patterns`. The platform's fidelity targets and what happens to these rows are in `docs/EXTENDING-THE-PLATFORM.md`.
 
 ## 3. Section patterns → section types
 

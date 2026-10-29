@@ -83,4 +83,22 @@ export const themes = {
     fonts: { heading: 'Fredoka', body: 'Nunito', googleFonts: true },
     radius: 'lg',
   },
+  // Near-white canvas, tangerine fills, sage accent, ink bands; handwritten script headings.
+  // Ink on primary 7.6:1, muted on background 7.1:1.
+  citrus: {
+    mode: 'light',
+    colors: {
+      primary: '#e99b3f',
+      primaryContrast: '#1c1a17',
+      secondary: '#1c1a17',
+      accent: '#99bd76',
+      background: '#fefefe',
+      surface: '#f1f1f1',
+      text: '#1c1a17',
+      muted: '#5d574f',
+      border: '#e6e1d9',
+    },
+    fonts: { heading: 'Dancing Script', body: 'Figtree', googleFonts: true },
+    radius: 'lg',
+  },
 } satisfies Record<string, Theme>;

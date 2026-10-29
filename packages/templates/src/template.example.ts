@@ -463,6 +463,8 @@ export const templateExtensions = {
     shadow: {
       photo: { $type: 'shadow', $value: { offsetX: '0', offsetY: '18px', blur: '26px', spread: '-14px', color: '#24151080' } },
     },
+    // Translucent overlay over full-bleed photo bands (hero, CTA bands), as 8-digit hex.
+    overlay: { scrim: { $type: 'color', $value: '#140f0a9e' } },
   },
 
   // What a site must supply for this template to look finished.
@@ -485,9 +487,64 @@ export const templateExtensions = {
   },
 
   // Candidate section types, components and decorations seen in real designs live in ONE
-  // shared catalog, so templates never keep diverging lists.
-  // Templates reference catalog keys in their own templateExtensions.patterns.
+  // shared catalog (x-patterns): kind, fields, fallback and how often they occur.
   patternCatalog: 'sites/example.config.yaml → x-patterns',
+
+  // UNSUPPORTED CAPABILITIES
+  // A source design is never forced to fit the platform. When the renderer lacks the component, field,
+  // token or infrastructure a design needs, the template renders the nearest honest fallback and flags
+  // the gap in two places:
+  //   1. a `// UNSUPPORTED <key> → <fallback>` comment on the section, navigation or page that falls back;
+  //   2. an entry in templateExtensions.unsupportedCapabilities, keyed by the x-patterns key:
+  //        affects          section ids, or 'header' | 'footer' | 'site'
+  //        purpose          why the design has it (the visitor or business goal)
+  //        expectedBehavior what the source does, with the sizes, states and breakpoints needed to rebuild it
+  //        requirements     what the platform must add: schema fields, components, web components, tokens,
+  //                         build output (headers, head tags), Studio and seed, docs, third-party dependencies
+  //        fallback         what the template renders today
+  // These entries are the platform's requirements backlog for full-fidelity templates
+  // (docs/EXTENDING-THE-PLATFORM.md, Phase B). Example for this template:
+  unsupportedCapabilities: {
+    'table-reservation': {
+      affects: ['contact'],
+      purpose: 'Let visitors book a consultation without leaving the page.',
+      expectedBehavior: 'Date and time picker with available slots; confirms by email.',
+      requirements: ['booking integration { provider, url } (schema, docs)', 'reservation section type or a cta variant'],
+      fallback: 'contact page with a phone number',
+    },
+  },
+
+  // CAPABILITY REGISTRY: every capability any template has flagged, with its platform support.
+  // Add newly discovered ones as 'unsupported' (same key as x-patterns); set 'supported' when the
+  // platform ships it, and remove the matching flags from the templates. Checked by template-example.test.ts.
+  capabilities: {
+    'transparent-header': { support: 'unsupported', requirement: 'navigation option transparentOverHero; Header.astro variant with a scroll script', firstSeenIn: 'family-kitchen' },
+    'header-icon-links': { support: 'unsupported', requirement: 'navigation.iconLinks; shared SVG icon set', firstSeenIn: 'family-kitchen' },
+    'localized-ui-labels': { support: 'unsupported', requirement: 'locale-keyed strings dictionary in packages/components, chosen by site.locale', firstSeenIn: 'family-kitchen' },
+    'hero-wordmark': { support: 'unsupported', requirement: 'hero option headingSize: display; fluid display font-size token', firstSeenIn: 'family-kitchen' },
+    'daily-specials': { support: 'unsupported', requirement: 'section type specials { heading, intro, price, priceNote, items, images, action }', firstSeenIn: 'family-kitchen' },
+    'promo-badge': { support: 'unsupported', requirement: 'badge { text, note } on specials and cta; CSS shape', firstSeenIn: 'family-kitchen' },
+    'image-marquee': { support: 'unsupported', requirement: 'gallery layout marquee; CSS loop, paused on hover, static under reduced motion', firstSeenIn: 'family-kitchen' },
+    'svg-icon-badges': { support: 'unsupported', requirement: 'features icon from a shared SVG set plus badgeColor; accent tokens', firstSeenIn: 'family-kitchen' },
+    'media-text-split': { support: 'unsupported', requirement: 'richText and contact fields image, imagePosition, action', firstSeenIn: 'family-kitchen' },
+    'offset-color-slab': { support: 'unsupported', requirement: 'media decoration slab: <accent token>; slab radius token', firstSeenIn: 'family-kitchen' },
+    'heading-accent-bar': { support: 'unsupported', requirement: 'theme option headingDecoration; shared section-heading component', firstSeenIn: 'family-kitchen' },
+    'line-doodles': { support: 'unsupported', requirement: 'per-section decoration slot for SVG assets', firstSeenIn: 'family-kitchen' },
+    'menu-item-photos': { support: 'unsupported', requirement: 'menu item image; Menu.astro layout cards', firstSeenIn: 'family-kitchen' },
+    'product-options-dialog': { support: 'unsupported', requirement: 'menu item ingredients; dialog web component', firstSeenIn: 'family-kitchen' },
+    'messaging-app-checkout': { support: 'unsupported', requirement: 'commerce provider whatsapp; cart web component; message, wa.me URL and order id with tests', firstSeenIn: 'family-kitchen' },
+    'delivery-location-pin': { support: 'unsupported', requirement: 'commerce.location; lazy Leaflet with SRI; geolocation allowed only when enabled', firstSeenIn: 'family-kitchen' },
+    'table-reservation': { support: 'unsupported', requirement: 'booking integration or forms endpoint; reservation section or cta variant', firstSeenIn: 'family-kitchen' },
+    'photo-band-card': { support: 'unsupported', requirement: 'cta backgroundImage and layout image-band; scrim token', firstSeenIn: 'family-kitchen' },
+    'masonry-gallery': { support: 'unsupported', requirement: 'gallery layout masonry with per-image span', firstSeenIn: 'family-kitchen' },
+    'section-header-action': { support: 'unsupported', requirement: 'optional headerAction link on sections without an action', firstSeenIn: 'family-kitchen' },
+    'carousel': { support: 'unsupported', requirement: 'testimonials layout carousel; small web component for the controls', firstSeenIn: 'family-kitchen' },
+    'review-rating': { support: 'unsupported', requirement: 'testimonial rating 1–5 and source', firstSeenIn: 'family-kitchen' },
+    'category-tiles': { support: 'unsupported', requirement: 'section type tiles, or a gallery layout with intro and action', firstSeenIn: 'family-kitchen' },
+    'scroll-reveal': { support: 'unsupported', requirement: 'theme motion option reveal; one IntersectionObserver script', firstSeenIn: 'family-kitchen' },
+    'installable-app': { support: 'unsupported', requirement: 'brand.pwa; Head.astro tags; install web component; service-worker registration', firstSeenIn: 'family-kitchen' },
+    'offline-page': { support: 'unsupported', requirement: 'per-site service worker and offline page; no-cache header for /sw.js', firstSeenIn: 'family-kitchen' },
+  },
 
   // Placeholder copy every site should replace before launch, by override path.
   requiredContent: [
@@ -496,6 +553,14 @@ export const templateExtensions = {
     'pages.index.sections.testimonials.items',
     'pages.contact.sections.contact',
   ],
+
+  // Sections the source design hid but that belong to the use case. They ship with the template;
+  // a site that does not offer them removes them with `sections.<id>: false`.
+  optionalSections: ['pricing'],
+
+  // Settings a site supplies to a pattern once the platform builds it, keyed by x-patterns key.
+  // They configure behaviour (a phone number, an order prefix), so they never go in sections.
+  integrationSettings: { 'table-reservation': ['booking provider', 'booking page URL'] },
 
   // Templates are not deployed on their own: a version ships when it is merged to
   // main and the sites that pin this template are redeployed (saito affected lists them).

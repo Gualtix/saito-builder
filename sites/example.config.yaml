@@ -84,11 +84,11 @@
 # =============================================================================
 x-meta:
   documentType: site-config            # site-config | template-blueprint
-  referenceVersion: 1.2.0              # semver of this reference file's structure
+  referenceVersion: 1.3.0              # semver of this reference file's structure
   status: reference                    # draft | active | deprecated | reference
   maintainers:
     - platform-team@meridian.example
-  lastReviewed: 2026-10-26             # ISO 8601 date
+  lastReviewed: 2026-10-29             # ISO 8601 date
 
 
 # =============================================================================
@@ -221,6 +221,8 @@ x-components:
 #  kind:   section | component | decoration | interaction | layout
 #  status: proposed (seen, not built) | planned | implemented (now a real type)
 #  seenIn lists website types or industries, never business names.
+#  occurrences counts distinct source designs: re-extracting one already counted
+#  (as a site and later as a template) does not add to it.
 # =============================================================================
 x-patterns:
   media-text-split:
@@ -501,6 +503,96 @@ x-patterns:
       label: string
     nearestType: none
     fallback: omitted
+    seenIn: [restaurant, cafe]
+    occurrences: 1
+  menu-item-photos:
+    kind: component
+    status: proposed
+    description: Menu items as photo cards (photo, category label, name, description, price, order button) in a responsive grid.
+    fields:
+      image: image
+      categoryLabel: boolean
+    nearestType: menu
+    fallback: menu text rows (photos lost)
+    seenIn: [restaurant]
+    occurrences: 1
+  product-options-dialog:
+    kind: interaction
+    status: proposed
+    description: "Dialog opened from a menu item: photo, description, removable ingredients (checked = included) and a quantity stepper; also edits an existing cart line."
+    fields:
+      ingredients: string[]
+      maxQty: number
+    nearestType: none
+    fallback: items ordered as listed (no customisation)
+    seenIn: [restaurant]
+    occurrences: 1
+  messaging-app-checkout:
+    kind: component
+    status: proposed
+    description: "Client-side cart (sticky cart bar, cart sheet with editable lines, checkout form for name, address and notes) that builds a formatted order message with an order id and opens a messaging app (WhatsApp wa.me). No server: cart and customer profile live in browser storage namespaced per site. Needs dialog and localStorage."
+    fields:
+      provider: "whatsapp"
+      phone: string
+      currency: "ISO 4217"
+      orderIdPrefix: string
+      maxQty: number
+    nearestType: cta
+    fallback: cta linking to the WhatsApp chat
+    seenIn: [restaurant]
+    occurrences: 1
+  delivery-location-pin:
+    kind: component
+    status: proposed
+    description: "Optional map in a checkout where the customer drops a pin or uses the device location; the order gets a maps link. Needs geolocation allowed by the site's Permissions-Policy, a map library loaded lazily with SRI, and map tiles (attribution and usage policy apply)."
+    fields:
+      center: "[lat, lng]"
+      zoom: number
+    nearestType: none
+    fallback: address text only
+    seenIn: [restaurant]
+    occurrences: 1
+  installable-app:
+    kind: component
+    status: proposed
+    description: "Web app manifest, maskable icons, iOS splash screens and theme colour, plus an install button on phones and tablets (the Chromium install prompt, or an instructions sheet on iOS, snoozed when dismissed). Needs a service worker."
+    fields:
+      manifest: "{ name, shortName, themeColor, backgroundColor }"
+      icons: "image[]"
+      splash: "image[]"
+    nearestType: none
+    fallback: omitted (the site stays a normal web page)
+    seenIn: [restaurant]
+    occurrences: 1
+  offline-page:
+    kind: interaction
+    status: proposed
+    description: "A service worker serves a self-contained offline page when a page load fails without a connection, and an in-page notice appears when an action needs the network."
+    fields:
+      title: string
+      body: string
+    nearestType: none
+    fallback: the browser's own offline error
+    seenIn: [restaurant]
+    occurrences: 1
+  hero-wordmark:
+    kind: component
+    status: proposed
+    description: The business name as the hero heading, in the script display font at display scale (about 230px on desktop, fluid on phones).
+    fields:
+      headingSize: "default | display"
+    nearestType: hero
+    fallback: hero heading at the normal size
+    seenIn: [restaurant]
+    occurrences: 1
+  localized-ui-labels:
+    kind: component
+    status: proposed
+    description: "Component chrome in the site language: mobile menu button, contact labels, form and dialog copy. Today several labels are hard-coded in English."
+    fields:
+      locale: "site.locale (no new site field)"
+    nearestType: none
+    fallback: English labels
     seenIn: [restaurant, cafe]
     occurrences: 1
 

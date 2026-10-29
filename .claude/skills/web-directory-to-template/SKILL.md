@@ -17,7 +17,7 @@ Turn a web project directory into a published, reusable template that any site c
 
 **A template, not a site.** A template keeps the design's structure and look but replaces the business's identity (name, phone, address, prices, reviewers, URLs, app name) with generic placeholders in the source language. The original business becomes the first site built on the template, in a separate step.
 
-The platform schema is fixed for this skill: no new section types, fields or component changes. What the schema cannot express is recorded (in `templateExtensions` and the pattern catalog), never forced into fields that would be silently dropped. Building it is platform work (`docs/EXTENDING-THE-PLATFORM.md`).
+The platform schema is fixed for this skill: no new section types, fields or component changes. **Don't force the design to fit what the platform renders today.** Keep an honest fallback so the template builds, and flag every component, feature or piece of infrastructure the Astro renderer lacks as an **unsupported capability**: why the design has it, how it behaves, and what the platform must add (`references/template-guide.md` section 9). Never force it into fields that would be silently dropped. The flags are the requirements backlog for full-fidelity templates; building them is platform work (`docs/EXTENDING-THE-PLATFORM.md`).
 
 ## Inputs
 
@@ -72,13 +72,15 @@ Skim tooling and assets; don't map them.
 - Map each layer with `references/mapping.md` section 1, and reconcile them: what renders wins over comments, docs and design briefs. Unreached code is dead: report it, don't map it.
 - Classify (industry, website types, visual style, tone, conversion, positioning) with values from `x-vocabulary`; this becomes `templateExtensions.taxonomy`.
 - Choose the id and decide single-page or multi-page (one template page per HTML page that is part of the site).
-- Plan every visible block **and every behaviour** → section id → type → fidelity (`exact`, `lossy`, `unmapped`, `decorative`) before writing code. Cite the source files for each row. Lossy, unmapped and reusable decorative rows map to `x-patterns` keys.
+- Plan every visible block **and every behaviour** → section id → type → fidelity (`exact`, `lossy`, `unmapped`, `decorative`) before writing code. Cite the source files for each row. Every lossy, unmapped and reusable decorative row is an unsupported capability with an `x-patterns` key.
 - Hidden blocks become optional sections when they belong to the use case (`mapping.md` section 6).
 - Decide the theme: an existing preset, a preset with overrides, or a new preset (`references/template-guide.md` section 4).
 
 ### 5. Write the template
 
-Create `packages/templates/src/<id>/v1.ts` following `references/template-guide.md` sections 3–6. Follow the existing templates' shape, write generic placeholder copy in the source language, use no local image paths, and give sections that require images working absolute placeholder URLs. Export a `templateExtensions` with source (the directory), taxonomy, patterns, tokens, assets, requiredContent and optionalSections.
+Create `packages/templates/src/<id>/v1.ts` following `references/template-guide.md` sections 3–6. Follow the existing templates' shape, write generic placeholder copy in the source language, use no local image paths, and give sections that require images working absolute placeholder URLs. Export a `templateExtensions` with source (the directory), taxonomy, unsupportedCapabilities, tokens, assets, integrationSettings, requiredContent and optionalSections.
+
+Flag each unsupported capability in two places (`references/template-guide.md` section 9): a `// UNSUPPORTED <key> → <fallback>` comment where the fallback renders, and an entry in `templateExtensions.unsupportedCapabilities` with `affects`, `purpose`, `expectedBehavior`, `requirements` and `fallback`.
 
 ### 6. Theme preset (only if needed)
 
@@ -90,7 +92,7 @@ Add the module to the registry in `packages/templates/src/index.ts`.
 
 ### 8. Enrich the references
 
-Apply `references/enrichment.md`: pattern entries in `x-patterns` (behaviours and app-shell features included), vocabulary values in `x-vocabulary`, theme capabilities beyond the schema in `template.example.ts` tokens, and reusable authoring conventions in `template.example.ts`. Generic and backward-compatible only.
+Apply `references/enrichment.md`: pattern entries in `x-patterns` (behaviours and app-shell features included), newly discovered capabilities in the `template.example.ts` registry (`templateExtensions.capabilities`, marked `support: 'unsupported'`), vocabulary values in `x-vocabulary`, theme capabilities beyond the schema in `template.example.ts` tokens, and reusable authoring conventions in `template.example.ts`. Generic and backward-compatible only.
 
 ### 9. Validate
 
@@ -111,7 +113,7 @@ Tell the user briefly:
 - **file coverage**: every file in the inventory is either mapped (to a section, theme, navigation or footer), recorded (a pattern, an asset a site must supply), used as context (docs, design brief), or skipped with a reason (tooling, dead code, git-ignored). Group the files by role; don't list each image.
 - the enrichment: new preset, pattern entries, vocabulary values, tokens or conventions added
 - what a site must supply (`requiredContent`, placeholder images to replace, local assets, the settings an integration needs)
-- platform gaps that block the fidelity target, as `x-patterns` keys
+- the unsupported capabilities: how many, which are new to the registry, and the ones that block the primary conversion or the fidelity target. They are the platform requirements this template creates
 - that the registry edit puts every site in `saito affected`, so they all need redeploying
 - the offer to create the original business as the first site on this template
 
@@ -120,7 +122,8 @@ Tell the user briefly:
 - Section ids and page slugs are the template's public API: name them by role, because renaming later needs a new major and a migration.
 - No business identity in the template, wherever it hides: data files, meta tags, manifest, cache names, storage keys, alt text. Generic industry nouns and the market (currency, country format) are fine.
 - Don't trust a single file. Comments, docs and briefs can be stale; the markup, data and CSS that load are the truth.
-- A component that renders content (a catalogue fed by a data file) is still content: map the data to the section it fills, and record the behaviour separately as a pattern.
+- A component that renders content (a catalogue fed by a data file) is still content: map the data to the section it fills, and flag the behaviour separately as an unsupported capability.
+- Don't drop a feature because the platform can't render it, and don't approximate it silently: every fallback has a flag.
 - `defineTemplate` rejects unknown manifest fields at compile time, and zod drops unknown fields inside sections: keep extras in `templateExtensions`.
 - Links: only `http(s):`, `mailto:`, `tel:`, `/…` and `#…` survive rendering.
 - `theme.radius` is one value for every rounded element; `full` turns cards into pills.

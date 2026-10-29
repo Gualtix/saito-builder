@@ -11,6 +11,7 @@ How to turn the planned mapping into `packages/templates/src/<id>/v1.ts`. The an
 6. Placeholder content and images
 7. Registration
 8. Smoke test
+9. Unsupported capabilities
 
 ## 1. A template is not a site
 
@@ -73,7 +74,7 @@ export default template;
 export const templateExtensions = {
   source: '<path to the web directory>',
   taxonomy: { /* same keys as templateExtensions.taxonomy in template.example.ts */ },
-  patterns: [/* x-patterns keys this template approximates (lossy/unmapped blocks) */],
+  unsupportedCapabilities: { /* one flag per capability the platform cannot render yet: section 9 */ },
   assets: { required: [/* … */], placeholderImages: [/* absolute URLs used as placeholders */] },
   requiredContent: [/* override paths a site must replace before launch */],
   optionalSections: [/* section ids the source hid; sites turn them off with sections.<id>: false */],
@@ -98,6 +99,7 @@ export const templateExtensions = {
 - Every section needs `id` + `type` and all of the type's required fields (the section catalog in `template.example.ts` and `sites/example.config.yaml` shows each type with every field).
 - Use the variants that reproduce the design: hero `layout`, `columns`, per-section `background` (`default | surface | primary | dark`) to rebuild the band rhythm.
 - Unmapped interactions get the honest fallback (usually a `cta` to the real thing), never a misleading section.
+- Every block that falls back is flagged as an unsupported capability (section 9).
 - Blocks the source hides become optional sections (`mapping.md` section 6), listed in `templateExtensions.optionalSections`.
 
 ## 6. Placeholder content and images
@@ -138,3 +140,42 @@ Before building, edit the throwaway site: `saito create` writes `locale: en` and
 Check in the outline: every section is present in order, in-page anchors exist, no unexpected `href="#"`. If a browser is available and a static server or dev server is allowed, also look at the page (contrast, card borders, empty image slots); otherwise say it was not viewed.
 
 Clean up all three generated folders: `sites/tmp-<id>-smoke/`, `dist/development/tmp-<id>-smoke/` and the Astro cache `apps/renderer/node_modules/.astro/tmp-<id>-smoke/`. Say in the report if you could not.
+
+## 9. Unsupported capabilities
+
+**Don't force the design to fit the platform.** When the renderer lacks the component, field, token or infrastructure a source feature needs, keep the nearest honest fallback in the manifest, so the template still builds, and **flag the gap**. Flags are the requirements the platform must meet before the template can render the source at full fidelity. Write them for the engineer who will build the feature without opening the source project.
+
+A capability is unsupported when the shared renderer can't produce it from schema fields. That covers missing section types or fields, component variants, visual decorations, interactive behaviour (web components), site-wide tokens, build output (head tags, headers, service workers), integrations, and component copy the platform hard-codes. It includes everything rated `lossy`, `unmapped` or reusable `decorative`. It does not include business content a site supplies (photos, copy), or a placeholder convention such as leaving `hero.image` unset.
+
+**1. Inline flag** on every section, `navigation`, `footer` or `pages` entry that renders a fallback, one line per capability, directly above its `id` (or the key):
+
+```ts
+          // UNSUPPORTED image-marquee → static 4-column gallery
+          id: 'featured-dishes',
+```
+
+The format is fixed (`UNSUPPORTED <x-patterns key> → <what renders instead>`), so `grep -rn "UNSUPPORTED" packages/templates/src` lists every gap.
+
+**2. Entry** in `templateExtensions.unsupportedCapabilities`, keyed by the same `x-patterns` key:
+
+```ts
+  unsupportedCapabilities: {
+    'image-marquee': {
+      affects: ['featured-dishes'],         // section ids, or 'header' | 'footer' | 'site'
+      purpose: 'Show many dishes in little space and add motion to the page.',
+      expectedBehavior: 'One row of captioned rounded photos scrolling left in a seamless loop; pauses on hover; static under prefers-reduced-motion.',
+      requirements: ['gallery layout: marquee (schema, Gallery.astro, Studio)', 'CSS keyframes; script only to duplicate the track'],
+      fallback: 'static 4-column gallery',
+    },
+  },
+```
+
+- **purpose**: the visitor or business goal it serves, not what it looks like.
+- **expectedBehavior**: what the source does, with the numbers needed to rebuild it: sizes, counts, breakpoints, states, timing, accessibility (reduced motion, labels, keyboard). Take them from the CSS and scripts, not from memory.
+- **requirements**: each platform change, naming the layer: schema field or section type, component or variant, web component, theme token, build output, Studio and seed, docs, third-party dependency (pinned, with SRI), browser permission. Include which settings a site would supply (and list them in `integrationSettings`).
+- **fallback**: what the template renders today. It matches the inline flag.
+- One entry per capability, even when it affects several sections; list them all in `affects`.
+
+**3. Registry**: every key must exist in `template.example.ts` → `templateExtensions.capabilities`, with `support: 'unsupported'`, and in `x-patterns`. Add newly discovered capabilities to both (`enrichment.md`). `packages/templates/test/template-example.test.ts` checks that templates, the registry and the catalog agree, that every flag is complete, and that every `affects` id exists.
+
+Templates extracted before this convention list keys in `templateExtensions.patterns` only. When you re-extract one, replace `patterns` with `unsupportedCapabilities`.

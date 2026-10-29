@@ -78,7 +78,7 @@ The template, and every site created from it, still has to build and work today:
 
 ### Step 5: Record it in the extraction
 
-The template records what was lost, so nothing disappears silently: `templateExtensions.patterns` in `packages/templates/src/<id>/v1.ts` lists the pattern keys it approximates, and the extraction report lists each block with its fidelity and the gaps a human must decide.
+The template records what was lost, so nothing disappears silently. Every capability the platform cannot render is flagged as **unsupported** in `packages/templates/src/<id>/v1.ts`: a `// UNSUPPORTED <key> → <fallback>` comment where the fallback renders, and an entry in `templateExtensions.unsupportedCapabilities` with its purpose, expected behaviour, implementation requirements, affected sections and fallback. New capabilities are added to the registry in `template.example.ts` (`templateExtensions.capabilities`, `support: 'unsupported'`). These flags are the requirements Phase B builds from. The extraction report lists each block with its fidelity and the gaps a human must decide.
 
 `templateExtensions` is ignored by the loader and renderer, so it never breaks validation.
 
@@ -116,7 +116,7 @@ The extraction report lists the exact, lossy, unmapped and decorative counts. It
 
 ### Step 8: Decide whether to build it
 
-Review the `x-patterns` catalog and set an entry's `status` to `planned` when it is worth building. Useful signals:
+Review the `x-patterns` catalog and set an entry's `status` to `planned` when it is worth building. The templates' `unsupportedCapabilities` flags for that key (purpose, expected behaviour, requirements) are the starting spec: `grep -rn "UNSUPPORTED <key>" packages/templates/src` finds every template that needs it. Useful signals:
 
 - `occurrences` above 1 and several `seenIn` values, meaning it is reused across sites or industries
 - an `unmapped` fallback that loses a conversion (booking, ordering)
@@ -224,8 +224,8 @@ Shared code touches every site: `saito affected` lists them all, so redeploy wit
 
 ### Step 12: Close the loop
 
-- Set the pattern's `status: implemented` in `x-patterns`.
-- Update the templates that used the fallback: replace it with the new section or field, and remove the pattern key from their `templateExtensions.patterns`.
+- Set the pattern's `status: implemented` in `x-patterns`, and `support: 'supported'` in the `template.example.ts` registry.
+- Update the templates that flagged it: replace the fallback with the new section or field, and remove the `// UNSUPPORTED` comment and the `unsupportedCapabilities` entry.
 - Future extractions now map that block as `exact`.
 - Let templates pick the extension up. A template that now uses the new field ships as a minor release, which pinned sites get on their next build. A template change that would break those sites needs a new major and a migration instead.
 - Push the code before content publishes rely on it. Builds triggered by the CMS clone the repository, so they only see pushed code and committed assets. A publish built from a stale branch replaces a newer manual deploy with older code.
@@ -255,7 +255,7 @@ HTML block
         ▼
   classify (lossy / unmapped / decorative), then apply the fidelity target
   ▶ apply the honest fallback, so the template still builds
-  ▶ record it in templateExtensions
+  ▶ flag it as unsupported (comment + templateExtensions.unsupportedCapabilities)
   ▶ add it to the x-patterns backlog, or raise its occurrences count
         │ worth building?
         ▼
