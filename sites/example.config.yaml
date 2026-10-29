@@ -554,7 +554,7 @@ x-patterns:
     occurrences: 1
   installable-app:
     kind: component
-    status: proposed
+    status: implemented
     description: "Web app manifest, maskable icons, iOS splash screens and theme colour, plus an install button on phones and tablets (the Chromium install prompt, or an instructions sheet on iOS, snoozed when dismissed). Needs a service worker."
     fields:
       manifest: "{ name, shortName, themeColor, backgroundColor }"
@@ -566,7 +566,7 @@ x-patterns:
     occurrences: 1
   offline-page:
     kind: interaction
-    status: proposed
+    status: implemented
     description: "A service worker serves a self-contained offline page when a page load fails without a connection, and an in-page notice appears when an action needs the network."
     fields:
       title: string
@@ -675,6 +675,13 @@ brand:
     height: 40
   logoText: Meridian         # [OPTIONAL] [COMPUTED default: name]
   favicon: /favicon.svg      # [OPTIONAL] path under public/
+  # pwa:                     # [OPTIONAL] installable app; absent → no manifest, install button or service worker
+  #   themeColor: "#c2410c"  # [REQUIRED-IF] hex
+  #   manifest: /manifest.webmanifest   # [OPTIONAL] default; the site supplies the file in public/
+  #   serviceWorker: /sw.js  # [OPTIONAL] default; site file, served with Cache-Control: no-cache
+  #   appleTouchIcon: /icons/apple-touch-icon.png  # [OPTIONAL]
+  #   splash:                # [OPTIONAL] default [] — iOS launch screens: { href, media }
+  #     - { href: /icons/splash/splash-390x844@3x.png, media: "(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" }
 
 
 # =============================================================================

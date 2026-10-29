@@ -22,7 +22,7 @@ The schema source of truth is [`packages/core/src/schema/site.ts`](../packages/c
 | `description` | | Default meta description |
 | `locale` | | BCP-47 language tag, default `en`; also used for price and date formatting, and for the labels the components write themselves (`en`, `es`; other languages fall back to English) |
 | `environments` | | `{ development, staging, production }` → `{ url }`. Sets canonical URLs and sitemaps |
-| `brand` | | `logo: { src, alt, width?, height? }`, `logoText`, `favicon` |
+| `brand` | | `logo: { src, alt, width?, height? }`, `logoText`, `favicon`, `pwa` (installable app, see below) |
 | `theme` | | Partial theme, merged over the template's (see below) |
 | `navigation` | | `links: [{ label, href }]`, `cta: { label, href }`, `transparent` (default false), `iconLinks: [{ icon, href }]`. Replaces the template navigation as a whole. `transparent` puts the header over the hero with white text, turning solid after 60px of scroll or while the mobile menu is open; it applies only on pages whose first section is a `hero` with `layout: image-background` and an `image` (that hero then fills the first screen), and the header stays solid without JavaScript. `iconLinks` are round icon buttons after the links from 981px; `icon` is `email` or a `footer.social` platform |
 | `footer` | | `tagline`, `columns: [{ title, links }]`, `social: [{ platform, href }]`, `legal` |
@@ -63,6 +63,25 @@ theme:
     reveal: true         # default false: blocks after the hero fade in and rise 24px over 700ms as they scroll into view;
                          # shown at once under reduced motion, and never hidden without JavaScript
 ```
+
+## Installable app (`brand.pwa`)
+
+Opt-in per site. Without `brand.pwa` a site renders no manifest link, install button or service worker.
+
+```yaml
+brand:
+  pwa:
+    themeColor: "#E99B3F"                   # required; hex
+    manifest: /manifest.webmanifest         # default
+    serviceWorker: /sw.js                   # default; served with Cache-Control: no-cache
+    appleTouchIcon: /icons/apple-touch-icon.png
+    splash:                                 # iOS launch screens, one per device size
+      - { href: /icons/splash/splash-390x844@3x.png, media: "(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" }
+```
+
+With it, the head gets the manifest, theme colour, apple-touch icon, `apple-mobile-web-app-*` metas (title = `name`) and splash links. The header shows an install button on phones and tablets only: the browser's install prompt on Android, a two-step instructions sheet on iOS, hidden for 30 days once closed. A full-screen notice appears while the device is offline and when an order needs the network.
+
+The site supplies the files in `public/`, because the platform only links and registers them: the manifest and its icons, `sw.js`, and a self-contained `offline.html`. The service worker's caching is the site's choice. It should not cache pages, so that new deploys always show. `sites/date-el-gusto/public/` is a working example: it serves `offline.html` when a page load fails and caches nothing else.
 
 ## Pages and sections
 

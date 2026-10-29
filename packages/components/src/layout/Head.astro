@@ -15,6 +15,7 @@ const ogImage = site.seo.defaultImage ? absolute(site.seo.defaultImage) : undefi
 const noindex = site.seo.noindex || site.env !== 'production';
 const fonts = googleFontsHref(site.theme);
 const { analytics, commerce } = site.integrations;
+const pwa = site.brand.pwa;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -46,7 +47,20 @@ const jsonLd = {
 <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
 {site.seo.twitterHandle && <meta name="twitter:site" content={site.seo.twitterHandle} />}
 
-<meta name="theme-color" content={site.theme.colors.primary} />
+<meta name="theme-color" content={pwa?.themeColor ?? site.theme.colors.primary} />
+{
+  /* pwa: installable app, only for sites that opt in with brand.pwa */
+  pwa && (
+    <>
+      <link rel="manifest" href={pwa.manifest} />
+      {pwa.appleTouchIcon && <link rel="apple-touch-icon" href={pwa.appleTouchIcon} />}
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-title" content={site.name} />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      {pwa.splash.map((s) => <link rel="apple-touch-startup-image" href={s.href} media={s.media} />)}
+    </>
+  )
+}
 {
   fonts && (
     <>

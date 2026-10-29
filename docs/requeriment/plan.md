@@ -1,6 +1,6 @@
 # Implementation plan: Date El Gusto showcase
 
-> **Status:** wave 1 done (Checkpoint A passed, 2026-10-29). Wave 2 and 2′ approved and in progress. Each later wave starts only after the person confirms it. Wave 3's spec (`pwa`) is still a draft.
+> **Status:** waves 1 and 2 done (Checkpoints A and B passed, 2026-10-29; T26–T27 still wait on the Sanity and Cloudflare logins). Wave 3 (`pwa`) built, awaiting Checkpoint C.
 > Inputs: [capability map](specs/date-el-gusto-capability-map.md) and its module specs in [`specs/`](specs/). Task list: [`todo.md`](todo.md). Runbook for accounts, content and deploys: [`step-by-step.md`](step-by-step.md).
 
 ## Constraint: no automated testing

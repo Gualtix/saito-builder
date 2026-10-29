@@ -30,6 +30,7 @@ export function writeEdgeArtifacts(dir: string, site: ResolvedSite): void {
   for (const stub of ['content-assets.mjs', 'content-modules.mjs']) rmSync(join(dir, stub), { force: true });
   const indexable = site.env === 'production' && !site.seo.noindex;
   const { commerce } = site.integrations;
+  const { pwa } = site.brand;
   // Only the whatsapp delivery map asks for the device location.
   const geolocation = commerce?.provider === 'whatsapp' && commerce.location?.enabled ? '(self)' : '()';
   const security = [
@@ -49,6 +50,9 @@ export function writeEdgeArtifacts(dir: string, site: ResolvedSite): void {
       ...security,
       ...(indexable ? [] : ['  X-Robots-Tag: noindex']),
       '',
+      // After /* on purpose: Cloudflare applies matching rules in file order, so the detach drops the
+      // inherited s-maxage (which would pin an old worker at the edge) before no-cache is set.
+      ...(pwa ? [pwa.serviceWorker, '  ! Cache-Control', '  Cache-Control: no-cache', ''] : []),
     ].join('\n'),
   );
 

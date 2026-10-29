@@ -1,6 +1,6 @@
 # Spec: `pwa`
 
-> Module of the [capability map](date-el-gusto-capability-map.md). Status: draft, awaiting review (2026-10-29). Depends on: `ui-strings`. **First to cut** if time runs short.
+> Module of the [capability map](date-el-gusto-capability-map.md). Status: implemented, awaiting Checkpoint C (approved 2026-10-29; the open question took the recommendation). Depends on: `ui-strings`. **First to cut** if time runs short.
 > **No automated tests** (decision 2026-10-29): validation is manual end-to-end testing by a person, using the checks under *Manual verification*.
 
 ## Objective

@@ -79,7 +79,8 @@
 - [x] **T24** Rewrite `site.config.yaml` as a thin site on `family-kitchen@1` (runbook Phase 1); drop `x-extraction`
   - Check: `saito validate date-el-gusto --env production` · Owner: primary · After: Checkpoint A
 - [x] **T25** Download and optimize the assets into `public/`: images as WebP, logo, favicon (Phase 2 §2.2) · Owner: primary
-- [ ] **T26** Sanity: Studio schema deploy, seed staging, then promote to production (Phases 3–4) · Owner: primary, with the person for logins · After: T10, T20 (Studio fields exist)
+- [x] **T26** Sanity: Studio schema deploy, seed staging, then promote to production (Phases 3–4) · Owner: primary, with the person for logins · After: T10, T20 (Studio fields exist)
+  - Progress 2026-10-29: Studio deployed with the wave-2 schema; staging seeded (2 documents, 31 images); the Sanity build matches the local one apart from image URLs. Production seeded the same way (`seed --env production`; never `dataset copy`, which would replace every site's production content).
 - [ ] **T27** Cloudflare Pages project, env files, webhooks, first staging deploy (Phases 5–6) · Owner: `devops-engineer`, with the person for accounts
 - [x] **T28** Add `integrations.commerce` (`whatsapp`) to the site config · Owner: primary · After: T23
 
@@ -88,11 +89,11 @@
 ## Wave 3, first to cut
 
 ### `pwa` ([spec](specs/SPEC-pwa.md))
-- [ ] **T29** `brand.pwa` schema and `Head.astro` tags
+- [x] **T29** `brand.pwa` schema and `Head.astro` tags
   - Files: `packages/core/src/schema/site.ts`, `layout/Head.astro` · Owner: `fullstack-engineer`
-- [ ] **T30** `web/pwa.ts` (install button, offline notice, service-worker registration), mounts, strings
+- [x] **T30** `web/pwa.ts` (install button, offline notice, service-worker registration), mounts, strings
   - Files: `web/pwa.ts`, `layout/Header.astro`, `layout/SiteLayout.astro`, `strings.ts` · Owner: `frontend-engineer` · After: T29
-- [ ] **T31** `/sw.js` revalidation header (checked against the Cloudflare `_headers` docs); docs; `family-kitchen` close-out (2 flags) · Files: `packages/cli/src/build.ts`, `docs/CONFIGURATION.md`, `family-kitchen/v1.ts`, `template.example.ts`, `sites/example.config.yaml` · Owner: `backend-engineer`, then primary · After: T30
-- [ ] **T32** Site PWA files in `public/` (manifest renamed "Date El Gusto", `sw.js`, `offline.html`, icons, splash screens) and `brand.pwa` in the site config · Owner: primary · After: T31
+- [x] **T31** `/sw.js` revalidation header (checked against the Cloudflare `_headers` docs); docs; `family-kitchen` close-out (2 flags) · Files: `packages/cli/src/build.ts`, `docs/CONFIGURATION.md`, `family-kitchen/v1.ts`, `template.example.ts`, `sites/example.config.yaml` · Owner: `backend-engineer`, then primary · After: T30
+- [x] **T32** Site PWA files in `public/` (manifest renamed "Date El Gusto", `sw.js`, `offline.html`, icons, splash screens) and `brand.pwa` in the site config · Owner: primary · After: T31
 
 **▶ Checkpoint C (person):** the PWA checks on Android and iPhone, then the runbook Phase 7 demo rehearsal.

@@ -38,7 +38,7 @@ export interface ResolvedSite {
   /** Absolute base URL for the target environment, without trailing slash. */
   url: string;
   template: { id: string; version: string };
-  brand: { logo?: Image; logoText: string; favicon?: string };
+  brand: { logo?: Image; logoText: string; favicon?: string; pwa?: SiteConfig['brand']['pwa'] };
   theme: Theme;
   navigation: Navigation;
   footer: Footer;

@@ -16,6 +16,8 @@ const { links, cta, iconLinks } = site.navigation;
 const hasCart = site.integrations.commerce?.provider === 'snipcart';
 const t = strings(site.locale);
 const isCurrent = (href: string) => href === currentPath;
+// pwa: install button (web/pwa.ts, loaded by SiteLayout); hidden until the browser can install
+const pwa = !!site.brand.pwa;
 
 // --- site-chrome: transparent header and icon links ---
 // Transparent only over a photo hero that opens the page. It renders solid ([data-solid]) and web/header.ts
@@ -65,6 +67,7 @@ const iconLabels: Record<IconLinkIcon, string> = {
           </a>
         ))
       }
+      {pwa && <saito-app-install hidden />}
       {
         hasCart && (
           <button type="button" class="snipcart-checkout text-sm font-medium">
@@ -103,6 +106,7 @@ const iconLabels: Record<IconLinkIcon, string> = {
             </a>
           ))
         }
+        {pwa && <saito-app-install class="mt-1" hidden />}
         {
           hasCart && (
             <button type="button" class="snipcart-checkout rounded-theme px-3 py-2 text-left text-sm hover:bg-surface">

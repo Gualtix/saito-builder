@@ -80,6 +80,17 @@ const en = {
   // --- site-chrome: header icon links (aria-label)
   emailLink: 'Email',
   // --- end site-chrome
+  // --- pwa: install button, iOS sheet and offline notice (web/pwa.ts). {name} is the site name; {share} the iOS Share icon.
+  pwaInstall: 'Install app',
+  pwaIosTitle: 'Add to Home Screen',
+  pwaIosIntro: 'Install {name} on your home screen for quick access.',
+  pwaIosShare: 'Tap the Share button {share} in Safari (if you don’t see it, it’s in the ••• menu).',
+  pwaIosAdd: 'Choose “Add to Home Screen”, then tap “Add”.',
+  pwaOfflineTitle: 'No internet connection',
+  pwaOfflineBody: '{name} needs an internet connection. Try again when you’re back online.',
+  pwaOfflineAuto: 'The page recovers on its own when the connection returns.',
+  pwaRetry: 'Try again',
+  // --- end pwa
 };
 
 const es: Record<keyof typeof en, string> = {
@@ -162,6 +173,17 @@ const es: Record<keyof typeof en, string> = {
   // --- site-chrome: header icon links (aria-label)
   emailLink: 'Correo',
   // --- end site-chrome
+  // --- pwa: from the prototype's data.js `text`, with the business name as {name}
+  pwaInstall: 'Instalar App',
+  pwaIosTitle: 'Agregar a Inicio',
+  pwaIosIntro: 'Instala {name} en tu pantalla de inicio para pedir más rápido.',
+  pwaIosShare: 'Toca el botón Compartir {share} en Safari (si no lo ves, está en el menú •••).',
+  pwaIosAdd: 'Elige «Agregar a inicio» y luego toca «Agregar».',
+  pwaOfflineTitle: 'Sin conexión a internet',
+  pwaOfflineBody: '{name} necesita una conexión a internet. Vuelve a intentarlo cuando tengas señal.',
+  pwaOfflineAuto: 'La página se recupera sola cuando vuelva la conexión.',
+  pwaRetry: 'Reintentar',
+  // --- end pwa
 };
 
 const byLanguage = { en, es };

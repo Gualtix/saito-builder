@@ -115,6 +115,16 @@ export const siteConfigSchema = z.object({
       /** Text used when no logo is provided. Defaults to the site name. */
       logoText: z.string().optional(),
       favicon: z.string().optional(),
+      /** pwa: installable app. Paths are site-root-relative files the site ships in public/. */
+      pwa: z
+        .object({
+          manifest: z.string().startsWith('/').default('/manifest.webmanifest'),
+          themeColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+          appleTouchIcon: z.string().startsWith('/').optional(),
+          splash: z.array(z.object({ href: z.string().startsWith('/'), media: z.string().max(200) })).default([]),
+          serviceWorker: z.string().startsWith('/').default('/sw.js'),
+        })
+        .optional(),
     })
     .default({}),
   /** Partial theme; deep-merged over the template theme. */

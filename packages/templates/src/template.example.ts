@@ -557,8 +557,8 @@ export const templateExtensions = {
     'review-rating': { support: 'unsupported', requirement: 'testimonial rating 1-5 and source', firstSeenIn: 'family-kitchen' },
     'category-tiles': { support: 'unsupported', requirement: 'section type tiles, or a gallery layout with intro and action', firstSeenIn: 'family-kitchen' },
     'scroll-reveal': { support: 'supported', requirement: 'theme motion option reveal; one IntersectionObserver script', firstSeenIn: 'family-kitchen' },
-    'installable-app': { support: 'unsupported', requirement: 'brand.pwa; Head.astro tags; install web component; service-worker registration', firstSeenIn: 'family-kitchen' },
-    'offline-page': { support: 'unsupported', requirement: 'per-site service worker and offline page; no-cache header for /sw.js', firstSeenIn: 'family-kitchen' },
+    'installable-app': { support: 'supported', requirement: 'brand.pwa; Head.astro tags; install web component; service-worker registration', firstSeenIn: 'family-kitchen' },
+    'offline-page': { support: 'supported', requirement: 'per-site service worker and offline page; no-cache header for /sw.js', firstSeenIn: 'family-kitchen' },
   },
 
   // Placeholder copy every site should replace before launch, by override path.

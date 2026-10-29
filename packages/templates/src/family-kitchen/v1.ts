@@ -28,7 +28,7 @@ const menuPhoto = (id: string, alt: string) => photo(id, alt, 600, 450);
 const template = defineTemplate({
   id: 'family-kitchen',
   name: 'Cocina Familiar',
-  version: '1.4.0',
+  version: '1.5.0',
   description:
     'Warm single-page site for family restaurants in Guatemala (GTQ, +502): daily lunch, photo menu, story, gallery, hours and ordering by WhatsApp.',
   websiteTypes: ['restaurant', 'landing-page'],
@@ -61,7 +61,6 @@ const template = defineTemplate({
     legal: 'Restaurante familiar. Todos los derechos reservados.',
   },
   seo: { schemaType: 'Restaurant' },
-  // UNSUPPORTED installable-app, offline-page → plain web page, no install or offline support
   pages: [
     {
       // UNSUPPORTED home-page-title → the browser title is the site name alone
@@ -276,6 +275,7 @@ const template = defineTemplate({
     { version: '1.2.0', notes: 'specials section type with price badge; marquee and masonry galleries with a header action; icon badges with dividers; photo beside text with offset slabs on about, flavors and visit; photo bands on reserve and order.' },
     { version: '1.3.0', notes: 'Menu as photo cards; items carry a photo and removable ingredients for the WhatsApp cart (the site enables integrations.commerce).' },
     { version: '1.4.0', notes: 'Transparent header over the hero with email and social icon links; display-size hero wordmark; accent bar under section headings; line doodles on about and flavors; scroll reveal.' },
+    { version: '1.5.0', notes: 'Installable app and offline page are supported; the site opts in with brand.pwa and supplies the files listed under assets.' },
   ],
 });
 
@@ -355,20 +355,6 @@ export const templateExtensions = {
       requirements: ['section type tiles { heading, intro, tiles[{ image, title, href? }], action }, or a gallery layout with intro and action'],
       fallback: 'gallery with captions; intro and contact link lost',
     },
-    'installable-app': {
-      affects: ['site'],
-      purpose: 'Customers keep the restaurant on their home screen.',
-      expectedBehavior: 'Web manifest (standalone, theme colour), icons and maskable icons, iOS splash screens; an "Instalar App" button on phones and tablets only: the Chromium install prompt, or a two-step instructions sheet on iOS, snoozed for 30 days when dismissed.',
-      requirements: ['brand.pwa { manifest, themeColor, appleTouchIcon, splash[] } (schema, Head.astro)', 'install web component', 'service-worker registration', 'site public/ assets'],
-      fallback: 'plain web page',
-    },
-    'offline-page': {
-      affects: ['site'],
-      purpose: 'A branded message instead of a browser error when the connection drops.',
-      expectedBehavior: 'The service worker precaches a self-contained offline page and serves it when a page load fails; a full-screen notice appears when an order action needs the network; the page reloads when the connection returns.',
-      requirements: ['service worker per site (generated or from public/)', '_headers: Cache-Control no-cache for /sw.js', 'strings from localized-ui-labels'],
-      fallback: "the browser's own offline error",
-    },
   },
   // Design tokens the theme cannot hold (DTCG). Radii, accent2/3 and the scrim moved to the theme in 1.1.0.
   tokens: {
@@ -392,9 +378,9 @@ export const templateExtensions = {
     required: ['logo mark (SVG)', 'hero food photo 1800 wide, darkened by the scrim', 'share card 1200×630'],
     optional: [
       'dish photos 600×450 (menu items, once menu-item-photos is supported)',
-      'app icons 192×192 and 512×512 plus maskable variants, apple-touch icon, favicons 16/32 and SVG (installable-app)',
-      'iOS splash screens, one per device size (installable-app)',
-      'app screenshots, narrow and wide (installable-app)',
+      'installable app (the site sets brand.pwa; templates cannot ship files): public/manifest.webmanifest, sw.js, offline.html (self-contained), app icons 192×192 and 512×512 plus maskable variants, apple-touch icon',
+      'iOS splash screens, one per device size, listed in brand.pwa.splash',
+      'app screenshots, narrow and wide, referenced from the manifest',
     ],
     placeholderImages: 'Unsplash stock URLs in featured-dishes, gallery and catering',
   },
