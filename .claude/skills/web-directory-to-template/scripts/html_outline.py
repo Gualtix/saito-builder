@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Outline a standalone HTML page as JSON, to plan a site.config.yaml extraction.
+"""Outline one HTML page as JSON, to plan a template extraction.
 
 Usage: python3 html_outline.py <page.html | folder-with-index.html>
        python3 html_outline.py --self-test
 Standard library only. Reports what is in the page; it does not decide any mapping.
+project_inventory.py calls outline() for every page of a web directory, passing the page's local stylesheets.
 """
 import json
 import re
@@ -25,6 +26,7 @@ class Outline(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.meta, self.fonts, self.blocks, self.images, self.forms = {}, [], [], [], []
         self.links, self.styles, self.jsonld = [], [], 0
+        self.scripts, self.stylesheets, self.custom_elements = [], [], Counter()
         self.stack, self.open_blocks, self.text_target, self.in_style, self.in_title = [], [], None, False, False
 
     def handle_starttag(self, tag, attrs):
@@ -39,10 +41,14 @@ class Outline(HTMLParser):
             self.meta[a.get("name") or a.get("property")] = a["content"]
         elif tag == "link" and "fonts.googleapis.com" in (a.get("href") or ""):
             self.fonts += [f.split(":")[0].replace("+", " ") for f in re.findall(r"family=([^&]+)", a["href"])]
+        elif tag == "link" and "stylesheet" in (a.get("rel") or "") and a.get("href"):
+            self.stylesheets.append(a["href"])
         elif tag == "style":
             self.in_style = True
         elif tag == "script" and a.get("type") == "application/ld+json":
             self.jsonld += 1
+        elif tag == "script" and a.get("src"):
+            self.scripts.append({"src": a["src"], "type": a.get("type", "classic")})
         elif tag == "img":
             self.images.append({"src": a.get("src", ""), "alt": a.get("alt", "")})
             for b in self.open_blocks:
@@ -61,13 +67,15 @@ class Outline(HTMLParser):
         for b in self.open_blocks:
             if tag in ("button", "li", "form", "figure", "blockquote", "table"):
                 b["counts"][tag] += 1
+        if "-" in tag:  # custom elements: their behaviour lives in the project's scripts
+            self.custom_elements[tag] += 1
         if tag in VOID:
             return
         parent = self.stack[-1][0] if self.stack else None
-        is_block = tag in BLOCKS or (tag == "div" and (a.get("id") or parent in ("main", "body")))
+        is_block = tag in BLOCKS or (tag in ("div", *self.custom_elements) and (a.get("id") or parent in ("main", "body")))
         if is_block:
             block = {"tag": tag, "id": a.get("id"), "class": a.get("class"), "depth": len(self.open_blocks),
-                     "heading": "", "counts": Counter()}
+                     "heading": "", "hidden": "hidden" in a, "counts": Counter()}
             self.blocks.append(block)
             self.open_blocks.append(block)
         self.stack.append((tag, is_block))
@@ -111,10 +119,11 @@ def classify_link(href):
     return "external" if href.startswith("http") else "internal"
 
 
-def outline(html):
+def outline(html, extra_css=""):
+    """extra_css: the page's local stylesheets, so tokens, colors and radii from styles.css are included."""
     p = Outline()
     p.feed(html)
-    css = "\n".join(p.styles)
+    css = "\n".join([*p.styles, extra_css])
     links = Counter()
     grouped = {}
     for link in p.links:
@@ -131,7 +140,10 @@ def outline(html):
         "cssVariables": dict(re.findall(r"(?<![\w-])(--[\w-]+)\s*:\s*([^;}{]+)", css)),
         "topColors": dict(Counter(c.lower() for c in re.findall(r"#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b", css)).most_common(12)),
         "radii": dict(Counter(re.findall(r"border-radius\s*:\s*([^;}{]+)", css)).most_common(6)),
-        "blocks": [{k: (dict(v) if k == "counts" else v) for k, v in b.items() if v not in (None, "")} for b in p.blocks],
+        "blocks": [{k: (dict(v) if k == "counts" else v) for k, v in b.items() if v not in (None, "") and (k != "hidden" or v)} for b in p.blocks],
+        "stylesheets": p.stylesheets,
+        "scripts": p.scripts,
+        "customElements": dict(p.custom_elements),
         "linkCounts": dict(links),
         "linkSamples": {k: v[:15] for k, v in grouped.items()},  # deduplicated, first 15 per kind; anchors only from nav
         "images": {"count": len(p.images), "hosts": dict(Counter(re.sub(r"^https?://([^/]+).*", r"\1", i["src"]) if i["src"].startswith("http") else "local" for i in p.images)), "sample": p.images[:8]},
@@ -147,12 +159,15 @@ def self_test():
     <style>:root{--primary:#E99B3F} .btn--primary:hover{color:#fff} .card{border-radius:20px;color:#111}</style></head><body>
     <header><nav><a href="#menu">Menú</a></nav></header>
     <main><div class="strip"><h3>Envío gratis</h3></div><div class="band" style="background:url('https://x.test/b.jpg')"></div>
+    <cart-bar></cart-bar><section id="old" hidden><h2>Oculto</h2></section>
     <section id="menu"><h2>Nuestro menú</h2><ul><li>A<li>B</ul><img src="https://images.unsplash.com/x" alt="Plato"><div id="reservas"><h3>Reserva</h3></div></section></main>
     <footer><a href="https://wa.me/50245393659">WhatsApp</a><a href="tel:+50245393659">Tel</a></footer></body></html>"""
-    o = outline(html)
+    o = outline(html, extra_css=":root{--sage:#99BD76}")
     assert o["meta"]["lang"] == "es" and o["meta"]["title"] == "Demo", o["meta"]
     assert o["fonts"] == ["Dancing Script", "Inter"], o["fonts"]
-    assert o["cssVariables"] == {"--primary": "#E99B3F"}, o["cssVariables"]
+    assert o["cssVariables"] == {"--primary": "#E99B3F", "--sage": "#99BD76"}, o["cssVariables"]
+    assert o["customElements"] == {"cart-bar": 1}, o["customElements"]
+    assert next(b for b in o["blocks"] if b.get("id") == "old")["hidden"] is True
     section = next(b for b in o["blocks"] if b.get("id") == "menu")
     assert section["heading"] == "Nuestro menú" and section["counts"]["img"] == 1 and section["counts"]["li"] == 2, section
     assert o["linkCounts"] == {"anchor": 1, "whatsapp": 1, "phone": 1}, o["linkCounts"]

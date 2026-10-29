@@ -1,6 +1,6 @@
 # Date El Gusto — family Guatemalan restaurant (tenant: date-el-gusto)
-# Extracted from live-sketching/eatery-cafe/tangerine/tangerine-web-site/index.html
-# with the html-to-site-config skill. Single-scroll page on the restaurant@1 home page.
+# Based on live-sketching/eatery-cafe/tangerine/tangerine-web-site/.
+# Single-scroll page on the restaurant@1 home page.
 
 x-taxonomy:
   industry: food-and-beverage

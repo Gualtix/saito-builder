@@ -435,7 +435,7 @@ export const exampleMigration: TemplateMigration = {
 // =============================================================================
 //  templateExtensions  [EXTENSION]
 //  Template knowledge the schema does not hold. The renderer ignores it; design
-//  tools, generators and the html-to-site-config skill read it. Vocabulary values
+//  tools, generators and the web-directory-to-template skill read it. Vocabulary values
 //  should come from x-vocabulary in sites/example.config.yaml.
 // =============================================================================
 export const templateExtensions = {
@@ -485,7 +485,7 @@ export const templateExtensions = {
   },
 
   // Candidate section types, components and decorations seen in real designs live in ONE
-  // shared catalog, so site and template extraction never keep two diverging lists.
+  // shared catalog, so templates never keep diverging lists.
   // Templates reference catalog keys in their own templateExtensions.patterns.
   patternCatalog: 'sites/example.config.yaml → x-patterns',
 
