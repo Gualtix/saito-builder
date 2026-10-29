@@ -29,11 +29,14 @@ export function writeEdgeArtifacts(dir: string, site: ResolvedSite): void {
   // Astro's content layer leaves empty module stubs in outDirs outside the project; they are never served.
   for (const stub of ['content-assets.mjs', 'content-modules.mjs']) rmSync(join(dir, stub), { force: true });
   const indexable = site.env === 'production' && !site.seo.noindex;
+  const { commerce } = site.integrations;
+  // Only the whatsapp delivery map asks for the device location.
+  const geolocation = commerce?.provider === 'whatsapp' && commerce.location?.enabled ? '(self)' : '()';
   const security = [
     '  X-Content-Type-Options: nosniff',
     '  Referrer-Policy: strict-origin-when-cross-origin',
     '  X-Frame-Options: SAMEORIGIN',
-    '  Permissions-Policy: camera=(), microphone=(), geolocation=()',
+    `  Permissions-Policy: camera=(), microphone=(), geolocation=${geolocation}`,
   ];
   writeFileSync(
     join(dir, '_headers'),

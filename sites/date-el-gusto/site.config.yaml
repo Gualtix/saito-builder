@@ -1,394 +1,135 @@
-# Date El Gusto — family Guatemalan restaurant (tenant: date-el-gusto)
-# Based on live-sketching/eatery-cafe/tangerine/tangerine-web-site/.
-# Single-scroll page on the restaurant@1 home page.
-
-x-taxonomy:
-  industry: food-and-beverage
-  subIndustry: family-restaurant
-  websiteTypes: [restaurant, landing-page]
-  visualStyle:
-    primary: warm-food-photography
-    secondary: [friendly-script-casual, soft-rounded-modern, playful-illustrated]
-    notStyles: [luxury, modern-minimal, corporate, brutalist, editorial, dark-moody]
-  tone: [warm, homey, cheerful, appetizing]
-  audience:
-    - local diners looking for home-style Guatemalan food
-    - takeout and delivery customers
-    - office workers looking for an affordable daily lunch
-    - families and event hosts who need catering
-  conversion:
-    primary: order-online
-    secondary: [reserve-table, view-menu, catering-inquiry]
-  positioning: mid-market
-  maturity: growing
-
-x-extraction:
-  source: live-sketching/eatery-cafe/tangerine/tangerine-web-site/index.html
-  extractedAt: 2026-10-26
-  template:
-    chosen: restaurant@1
-    reason: >-
-      Restaurant site with story, highlights and visit (hours + address); restaurant@1 provides
-      hero (image-background), story, highlights and visit on its home page. The source is a single
-      scroll, so everything stays on index; the template's menu page is disabled because the source
-      has no per-dish prices.
-  mapping:
-    - source: "header#top-bar (logo, nav links, Pedir en línea, email/Facebook/Instagram icons)"
-      target: navigation
-      type: navigation
-      fidelity: lossy
-      notes: Links and order CTA kept; circular social/email icon buttons and the transparent-to-solid scroll behavior lost (see also transparent-header).
-      pattern: header-icon-links
-    - source: "section#inicio (hero: Date El Gusto)"
-      target: pages.index.sections.hero
-      type: hero
-      fidelity: lossy
-      notes: Tagline and takeout note merged into subheading; oversized script wordmark rendered at the standard h1 size.
-    - source: "div.marquee (8 dish photos with names)"
-      target: pages.index.sections.platillos-destacados
-      type: gallery
-      fidelity: lossy
-      notes: Auto-scrolling loop lost; shown as a static 4-column captioned grid.
-      pattern: image-marquee
-    - source: "div.strip (3 values with colored icon badges)"
-      target: pages.index.sections.highlights
-      type: features
-      fidelity: lossy
-      notes: SVG icons on colored circular badges replaced by emoji; vertical dividers lost.
-      pattern: svg-icon-badges
-    - source: "section#nosotros (Bienvenidos, image on sage slab, Nuestra historia button)"
-      target: pages.index.sections.story
-      type: richText
-      fidelity: lossy
-      notes: Photo, offset color slab and button (it only pointed at the photo) lost.
-      pattern: media-text-split
-    - source: "section (Sabores de Guatemala, image on mustard slab, Ver menú button)"
-      target: pages.index.sections.sabores
-      type: richText
-      fidelity: lossy
-      notes: Photo, offset color slab and the Ver menú button lost.
-      pattern: media-text-split
-    - source: "section#menu (Nuestro menú: 4 category photo cards + Ver menú completo)"
-      target: pages.index.sections.categorias
-      type: gallery
-      fidelity: lossy
-      notes: Category name and subtitle kept as captions; card links and the header button lost (see also section-header-action).
-      pattern: category-tiles
-    - source: "div#reservas (reservation widget: date, time, party size over a darkened photo)"
-      target: pages.index.sections.reservas
-      type: cta
-      fidelity: unmapped
-      notes: Front-end-only demo widget with no booking backend. Fallback is a cta that calls the restaurant.
-      pattern: table-reservation
-    - source: "section#galeria (Nuestros platillos: 6-photo masonry + Ver Instagram)"
-      target: pages.index.sections.galeria
-      type: gallery
-      fidelity: lossy
-      notes: Masonry layout lost (uniform 4:3 crops); Ver Instagram header button lost (see also section-header-action).
-      pattern: masonry-gallery
-    - source: "section (Testimonios: 5 review cards in a carousel)"
-      target: pages.index.sections.testimonios
-      type: testimonials
-      fidelity: lossy
-      notes: Review source kept in role; star ratings (one review is 4/5), initials avatars and carousel controls lost (see also carousel).
-      pattern: review-rating
-    - source: "div#pedir (Pide en línea card over a darkened photo)"
-      target: pages.index.sections.pedir
-      type: cta
-      fidelity: lossy
-      notes: Photo band and floating card lost; order link is a placeholder in the source.
-      pattern: photo-band-card
-    - source: "section (¡Almuerzos del día! Q65 starburst, 5 dishes, photo collage, Ver menú)"
-      target: pages.index.sections.almuerzos
-      type: menu
-      fidelity: lossy
-      notes: Each dish listed at 65 GTQ (the source says "Q65 por plato"); starburst badge, photo collage and button lost.
-      pattern: daily-specials
-    - source: "section.catering (heading, intro with Escríbenos mail link)"
-      target: pages.index.sections.catering
-      type: cta
-      fidelity: exact
-    - source: "section.catering .tiles (4 event-type photo tiles)"
-      target: pages.index.sections.catering-eventos
-      type: gallery
-      fidelity: lossy
-      notes: Label overlaid on a tall photo becomes a caption under a 4:3 crop.
-      pattern: category-tiles
-    - source: "section#contacto (Visítanos: photo on burnt slab, address, phone, hours table, Pedir ahora)"
-      target: pages.index.sections.visit
-      type: contact
-      fidelity: lossy
-      notes: Photo, slab and Pedir ahora button lost; hour rows with equal hours merged (Martes – Jueves, Viernes – Sábado).
-      pattern: media-text-split
-    - source: footer (logo, repeated nav, address + phone, copyright, prototype note)
-      target: footer
-      type: footer
-      fidelity: lossy
-      notes: Repeated nav links dropped (columns need a title the source does not have); black footer becomes the theme surface.
-    - source: "svg.doodle (line-drawn food doodles in the margins)"
-      target: none
-      fidelity: decorative
-      pattern: line-doodles
-    - source: ".media::before (offset accent-color slabs behind photos)"
-      target: none
-      fidelity: decorative
-      pattern: offset-color-slab
-    - source: "h2.script::after (short accent underline bar under every section heading)"
-      target: none
-      fidelity: decorative
-      pattern: heading-accent-bar
-    - source: scroll reveal (.rv + IntersectionObserver)
-      target: none
-      fidelity: decorative
-      pattern: scroll-reveal
-  assets:
-    images: 31                # 28 <img> plus 3 CSS backgrounds (hero, reservation band, order band)
-    hotlinked: images.unsplash.com
-    action: >-
-      Download licensed copies into sites/date-el-gusto/public/images/ before production and
-      replace the generic stock photos (salmon, poke bowls) with real dishes.
-  gaps:
-    - No production or staging URL given; only environments.development is set.
-    - No forms endpoint given; integrations.forms omitted, so the visit section shows no form.
-    - No analytics given; integrations.analytics omitted.
-    - Order links ("Pedir ahora", "Haz tu pedido") are placeholders in the source ("#"); add the delivery app or ordering URL.
-    - Facebook and Instagram links are placeholders in the source; footer.social left empty until real profile URLs exist.
-    - Reservation widget has no backend; the fallback cta only offers a phone call. Decide on a booking provider.
-    - Email hola@dateelgusto.example and the reviews are fictitious prototype content ("Prototipo con contenido ficticio").
-    - Contact section labels ("Address", "Contact", "Opening hours") are hardcoded in English in the renderer; the site is in Spanish.
-    - Brand mark is an inline SVG in the source; no logo or favicon file exists, so the logo text is shown.
-    - Taxonomy maturity (growing) and positioning (mid-market) are inferred; confirm with the client.
-
-# Shared values, referenced below with aliases.
-x-components:
-  business:
-    phone: &business-phone "+502 4539 3659"
-    address: &business-address Ciudad Vieja, Sacatepéquez, Guatemala
-  links:
-    order: &action-order
-      label: Pedir en línea
-      href: "#pedir"
-    menu: &link-menu
-      label: Ver menú
-      href: "#menu"
+# Date El Gusto — family Guatemalan kitchen, showcase site (tenant: date-el-gusto)
+# Content from live-sketching/eatery-cafe/tangerine/tangerine-web-site/ (fictional, as in the prototype).
 
 id: date-el-gusto
 tenant: date-el-gusto
 name: Date El Gusto
-description: >-
+description: &description >-
   Cocina guatemalteca casera, hecha con cariño. Pide a domicilio, reserva tu mesa o
   celebra con nuestro servicio de catering.
 locale: es-GT
-template: restaurant@1
+template: family-kitchen@1
 
 environments:
   development:
     url: http://localhost:4321
+  staging:
+    url: https://staging.saito-date-el-gusto.pages.dev
+  production:
+    url: https://saito-date-el-gusto.pages.dev
 
-theme:
-  mode: light
-  colors:
-    primary: "#e99b3f"          # tangerine: buttons
-    primaryContrast: "#1c1a17"  # ink text on tangerine buttons, as in the source
-    secondary: "#1c1a17"        # ink: footer and dark photo scrims
-    accent: "#99bd76"           # sage: heading underline bars, icon badges
-    background: "#fefefe"
-    surface: "#f1f1f1"
-    text: "#1c1a17"
-    muted: "#5d574f"
-    border: "#e6e1d9"
-  fonts:
-    heading: Dancing Script
-    body: Figtree
-  radius: lg                    # cards 20-30px; pill buttons (9999px) would also round cards and inputs
+brand:
+  # The header shows the logo instead of the name text, so the "Date El Gusto" wordmark is not rendered.
+  logo: { src: /images/logo.svg, alt: Date El Gusto, width: 32, height: 32 }
+  favicon: /favicon.svg
 
-navigation:
-  links:
-    - { label: Nosotros, href: "#nosotros" }
-    - { label: Menú, href: "#menu" }
-    - { label: Contacto, href: "#contacto" }
-  cta: *action-order
+seo:
+  noindex: true                 # showcase only: noindex in every environment, production included
+  defaultImage: /images/share.jpg   # JPEG, not WebP: some link-preview crawlers skip WebP
 
 footer:
   tagline: "Ciudad Vieja, Sacatepéquez, Guatemala · +502 4539 3659"
   legal: Restaurante Familiar. Prototipo con contenido ficticio.   # renderer prefixes "© <year> <name>."
 
-seo:
-  titleTemplate: "%s | Date El Gusto"
-  schemaType: Restaurant
+integrations:
+  commerce:                   # orders go to WhatsApp; the number is public by design
+    provider: whatsapp
+    phone: "+502 4539 3659"
+    currency: GTQ
+    orderIdPrefix: DG
+    maxQty: 20
+    location: { enabled: true, center: [14.523, -90.759], zoom: 16 }
 
 pages:
   index:
-    title: Cocina chapina de familia
-    description: >-
-      Cocina guatemalteca casera, hecha con cariño. Pide a domicilio, reserva tu mesa o
-      celebra con nuestro servicio de catering.
+    description: *description
     sections:
       hero:
-        layout: image-background
         heading: Date El Gusto
-        subheading: Auténtica cocina chapina de familia · Disponible para llevar y a domicilio
-        primaryAction: { label: Pedir ahora, href: "#pedir" }
-        secondaryAction: *link-menu
-        image:
-          src: https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1800&q=70
-          alt: Platillo casero servido en la mesa
-          width: 1800
-          height: 1200
-        anchor: inicio
+        subheading: Auténtica cocina chapina de familia. A domicilio y para llevar · pedidos por WhatsApp.
+        image: { src: /images/hero.webp, alt: Platillo casero servido en la mesa, width: 1800, height: 1200 }
 
-      platillos-destacados:
-        type: gallery
-        columns: 4
+      specials:
+        # Copy, price and the lunch list come from the template; only the collage is local (tall photo first).
         images:
-          - { src: "https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=300&h=220&q=70", alt: Albóndigas en salsa sobre hojas verdes, caption: Albóndigas en salsa, width: 300, height: 220 }
-          - { src: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&h=220&q=70", alt: Costillas BBQ con vegetales, caption: Costillas BBQ, width: 300, height: 220 }
-          - { src: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=300&h=220&q=70", alt: Pinchos mixtos a la parrilla, caption: Pinchos mixtos, width: 300, height: 220 }
-          - { src: "https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=300&h=220&q=70", alt: Churrasco con papas fritas, caption: Churrasco chapín, width: 300, height: 220 }
-          - { src: "https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&w=300&h=220&q=70", alt: Lomo de cerdo con piña, caption: Cerdo con piña, width: 300, height: 220 }
-          - { src: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=300&h=220&q=70", alt: Filete de salmón con limón, caption: Salmón al limón, width: 300, height: 220 }
-          - { src: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&h=220&q=70", alt: Ensalada fresca con aguacate, caption: Ensalada de la casa, width: 300, height: 220 }
-          - { src: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=300&h=220&q=70", alt: Pastel de frambuesa, caption: Pastel de frutos rojos, width: 300, height: 220 }
+          - { src: /images/specials-lunch-table.webp, alt: Mesa con platillos variados del almuerzo, width: 600, height: 700 }
+          - { src: /images/specials-ejotes-arroz.webp, alt: "Plato con ejotes, arroz y vegetales", width: 500, height: 330 }
+          - { src: /images/specials-bowl.webp, alt: Bowl con proteína y vegetales frescos, width: 500, height: 330 }
 
-      highlights:
-        items:
-          - { icon: "🍲", title: Sabores auténticos, description: Recetas de abuela, con ingredientes frescos de mercados locales. }
-          - { icon: "❤️", title: Hecho en casa, description: Todo se cocina cada mañana, despacio y con mucho cariño. }
-          - { icon: "👪", title: Ambiente familiar, description: Una mesa grande donde todos son bienvenidos, como en casa. }
+      featured-dishes:
+        images:
+          - { src: /images/featured-albondigas.webp, alt: Albóndigas en salsa sobre hojas verdes, caption: Albóndigas en salsa, width: 300, height: 220 }
+          - { src: /images/featured-costillas.webp, alt: Costillas BBQ con vegetales, caption: Costillas BBQ, width: 300, height: 220 }
+          - { src: /images/featured-pinchos.webp, alt: Pinchos mixtos a la parrilla, caption: Pinchos mixtos, width: 300, height: 220 }
+          - { src: /images/featured-churrasco.webp, alt: Churrasco con papas fritas, caption: Churrasco chapín, width: 300, height: 220 }
+          - { src: /images/featured-cerdo-pina.webp, alt: Lomo de cerdo con piña, caption: Cerdo con piña, width: 300, height: 220 }
+          - { src: /images/featured-salmon.webp, alt: Filete de salmón con limón, caption: Salmón al limón, width: 300, height: 220 }
+          - { src: /images/featured-ensalada.webp, alt: Ensalada fresca con aguacate, caption: Ensalada de la casa, width: 300, height: 220 }
+          - { src: /images/featured-pastel.webp, alt: Pastel de frambuesa, caption: Pastel de frutos rojos, width: 300, height: 220 }
 
-      story:
-        anchor: nosotros
-        heading: Bienvenidos
+      about:
         body: |-
           Bienvenidos a nuestro restaurante familiar de cocina guatemalteca, donde te invitamos a saborear los sabores más cálidos de nuestra tierra. Nuestro compromiso con la calidad y la tradición hace que cada plato esté preparado con esmero, con recetas de toda la vida e ingredientes frescos.
 
           Acompáñanos a celebrar la calidez de la familia, la riqueza de la cultura y el placer de la comida chapina.
+        image: { src: /images/about-interior.webp, alt: Interior cálido del restaurante con mesas de madera, width: 900, height: 675 }
 
-      sabores:
-        type: richText
+      flavors:
         heading: Sabores de Guatemala
         body: |-
           Nos enorgullece preparar los platillos vibrantes y diversos de nuestras tradiciones culinarias. Cada bocado es un viaje al corazón de Guatemala: caldos humeantes, carnes a las brasas, salsas de recado y tortillas recién hechas.
 
           Ven a disfrutar estos sabores de siempre, servidos como se merecen: a tu mesa.
+        image: { src: /images/flavors-parrillada.webp, alt: Parrillada de carnes y verduras asadas, width: 900, height: 675 }
 
-      categorias:
-        type: gallery
-        anchor: menu
-        heading: Nuestro menú
-        columns: 4
-        images:
-          - { src: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=500&h=500&q=70", alt: Entradas frescas y vegetales, caption: "Entradas: tostadas, ceviches y frescos", width: 500, height: 500 }
-          - { src: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=500&h=500&q=70", alt: Costillas a la parrilla, caption: "Platos fuertes: pepián, jocón y parrilladas", width: 500, height: 500 }
-          - { src: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=500&h=500&q=70", alt: Panqueques con miel, caption: "Postres: rellenitos, canillitas y más", width: 500, height: 500 }
-          - { src: "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=500&h=500&q=70", alt: Cócteles de colores, caption: "Bebidas: refrescos, atoles y cócteles", width: 500, height: 500 }
-
-      # Fallback for the source's reservation widget (no booking backend exists).
-      reservas:
-        type: cta
-        heading: Reserva tu mesa
-        primaryAction: { label: "Llámanos: +502 4539 3659", href: "tel:+50245393659" }
-        background: dark
-
-      galeria:
-        type: gallery
-        heading: Nuestros platillos
-        columns: 3
-        images:
-          - { src: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&h=400&q=70", alt: Salmón a la plancha, width: 600, height: 400 }
-          - { src: "https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&w=600&h=800&q=70", alt: Cerdo asado con piña, width: 600, height: 800 }
-          - { src: "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?auto=format&fit=crop&w=600&h=400&q=70", alt: Pollo asado con ensalada, width: 600, height: 400 }
-          - { src: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&h=800&q=70", alt: Pinchos a la parrilla, width: 600, height: 800 }
-          - { src: "https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=600&h=400&q=70", alt: Albóndigas con salsa, width: 600, height: 400 }
-          - { src: "https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=600&h=400&q=70", alt: Churrasco con papas, width: 600, height: 400 }
-
-      testimonios:
-        type: testimonials
-        heading: Testimonios
-        items:
-          - quote: Sabor increíble y de verdad casero. El pepián me recordó a la cocina de mi abuela. ¡Totalmente recomendado!
-            author: Patricia Méndez
-            role: Reseña de Google
-          - quote: Deliciosa y sabrosa. Soy muy exigente con la comida chapina y aquí me sentí como en casa. ¡Los volveré a visitar!
-            author: Ana Castillo
-            role: Reseña de Google
-          - quote: Mi lugar favorito para almorzar con mis compañeros. Porciones generosas, buen precio y el personal es muy amable.
-            author: Carlos Tún
-            role: Reseña de Google
-          - quote: Pedimos el catering para el cumpleaños de mi mamá y todos quedaron felices. Puntuales y todo riquísimo.
-            author: Lucía Ramírez
-            role: Reseña de Facebook
-          - quote: El ambiente es súper acogedor y los postres son un sueño. Volveremos pronto con toda la familia.
-            author: Jorge Girón
-            role: Reseña de Google
-
-      pedir:
-        type: cta
-        heading: Pide en línea
-        body: ¿Se te antojó algo? Ordena ahora y disfruta nuestros platillos en la puerta de tu casa.
-        primaryAction: { label: Haz tu pedido, href: "#" }   # placeholder in the source: add the ordering URL
-        background: dark
-
-      almuerzos:
-        type: menu
-        heading: ¡Almuerzos del día!
-        intro: >-
-          Haz una pausa sabrosa a la hora del almuerzo con nuestro menú diario. De 11:00 a 15:00 h.
-          Incluye bebida y postre del día. Q65 por plato.
-        currency: GTQ
-        background: surface
+      menu:
+        # The full product list from data.js: arrays replace, and the site owns its catalogue.
         categories:
-          - name: Menú del día
+          - name: Entradas
             items:
-              - { name: Pollo en crema, price: 65 }
-              - { name: Pepián de pollo, price: 65 }
-              - { name: Jocón con arroz, price: 65 }
-              - { name: Churrasco chapín, price: 65 }
-              - { name: Chiles rellenos, price: 65 }
+              - { id: tostadas, name: Tostadas chapinas, description: "Tres tostadas crujientes con guacamol, frijol volteado y salsa de tomate.", price: 35, orderable: true, image: { src: /images/menu-tostadas.webp, alt: Tostadas chapinas, width: 600, height: 450 }, ingredients: [Guacamol, Frijol volteado, Salsa de tomate, Cebolla, Queso seco, Perejil] }
+              - { id: ceviche, name: Ceviche de camarón, description: "Camarón marinado en limón con tomate, cebolla, cilantro y aguacate.", price: 70, orderable: true, image: { src: /images/menu-ceviche.webp, alt: Ceviche de camarón, width: 600, height: 450 }, ingredients: [Tomate, Cebolla, Cilantro, Aguacate, Chile] }
+          - name: Platos fuertes
+            items:
+              - { id: pepian, name: Pepián de pollo, description: "Recado tostado de semillas y chiles con pollo, güisquil y papa. Con arroz.", price: 85, orderable: true, image: { src: /images/menu-pepian.webp, alt: Pepián de pollo, width: 600, height: 450 }, ingredients: [Güisquil, Papa, Ejotes, Arroz, Tortillas] }
+              - { id: jocon, name: Jocón con arroz, description: "Pollo en recado verde de miltomate y cilantro, servido con arroz.", price: 80, orderable: true, image: { src: /images/menu-jocon.webp, alt: Jocón con arroz, width: 600, height: 450 }, ingredients: [Cebolla, Cilantro, Arroz, Tortillas] }
+              - { id: churrasco, name: Churrasco chapín, description: "Puyazo a las brasas con chirmol, frijoles, guacamol y cebollín asado.", price: 110, orderable: true, image: { src: /images/menu-churrasco.webp, alt: Churrasco chapín, width: 600, height: 450 }, ingredients: [Chirmol, Frijoles, Guacamol, Cebollín, Chorizo, Tortillas] }
+              - { id: costillas, name: Costillas BBQ, description: "Costillas de cerdo glaseadas, con papas y ensalada de la casa.", price: 120, orderable: true, image: { src: /images/menu-costillas.webp, alt: Costillas BBQ, width: 600, height: 450 }, ingredients: [Salsa BBQ, Papas, Ensalada, Cebolla morada] }
+          - name: Postres
+            items:
+              - { id: rellenitos, name: Rellenitos de plátano, description: "Plátano maduro relleno de frijol dulce con chocolate y canela.", price: 30, orderable: true, image: { src: /images/menu-rellenitos.webp, alt: Rellenitos de plátano, width: 600, height: 450 }, ingredients: [Azúcar, Canela] }
+              - { id: pastel, name: Pastel de frutos rojos, description: "Bizcocho suave con crema y frambuesas frescas.", price: 35, orderable: true, image: { src: /images/menu-pastel.webp, alt: Pastel de frutos rojos, width: 600, height: 450 }, ingredients: [Crema, Frambuesas] }
+          - name: Bebidas
+            items:
+              - { id: horchata, name: Horchata, description: "Bebida fría de arroz con canela, hecha en casa.", price: 18, orderable: true, image: { src: /images/menu-horchata.webp, alt: Horchata, width: 600, height: 450 }, ingredients: [Hielo, Canela] }
 
-      catering:
-        type: cta
-        heading: Servicio de catering
-        body: Convierte tus eventos en experiencias culinarias inolvidables. Escríbenos para recibir una cotización.
-        primaryAction: { label: Escríbenos, href: "mailto:hola@dateelgusto.example" }
+      # Hidden in the prototype.
+      reserve: false
+      reviews: false
+      catering: false
 
-      catering-eventos:
-        type: gallery
-        columns: 4
+      gallery:
+        # Prototype crops kept (600×400 and tall 600×800) for the masonry layout.
         images:
-          - { src: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=500&h=625&q=70", alt: Equipo almorzando en una mesa grande, caption: Empresariales, width: 500, height: 625 }
-          - { src: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=500&h=625&q=70", alt: Rebanada de pastel con frambuesas, caption: Cumpleaños, width: 500, height: 625 }
-          - { src: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=500&h=625&q=70", alt: Mesa decorada con flores y copas, caption: Bodas, width: 500, height: 625 }
-          - { src: "https://images.unsplash.com/photo-1530062845289-9109b2c9c868?auto=format&fit=crop&w=500&h=625&q=70", alt: Mesa de tapas y vino al aire libre, caption: Reuniones, width: 500, height: 625 }
+          - { src: /images/gallery-salmon.webp, alt: Salmón a la plancha, width: 600, height: 400 }
+          - { span: tall, src: /images/gallery-cerdo-pina.webp, alt: Cerdo asado con piña, width: 600, height: 800 }
+          - { src: /images/gallery-pollo.webp, alt: Pollo asado con ensalada, width: 600, height: 400 }
+          - { span: tall, src: /images/gallery-pinchos.webp, alt: Pinchos a la parrilla, width: 600, height: 800 }
+          - { src: /images/gallery-albondigas.webp, alt: Albóndigas con salsa, width: 600, height: 400 }
+          - { src: /images/gallery-churrasco.webp, alt: Churrasco con papas, width: 600, height: 400 }
+
+      order:
+        image: { src: /images/order-band.webp, alt: "", width: 1600, height: 1067 }
 
       visit:
-        anchor: contacto
-        heading: Visítanos
-        address: *business-address
-        phone: *business-phone
-        hours:
+        image: { src: /images/visit-ensalada.webp, alt: Ensalada colorida con aguacate y garbanzos, width: 900, height: 675 }
+        address: Ciudad Vieja, Sacatepéquez, Guatemala
+        phone: "+502 4539 3659"
+        hours:                  # one row per day, as in the prototype
           - { days: Lunes, hours: Cerrado }
-          - { days: Martes – Jueves, hours: "11:00 – 21:00" }
-          - { days: Viernes – Sábado, hours: "11:00 – 22:00" }
-          - { days: Domingo, hours: "11:00 – 20:00" }
-        form:
-          enabled: false        # no forms endpoint yet
-
-    order:
-      - hero
-      - platillos-destacados
-      - highlights
-      - story
-      - sabores
-      - categorias
-      - reservas
-      - galeria
-      - testimonios
-      - pedir
-      - almuerzos
-      - catering
-      - catering-eventos
-      - visit
-
-  menu:
-    enabled: false              # no per-dish prices in the source; the template menu would show placeholders
+          - { days: Martes, hours: "11:00 - 21:00" }
+          - { days: Miércoles, hours: "11:00 - 21:00" }
+          - { days: Jueves, hours: "11:00 - 21:00" }
+          - { days: Viernes, hours: "11:00 - 22:00" }
+          - { days: Sábado, hours: "11:00 - 22:00" }
+          - { days: Domingo, hours: "11:00 - 20:00" }

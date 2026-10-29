@@ -2,6 +2,7 @@
 import type { ResolvedSite, SectionOf } from '@saito/core';
 import Section from '../ui/Section.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
+import { icons, iconSvgAttrs, isIconName } from '../ui/icons.ts';
 
 interface Props {
   section: SectionOf<'features'>;
@@ -10,21 +11,43 @@ interface Props {
 
 const { section } = Astro.props;
 const cols = { 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:grid-cols-2 lg:grid-cols-4' };
+// Dividers switch columns at one breakpoint so the rule logic below matches the grid.
+const dividerCols = { 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:grid-cols-4' };
+const badgeColors = ['bg-accent', 'bg-accent-2', 'bg-accent-3'];
+const { dividers, iconStyle, columns } = section;
 ---
 
 <Section section={section}>
   <SectionHeader heading={section.heading} intro={section.intro} />
-  <ul class:list={['grid gap-6', cols[section.columns]]}>
+  <ul class:list={dividers ? ['grid gap-[18px] md:gap-0', dividerCols[columns]] : ['grid gap-6', cols[columns]]}>
     {
-      section.items.map((item) => (
-        <li class="saito-card">
-          {item.icon && (
-            <span class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-theme bg-primary/10 text-2xl" aria-hidden="true">
-              {item.icon}
-            </span>
+      section.items.map((item, i) => (
+        <li
+          class:list={
+            dividers
+              ? ['px-7 py-2 text-center', i > 0 && 'border-line max-md:border-t max-md:pt-[22px]', i % columns !== 0 && 'border-line md:border-l']
+              : 'saito-card'
+          }
+        >
+          {item.icon &&
+            (iconStyle === 'badge' ? (
+              <span
+                class:list={['grid h-12 w-12 place-items-center rounded-full text-ink', dividers ? 'mx-auto mb-2.5' : 'mb-4', badgeColors[i % 3]]}
+                aria-hidden="true"
+              >
+                {isIconName(item.icon) ? <svg {...iconSvgAttrs} class="h-6 w-6" set:html={icons[item.icon]} /> : item.icon}
+              </span>
+            ) : (
+              <span class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-theme bg-primary/10 text-2xl" aria-hidden="true">
+                {item.icon}
+              </span>
+            ))}
+          {dividers ? (
+            <h3 class="font-body text-base font-bold">{item.title}</h3>
+          ) : (
+            <h3 class="font-heading text-lg font-semibold">{item.title}</h3>
           )}
-          <h3 class="font-heading text-lg font-semibold">{item.title}</h3>
-          {item.description && <p class="mt-2 text-muted">{item.description}</p>}
+          {item.description && <p class:list={dividers ? 'saito-muted mt-1 text-[.92rem]' : 'mt-2 text-muted'}>{item.description}</p>}
         </li>
       ))
     }

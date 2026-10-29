@@ -1,5 +1,7 @@
 ---
 import type { ResolvedSite, SectionOf } from '@saito/core';
+import Button from '../ui/Button.astro';
+import MediaSplit from '../ui/MediaSplit.astro';
 import Section from '../ui/Section.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
 import { strings } from '../strings.ts';
@@ -17,8 +19,9 @@ const t = strings(site.locale);
 ---
 
 <Section section={section}>
-  <SectionHeader heading={section.heading} intro={section.intro} />
-  <div class:list={['grid gap-12', showForm ? 'lg:grid-cols-2' : 'mx-auto max-w-xl']}>
+  <MediaSplit image={section.image} position={section.imagePosition} slab={section.slab}>
+  <SectionHeader heading={section.heading} intro={section.intro} align={section.image ? 'left' : 'center'} />
+  <div class:list={['grid gap-12', section.image ? '' : showForm ? 'lg:grid-cols-2' : 'mx-auto max-w-xl']}>
     <div class="space-y-6">
       {
         section.address && (
@@ -71,6 +74,13 @@ const t = strings(site.locale);
           />
         )
       }
+      {
+        section.action && (
+          <div>
+            <Button link={section.action} />
+          </div>
+        )
+      }
     </div>
 
     {
@@ -109,6 +119,7 @@ const t = strings(site.locale);
       )
     }
   </div>
+  </MediaSplit>
 </Section>
 
 <script>

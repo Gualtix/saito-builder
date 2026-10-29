@@ -60,6 +60,20 @@ function section(name: string, title: string, fields: FieldDefinition[]) {
   });
 }
 
+// --- section-variants: shared fields (mirror `mediaSplit` in packages/core/src/schema/sections.ts) ---
+const mediaSplitFields = () => [
+  image('image', 'Image beside the text'),
+  defineField({ name: 'imagePosition', title: 'Image position', type: 'string', options: { list: ['start', 'end'] } }),
+  link('action', 'Action'),
+  defineField({
+    name: 'slab',
+    title: 'Colour slab behind the image',
+    type: 'string',
+    options: { list: ['accent', 'accent2', 'accent3', 'primary'] },
+  }),
+];
+// --- end section-variants shared fields ---
+
 const sections = [
   section('hero', 'Hero', [
     defineField({ name: 'layout', type: 'string', options: { list: ['centered', 'split', 'image-background'] } }),
@@ -69,12 +83,29 @@ const sections = [
     link('primaryAction', 'Primary action'),
     link('secondaryAction', 'Secondary action'),
     image(),
+    // site-chrome
+    defineField({
+      name: 'headingSize',
+      title: 'Heading size',
+      type: 'string',
+      options: { list: ['default', 'display'] },
+      description: '"display" sets the heading as a large wordmark.',
+    }),
   ]),
   section('features', 'Features', [
     text('heading'),
     longText('intro'),
     defineField({ name: 'columns', type: 'number', options: { list: [2, 3, 4] } }),
-    list('items', 'Items', [text('icon', 'Icon (emoji)'), text('title', 'Title', true), longText('description')]),
+    // section-variants: icon style and dividers
+    defineField({
+      name: 'iconStyle',
+      title: 'Icon style',
+      type: 'string',
+      description: 'badge: each icon is a name from the shared set (pot, heart, home, family, leaf, mail, …) in a round accent badge.',
+      options: { list: ['emoji', 'badge'] },
+    }),
+    defineField({ name: 'dividers', type: 'boolean', description: 'Plain centred columns with thin rules between them instead of cards.' }),
+    list('items', 'Items', [text('icon', 'Icon (emoji, or an icon name with the badge style)'), text('title', 'Title', true), longText('description')]),
   ]),
   section('stats', 'Stats', [text('heading'), list('items', 'Items', [text('value', 'Value', true), text('label', 'Label', true)])]),
   section('logoCloud', 'Logo cloud', [text('heading'), list('logos', 'Logos', [text('name', 'Name', true), text('src', 'Image URL'), text('href', 'Link')])]),
@@ -96,7 +127,21 @@ const sections = [
     ]),
   ]),
   section('faq', 'FAQ', [text('heading'), list('items', 'Questions', [text('question', 'Question', true), longText('answer', 'Answer', true)])]),
-  section('cta', 'Call to action', [text('heading', 'Heading', true), longText('body'), link('primaryAction', 'Primary action'), link('secondaryAction', 'Secondary action')]),
+  section('cta', 'Call to action', [
+    text('heading', 'Heading', true),
+    longText('body'),
+    link('primaryAction', 'Primary action'),
+    link('secondaryAction', 'Secondary action'),
+    // section-variants: photo band
+    defineField({ name: 'layout', type: 'string', options: { list: ['band', 'photo-band'] } }),
+    defineField({
+      ...image('image', 'Background photo (required for photo-band)'),
+      validation: (r) =>
+        r.custom((value, context) =>
+          (context.parent as { layout?: string } | undefined)?.layout === 'photo-band' && !value ? 'Required for the photo-band layout' : true,
+        ),
+    }),
+  ]),
   section('richText', 'Rich text', [
     text('heading'),
     defineField({
@@ -107,14 +152,35 @@ const sections = [
       validation: (r) => r.required(),
     }),
     defineField({ name: 'width', type: 'string', options: { list: ['narrow', 'wide'] } }),
+    ...mediaSplitFields(), // section-variants
+    // site-chrome
+    defineField({
+      name: 'doodle',
+      type: 'string',
+      options: { list: ['leaf', 'citrus', 'pod'] },
+      description: 'A faint line drawing under the text, on wide screens only.',
+    }),
   ]),
   section('gallery', 'Gallery', [
     text('heading'),
     defineField({ name: 'columns', type: 'number', options: { list: [2, 3, 4] } }),
+    // section-variants: layout and header action
+    defineField({ name: 'layout', type: 'string', options: { list: ['grid', 'marquee', 'masonry'] } }),
+    link('action', 'Action beside the heading'),
     defineField({
       name: 'images',
       type: 'array',
-      of: [defineArrayMember({ type: 'image', options: { hotspot: true }, fields: [text('alt', 'Alt text'), text('caption')] })],
+      of: [
+        defineArrayMember({
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            text('alt', 'Alt text'),
+            text('caption'),
+            defineField({ name: 'span', title: 'Span (masonry)', type: 'string', options: { list: ['tall'] } }),
+          ],
+        }),
+      ],
     }),
   ]),
   section('team', 'Team', [
@@ -126,6 +192,8 @@ const sections = [
     text('heading'),
     longText('intro'),
     text('currency', 'Currency (ISO code)'),
+    // whatsapp-commerce: layout, item image and ingredients
+    defineField({ name: 'layout', type: 'string', options: { list: ['list', 'cards'] } }),
     list('categories', 'Categories', [
       text('name', 'Name', true),
       list('items', 'Dishes', [
@@ -135,6 +203,8 @@ const sections = [
         defineField({ name: 'price', type: 'number', validation: (r) => r.required().min(0) }),
         defineField({ name: 'tags', type: 'array', of: [defineArrayMember({ type: 'string' })] }),
         defineField({ name: 'orderable', type: 'boolean' }),
+        image(),
+        defineField({ name: 'ingredients', title: 'Removable ingredients', type: 'array', of: [defineArrayMember({ type: 'string' })] }),
       ]),
     ]),
   ]),
@@ -165,6 +235,7 @@ const sections = [
       type: 'object',
       fields: [defineField({ name: 'enabled', type: 'boolean' }), text('submitLabel', 'Button label'), text('successMessage', 'Success message')],
     }),
+    ...mediaSplitFields(), // section-variants
   ]),
   section('schedule', 'Schedule', [
     text('heading'),
@@ -178,6 +249,22 @@ const sections = [
     text('heading', 'Heading', true),
     defineField({ name: 'target', type: 'datetime', validation: (r) => r.required() }),
     text('expiredText', 'Text after the countdown ends'),
+    link('action', 'Action'),
+  ]),
+  // section-variants: daily specials
+  section('specials', 'Specials', [
+    text('heading', 'Heading', true),
+    longText('intro'),
+    text('price', 'Price (display text, e.g. "Q65")', true),
+    text('priceNote', 'Price note (e.g. "por plato")'),
+    defineField({ name: 'badge', type: 'boolean', description: 'Show the price as a star badge (default on).' }),
+    defineField({ name: 'items', title: 'Dishes', type: 'array', of: [defineArrayMember({ type: 'string' })], validation: (r) => r.required().min(1) }),
+    defineField({
+      name: 'images',
+      type: 'array',
+      of: [defineArrayMember({ type: 'image', options: { hotspot: true }, fields: [text('alt', 'Alt text')] })],
+      validation: (r) => r.max(3),
+    }),
     link('action', 'Action'),
   ]),
 ];
@@ -214,7 +301,27 @@ const siteSettings = defineType({
     defineField({
       name: 'navigation',
       type: 'object',
-      fields: [list('links', 'Links', [text('label', 'Label', true), text('href', 'Href', true)]), link('cta', 'Call to action')],
+      fields: [
+        list('links', 'Links', [text('label', 'Label', true), text('href', 'Href', true)]),
+        link('cta', 'Call to action'),
+        // --- site-chrome (mirror navigationSchema in packages/core/src/schema/site.ts) ---
+        defineField({
+          name: 'transparent',
+          title: 'Transparent over the hero',
+          type: 'boolean',
+          description: 'Only when the page starts with an image-background hero that has an image.',
+        }),
+        list('iconLinks', 'Icon links (wide screens)', [
+          defineField({
+            name: 'icon',
+            type: 'string',
+            options: { list: ['email', 'x', 'facebook', 'instagram', 'linkedin', 'youtube', 'github', 'tiktok'] },
+            validation: (r) => r.required(),
+          }),
+          text('href', 'URL (mailto: for email)', true),
+        ]),
+        // --- end site-chrome ---
+      ],
     }),
     defineField({
       name: 'footer',

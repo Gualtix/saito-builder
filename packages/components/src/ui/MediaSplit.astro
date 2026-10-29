@@ -1,0 +1,48 @@
+---
+import type { Image } from '@saito/core';
+
+interface Props {
+  /** Unset: renders the slot alone, with no wrapper, so sections without a photo keep their markup. */
+  image?: Image;
+  position: 'start' | 'end';
+  slab?: 'accent' | 'accent2' | 'accent3' | 'primary';
+}
+
+const { image, position, slab } = Astro.props;
+const slabColors = { accent: 'before:bg-accent', accent2: 'before:bg-accent-2', accent3: 'before:bg-accent-3', primary: 'before:bg-primary' };
+// The slab sticks out past the photo's outer top corner (smaller offset on phones) and rounds only that corner.
+const slabSides = {
+  end: 'before:inset-[-14px_-14px_22px_22px] before:rounded-tr-panel min-[821px]:before:inset-[-24px_-24px_28px_28px]',
+  start: 'before:inset-[-14px_22px_22px_-14px] before:rounded-tl-panel min-[821px]:before:inset-[-24px_28px_28px_-24px]',
+};
+---
+
+{
+  image ? (
+    <div class="grid grid-cols-1 items-center gap-[clamp(32px,6vw,80px)] min-[821px]:grid-cols-2">
+      {position === 'end' && (
+        <div>
+          <slot />
+        </div>
+      )}
+      <div class:list={slab && ['relative isolate before:absolute before:-z-10', slabColors[slab], slabSides[position]]}>
+        <img
+          src={image.src}
+          alt={image.alt}
+          width={image.width}
+          height={image.height}
+          class="aspect-[4/3] w-full rounded-image object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      {position === 'start' && (
+        <div>
+          <slot />
+        </div>
+      )}
+    </div>
+  ) : (
+    <slot />
+  )
+}

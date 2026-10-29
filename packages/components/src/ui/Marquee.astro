@@ -1,0 +1,35 @@
+---
+import type { SectionOf } from '@saito/core';
+
+interface Props {
+  images: SectionOf<'gallery'>['images'];
+}
+
+const { images } = Astro.props;
+---
+
+{/* Bleeds to the edge of the section container; web/marquee.ts loops the track. */}
+<saito-marquee class="saito-marquee -mx-4 block sm:-mx-6 lg:-mx-8">
+  <ul class="flex w-max gap-5">
+    {
+      images.map((image) => (
+        <li class="saito-muted w-[150px] text-center text-[.8rem] font-medium">
+          <img
+            src={image.src}
+            alt={image.alt}
+            width={image.width ?? 150}
+            height={image.height ?? 110}
+            class="mb-2 h-[110px] w-[150px] rounded-card object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+          {image.caption}
+        </li>
+      ))
+    }
+  </ul>
+</saito-marquee>
+
+<script>
+  import '../web/marquee.ts';
+</script>

@@ -1,18 +1,37 @@
 ---
+import type { Link } from '@saito/core';
+import Button from './Button.astro';
+
 interface Props {
   heading?: string;
   intro?: string;
   align?: 'center' | 'left';
+  /** A button beside the heading; the header then aligns left with the button at the end. */
+  action?: Link;
 }
 
-const { heading, intro, align = 'center' } = Astro.props;
+const { heading, intro, align = 'center', action } = Astro.props;
+// site-chrome: with theme.headingDecoration "bar", global.css draws an accent bar under `header > h2` here
+// (centred under `header.text-center`), keyed on <html data-heading-decoration>, so the markup never changes.
 ---
 
 {
-  (heading || intro) && (
-    <header class:list={['mb-12 max-w-2xl', align === 'center' ? 'mx-auto text-center' : '']}>
-      {heading && <h2 class="font-heading text-3xl font-bold tracking-tight sm:text-4xl">{heading}</h2>}
-      {intro && <p class="saito-muted mt-4 text-lg">{intro}</p>}
-    </header>
+  action ? (
+    <div class="mb-12 flex flex-wrap items-end justify-between gap-3">
+      {(heading || intro) && (
+        <header class="max-w-2xl">
+          {heading && <h2 class="font-heading text-3xl font-bold tracking-tight sm:text-4xl">{heading}</h2>}
+          {intro && <p class="saito-muted mt-4 text-lg">{intro}</p>}
+        </header>
+      )}
+      <Button link={action} />
+    </div>
+  ) : (
+    (heading || intro) && (
+      <header class:list={['mb-12 max-w-2xl', align === 'center' ? 'mx-auto text-center' : '']}>
+        {heading && <h2 class="font-heading text-3xl font-bold tracking-tight sm:text-4xl">{heading}</h2>}
+        {intro && <p class="saito-muted mt-4 text-lg">{intro}</p>}
+      </header>
+    )
   )
 }

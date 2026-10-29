@@ -1,6 +1,6 @@
 # Implementation plan: Date El Gusto showcase
 
-> **Status:** wave 1 approved and in progress (2026-10-29). Each later wave starts only after the person confirms it. Wave 2's specs (`section-variants`, `site-chrome`, `whatsapp-commerce`, `date-el-gusto-site`) and wave 3's (`pwa`) are still drafts.
+> **Status:** wave 1 done (Checkpoint A passed, 2026-10-29). Wave 2 and 2′ approved and in progress. Each later wave starts only after the person confirms it. Wave 3's spec (`pwa`) is still a draft.
 > Inputs: [capability map](specs/date-el-gusto-capability-map.md) and its module specs in [`specs/`](specs/). Task list: [`todo.md`](todo.md). Runbook for accounts, content and deploys: [`step-by-step.md`](step-by-step.md).
 
 ## Constraint: no automated testing

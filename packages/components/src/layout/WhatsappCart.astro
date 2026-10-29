@@ -1,0 +1,56 @@
+---
+/**
+ * Mounts the WhatsApp storefront (web/whatsapp-cart.ts) at the end of <body>: the product and cart dialogs,
+ * the cart bar, and one JSON blob with the public config, the UI copy and the site-wide catalogue
+ * (every orderable menu item with an id, on any page, so the cart works and edits on every page).
+ */
+import { jsonForScript, type Integrations, type ResolvedSite } from '@saito/core';
+import { strings } from '../strings.ts';
+
+interface Props {
+  site: ResolvedSite;
+  commerce: Extract<NonNullable<Integrations['commerce']>, { provider: 'whatsapp' }>;
+}
+
+const { site, commerce } = Astro.props;
+const t = strings(site.locale);
+
+const catalog = new Map<string, unknown>();
+for (const page of site.pages)
+  for (const section of page.sections)
+    if (section.type === 'menu')
+      for (const category of section.categories)
+        for (const item of category.items)
+          if (item.orderable && item.id && !catalog.has(item.id))
+            catalog.set(item.id, {
+              id: item.id,
+              name: item.name,
+              category: category.name,
+              description: item.description ?? '',
+              price: item.price,
+              image: item.image?.src,
+              ingredients: item.ingredients ?? [],
+            });
+
+const data = {
+  config: {
+    siteId: site.id,
+    locale: site.locale,
+    phone: commerce.phone,
+    currency: commerce.currency,
+    orderIdPrefix: commerce.orderIdPrefix,
+    maxQty: commerce.maxQty,
+    location: commerce.location,
+  },
+  text: { ...t, msgGreeting: t.msgGreeting.replace('{business}', site.name) },
+  products: [...catalog.values()],
+};
+---
+
+<saito-product-dialog></saito-product-dialog>
+<saito-cart-dialog></saito-cart-dialog>
+<saito-cart-bar></saito-cart-bar>
+<script type="application/json" id="saito-cart-data" is:inline set:html={jsonForScript(data)} />
+<script>
+  import '../web/whatsapp-cart.ts';
+</script>

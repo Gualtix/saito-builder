@@ -12,6 +12,13 @@ const { section } = Astro.props;
 const { layout, image } = section;
 const isSplit = layout === 'split';
 const overlay = layout === 'image-background' && image;
+// site-chrome: `display` sets the heading as a fluid wordmark; it wraps (never overflows) on phones.
+const display = section.headingSize === 'display';
+const headingClass = display
+  ? ['font-heading text-[clamp(3.2rem,12.5vw,9.5rem)] leading-none font-bold text-balance wrap-break-word', overlay && '[text-shadow:0_4px_30px_rgba(0,0,0,.45)]']
+      .filter(Boolean)
+      .join(' ')
+  : 'font-heading text-4xl font-extrabold tracking-tight text-balance sm:text-6xl';
 ---
 
 <Section section={section} width="wide" class={overlay ? 'relative overflow-hidden' : ''}>
@@ -26,13 +33,13 @@ const overlay = layout === 'image-background' && image;
   <div
     class:list={[
       'relative',
-      isSplit ? 'grid items-center gap-12 lg:grid-cols-2' : 'mx-auto max-w-3xl text-center',
+      isSplit ? 'grid items-center gap-12 lg:grid-cols-2' : display ? 'mx-auto text-center' : 'mx-auto max-w-3xl text-center',
       overlay && 'py-12 text-white',
     ]}
   >
     <div>
       {section.eyebrow && <p class="saito-eyebrow mb-4">{section.eyebrow}</p>}
-      <h1 class="font-heading text-4xl font-extrabold tracking-tight text-balance sm:text-6xl">{section.heading}</h1>
+      <h1 class={headingClass}>{section.heading}</h1>
       {section.subheading && <p class:list={['mt-6 text-lg sm:text-xl', overlay ? 'text-white/85' : 'saito-muted']}>{section.subheading}</p>}
       {
         (section.primaryAction || section.secondaryAction) && (

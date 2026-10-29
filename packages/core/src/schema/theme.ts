@@ -39,6 +39,13 @@ export const themeSchema = z.object({
       panel: radiusScale.optional(),
     })
     .optional(),
+  // --- site-chrome ---
+  /** `bar`: a short accent-coloured bar under section headings (SectionHeader and richText). Unset means `none`. */
+  // Optional rather than .default('none') so theme presets typed as the output `Theme` stay valid.
+  headingDecoration: z.enum(['none', 'bar']).optional(),
+  /** `reveal`: blocks fade in and rise as they scroll into view (skipped under reduced motion). */
+  motion: z.object({ reveal: z.boolean().default(false) }).optional(),
+  // --- end site-chrome ---
 });
 
 export type Theme = z.infer<typeof themeSchema>;

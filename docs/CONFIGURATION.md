@@ -24,7 +24,7 @@ The schema source of truth is [`packages/core/src/schema/site.ts`](../packages/c
 | `environments` | | `{ development, staging, production }` → `{ url }`. Sets canonical URLs and sitemaps |
 | `brand` | | `logo: { src, alt, width?, height? }`, `logoText`, `favicon` |
 | `theme` | | Partial theme, merged over the template's (see below) |
-| `navigation` | | `links: [{ label, href }]`, `cta: { label, href }`. Replaces the template navigation |
+| `navigation` | | `links: [{ label, href }]`, `cta: { label, href }`, `transparent` (default false), `iconLinks: [{ icon, href }]`. Replaces the template navigation as a whole. `transparent` puts the header over the hero with white text, turning solid after 60px of scroll or while the mobile menu is open; it applies only on pages whose first section is a `hero` with `layout: image-background` and an `image` (that hero then fills the first screen), and the header stays solid without JavaScript. `iconLinks` are round icon buttons after the links from 981px; `icon` is `email` or a `footer.social` platform |
 | `footer` | | `tagline`, `columns: [{ title, links }]`, `social: [{ platform, href }]`, `legal` |
 | `seo` | | `titleTemplate` (`%s` = page title), `defaultImage`, `twitterHandle`, `noindex` (meta robots, `robots.txt` and the `X-Robots-Tag` header, in every environment, production included), `schemaType` |
 | `integrations` | | `analytics`, `commerce`, `forms` (see below) |
@@ -58,6 +58,10 @@ theme:
     card: xl             # .saito-card
     image: 2xl           # gallery images, split-hero image
     panel: 3xl           # reserved for panels and slabs
+  headingDecoration: bar # none (default) | bar: a short accent bar under section headings (section headers and richText)
+  motion:
+    reveal: true         # default false: blocks after the hero fade in and rise 24px over 700ms as they scroll into view;
+                         # shown at once under reduced motion, and never hidden without JavaScript
 ```
 
 ## Pages and sections
@@ -91,22 +95,23 @@ Every section accepts `background: default | surface | primary | dark` and an op
 
 | Type | Key fields |
 |------|------------|
-| `hero` | `layout` (centered, split, image-background), `eyebrow`, `heading`*, `subheading`, `primaryAction`, `secondaryAction`, `image` |
-| `features` | `heading`, `intro`, `columns` (2–4), `items[]: { icon, title*, description }` |
+| `hero` | `layout` (centered, split, image-background), `eyebrow`, `heading`*, `subheading`, `primaryAction`, `secondaryAction`, `image`, `headingSize` (default, display; default default). `display` sets the heading as a fluid wordmark (`clamp(4rem, 14vw, 14rem)` in the heading font) that wraps on phones |
+| `features` | `heading`, `intro`, `columns` (2–4), `iconStyle` (emoji, badge; default emoji), `dividers` (default false), `items[]: { icon, title*, description }`. With `badge`, `icon` is a name from the shared icon set (`pot`, `heart`, `home`, `family`, `leaf`, `mail`, `whatsapp`, and the social platforms) in a round badge cycling `accent`, `accent2`, `accent3`; `dividers` drops the cards for centred columns with thin rules between them |
 | `stats` | `heading`, `items[]: { value*, label* }` |
 | `logoCloud` | `heading`, `logos[]: { name*, src, href }` |
 | `testimonials` | `heading`, `items[]: { quote*, author*, role, avatar }` |
 | `pricing` | `heading`, `intro`, `plans[]: { name*, price*, period, description, features[], action*, highlighted }` |
 | `faq` | `heading`, `items[]: { question*, answer* }` |
-| `cta` | `heading`*, `body`, `primaryAction`*, `secondaryAction` |
-| `richText` | `heading`, `body`* (paragraphs, `**bold**`, `*italic*`, `[link](url)`), `width` (narrow, wide) |
-| `gallery` | `heading`, `columns`, `images[]: { src*, alt, caption }` |
+| `cta` | `heading`*, `body`, `primaryAction`*, `secondaryAction`, `layout` (band, photo-band; default band), `image` (required for photo-band: full-bleed photo under the theme scrim, content in a centred card) |
+| `richText` | `heading`, `body`* (paragraphs, `**bold**`, `*italic*`, `[link](url)`), `width` (narrow, wide), `image`, `imagePosition` (start, end; default end), `action`, `slab` (accent, accent2, accent3, primary), `doodle`. With `image`, text and photo sit side by side from 821px and stack below; `slab` draws a colour block offset behind the photo with the theme's panel radius. `doodle` (leaf, citrus, pod) adds a faint line drawing below the text, from 821px only |
+| `gallery` | `heading`, `columns`, `layout` (grid, marquee, masonry; default grid), `action` (button beside the heading), `images[]: { src*, alt, caption, span }`. `marquee`: one looping row that pauses on hover and stays static with reduced motion. `masonry`: 2 columns, `columns` from 821px; `span: tall` takes two rows |
 | `team` | `heading`, `intro`, `members[]: { name*, role, photo, bio }` |
-| `menu` | `heading`, `intro`, `currency`, `categories[]: { name*, items[]: { id, name*, description, price*, tags[], orderable } }` |
+| `menu` | `heading`, `intro`, `currency`, `layout` (list, cards; default list), `categories[]: { name*, items[]: { id, name*, description, price*, tags[], orderable, image, ingredients[] } }`. `cards`: photo cards with an order button. `ingredients` are the removable options in the WhatsApp product dialog. With a cart provider, `orderable` items with an `id` get an order button |
 | `products` | `heading`, `intro`, `currency`, `items[]: { id*, name*, description, price*, image, url }` |
-| `contact` | `heading`, `intro`, `email`, `phone`, `address`, `hours[]: { days, hours }`, `mapEmbedUrl`, `form: { enabled, submitLabel, successMessage }` (both unset → the locale's text) |
+| `contact` | `heading`, `intro`, `email`, `phone`, `address`, `hours[]: { days, hours }`, `mapEmbedUrl`, `form: { enabled, submitLabel, successMessage }` (both unset → the locale's text), and `image`, `imagePosition`, `action`, `slab` as on `richText` |
 | `schedule` | `heading`, `intro`, `days[]: { label*, items[]: { time*, title*, speaker, description } }` |
 | `countdown` | `heading`*, `target`* (ISO date-time with offset), `expiredText` (unset → the locale's text), `action` |
+| `specials` | `heading`*, `intro`, `price`* (display string, e.g. "Q65"), `priceNote`, `badge` (default true: the price in a rotated star badge on the panel edge; false: as text), `items[]`* (dish names), `images[]` (up to 3, a collage), `action` |
 
 `*` = required. Links are `{ label, href }`; images are `{ src, alt, width?, height? }`.
 
@@ -123,6 +128,14 @@ integrations:
     currency: EUR
     # provider: shopify        → storeDomain, storefrontToken; products link to their `url`
     # provider: commerce-layer → organization, clientId; products link to their `url`
+    # provider: whatsapp       → cart in the browser; the order is sent as a WhatsApp message (no backend)
+    #   phone: "+502 0000 0000"   # any format, reduced to digits for wa.me (public by design)
+    #   currency: GTQ
+    #   orderIdPrefix: DG         # A–Z/0–9, up to 6; order id <prefix>-YYMMDD-XXXXX
+    #   maxQty: 20                # per line, default 20
+    #   location: { enabled: true, center: [14.523, -90.759], zoom: 16 }
+    #     # optional map pin in checkout (Leaflet + OpenStreetMap, loaded only when opened);
+    #     # enabled → Permissions-Policy geolocation=(self), otherwise geolocation=()
   forms:
     endpoint: https://api.example.com   # apps/api base URL; the contact form posts here
     webhookUrl: https://hooks.example/… # server-side only; never rendered into pages

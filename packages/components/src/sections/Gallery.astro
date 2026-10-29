@@ -1,5 +1,6 @@
 ---
 import type { ResolvedSite, SectionOf } from '@saito/core';
+import Marquee from '../ui/Marquee.astro';
 import Section from '../ui/Section.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
 
@@ -10,28 +11,57 @@ interface Props {
 
 const { section } = Astro.props;
 const cols = { 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-2 lg:grid-cols-3', 4: 'sm:grid-cols-2 lg:grid-cols-4' };
+// Masonry: two columns on phones, `columns` from 821px; `span: tall` tiles take two rows.
+const masonryCols = { 2: 'min-[821px]:grid-cols-2', 3: 'min-[821px]:grid-cols-3', 4: 'min-[821px]:grid-cols-4' };
 ---
 
 <Section section={section} width="wide">
-  <SectionHeader heading={section.heading} />
-  <ul class:list={['grid gap-4', cols[section.columns]]}>
-    {
-      section.images.map((image) => (
-        <li>
-          <figure>
-            <img
-              src={image.src}
-              alt={image.alt}
-              width={image.width}
-              height={image.height}
-              class="aspect-[4/3] w-full rounded-image object-cover"
-              loading="lazy"
-              decoding="async"
-            />
-            {image.caption && <figcaption class="saito-muted mt-2 text-sm">{image.caption}</figcaption>}
-          </figure>
-        </li>
-      ))
-    }
-  </ul>
+  <SectionHeader heading={section.heading} action={section.action} />
+  {
+    section.layout === 'marquee' ? (
+      <Marquee images={section.images} />
+    ) : section.layout === 'masonry' ? (
+      <ul class:list={['grid auto-rows-[170px] grid-cols-2 gap-4 min-[821px]:auto-rows-[210px]', masonryCols[section.columns]]}>
+        {section.images.map((image) => (
+          <li class:list={['group relative overflow-hidden rounded-card', image.span === 'tall' && 'row-span-2']}>
+            <figure class="h-full">
+              <img
+                src={image.src}
+                alt={image.alt}
+                width={image.width}
+                height={image.height}
+                class="h-full w-full rounded-card object-cover motion-safe:transition-transform motion-safe:duration-[400ms] motion-safe:group-hover:scale-105"
+                loading="lazy"
+                decoding="async"
+              />
+              {image.caption && (
+                <figcaption class="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/70 to-transparent px-4 pt-9 pb-3.5 font-bold text-white">
+                  {image.caption}
+                </figcaption>
+              )}
+            </figure>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <ul class:list={['grid gap-4', cols[section.columns]]}>
+        {section.images.map((image) => (
+          <li>
+            <figure>
+              <img
+                src={image.src}
+                alt={image.alt}
+                width={image.width}
+                height={image.height}
+                class="aspect-[4/3] w-full rounded-image object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+              {image.caption && <figcaption class="saito-muted mt-2 text-sm">{image.caption}</figcaption>}
+            </figure>
+          </li>
+        ))}
+      </ul>
+    )
+  }
 </Section>

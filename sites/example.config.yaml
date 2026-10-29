@@ -227,7 +227,7 @@ x-components:
 x-patterns:
   media-text-split:
     kind: section
-    status: proposed
+    status: implemented
     description: Heading, paragraphs and a button beside a large photo, alternating sides down the page (zig-zag).
     fields:
       heading: string
@@ -241,7 +241,7 @@ x-patterns:
     occurrences: 2
   image-marquee:
     kind: interaction
-    status: proposed
+    status: implemented
     description: Horizontally auto-scrolling, looping row of small captioned photos.
     fields:
       images: "{ image, caption?: string }[]"
@@ -252,7 +252,7 @@ x-patterns:
     occurrences: 1
   svg-icon-badges:
     kind: component
-    status: proposed
+    status: implemented
     description: Feature items led by an SVG icon inside a colored circular badge, each badge a different accent color.
     fields:
       icon: "icon name or SVG asset"
@@ -290,7 +290,7 @@ x-patterns:
     occurrences: 2
   masonry-gallery:
     kind: layout
-    status: proposed
+    status: implemented
     description: Photo grid with mixed tile heights (some tiles span two rows) instead of uniform crops.
     fields:
       images: "{ image, span?: \"tall | wide\" }[]"
@@ -322,7 +322,7 @@ x-patterns:
     occurrences: 1
   photo-band-card:
     kind: layout
-    status: proposed
+    status: implemented
     description: Full-width darkened photo background with a floating white card holding the heading, text and button.
     fields:
       backgroundImage: image
@@ -333,7 +333,7 @@ x-patterns:
     occurrences: 1
   daily-specials:
     kind: section
-    status: proposed
+    status: implemented
     description: Highlighted panel for a fixed-price offer, with a list of included items, a price badge, a photo collage and a button.
     fields:
       heading: string
@@ -352,7 +352,7 @@ x-patterns:
     occurrences: 2
   section-header-action:
     kind: component
-    status: proposed
+    status: implemented
     description: Button aligned with a section heading ("View full menu", "Follow us") on sections that have no action field.
     fields:
       headerAction: link
@@ -363,7 +363,7 @@ x-patterns:
     occurrences: 2
   header-icon-links:
     kind: component
-    status: proposed
+    status: implemented
     description: Circular outlined icon buttons (email, social profiles) in the top navigation.
     fields:
       iconLinks: "{ platform | email, href }[]"
@@ -373,7 +373,7 @@ x-patterns:
     occurrences: 1
   transparent-header:
     kind: interaction
-    status: proposed
+    status: implemented
     description: Header transparent over a full-bleed hero, turning solid after scrolling.
     fields:
       transparentOverHero: boolean
@@ -383,7 +383,7 @@ x-patterns:
     occurrences: 2
   line-doodles:
     kind: decoration
-    status: proposed
+    status: implemented
     description: Low-contrast line drawings related to the business (food, tools) scattered in section margins.
     fields:
       doodles: "SVG asset[]"
@@ -393,7 +393,7 @@ x-patterns:
     occurrences: 2
   offset-color-slab:
     kind: decoration
-    status: proposed
+    status: implemented
     description: Flat accent-colored block with one large rounded corner, offset behind a photo to add depth.
     fields:
       slabColor: "<theme color>"
@@ -403,7 +403,7 @@ x-patterns:
     occurrences: 1
   heading-accent-bar:
     kind: decoration
-    status: proposed
+    status: implemented
     description: Short accent-colored bar under every section heading.
     fields:
       color: "<theme color>"
@@ -413,7 +413,7 @@ x-patterns:
     occurrences: 1
   scroll-reveal:
     kind: interaction
-    status: proposed
+    status: implemented
     description: Blocks fade or slide in as they enter the viewport (respecting reduced motion).
     fields:
       enabled: boolean
@@ -424,7 +424,7 @@ x-patterns:
 
   promo-badge:
     kind: decoration
-    status: proposed
+    status: implemented
     description: Round discount badge or edge ribbon ("-50%", "Today's special") overlapping a photo or section edge.
     fields:
       text: string
@@ -507,7 +507,7 @@ x-patterns:
     occurrences: 1
   menu-item-photos:
     kind: component
-    status: proposed
+    status: implemented
     description: Menu items as photo cards (photo, category label, name, description, price, order button) in a responsive grid.
     fields:
       image: image
@@ -518,7 +518,7 @@ x-patterns:
     occurrences: 1
   product-options-dialog:
     kind: interaction
-    status: proposed
+    status: implemented
     description: "Dialog opened from a menu item: photo, description, removable ingredients (checked = included) and a quantity stepper; also edits an existing cart line."
     fields:
       ingredients: string[]
@@ -529,7 +529,7 @@ x-patterns:
     occurrences: 1
   messaging-app-checkout:
     kind: component
-    status: proposed
+    status: implemented
     description: "Client-side cart (sticky cart bar, cart sheet with editable lines, checkout form for name, address and notes) that builds a formatted order message with an order id and opens a messaging app (WhatsApp wa.me). No server: cart and customer profile live in browser storage namespaced per site. Needs dialog and localStorage."
     fields:
       provider: "whatsapp"
@@ -543,7 +543,7 @@ x-patterns:
     occurrences: 1
   delivery-location-pin:
     kind: component
-    status: proposed
+    status: implemented
     description: "Optional map in a checkout where the customer drops a pin or uses the device location; the order gets a maps link. Needs geolocation allowed by the site's Permissions-Policy, a map library loaded lazily with SRI, and map tiles (attribution and usage policy apply)."
     fields:
       center: "[lat, lng]"
@@ -575,9 +575,41 @@ x-patterns:
     fallback: the browser's own offline error
     seenIn: [restaurant]
     occurrences: 1
-  hero-wordmark:
+  header-logo-wordmark:
     kind: component
     status: proposed
+    description: "Logo mark (32px) followed by the business name in the script heading font, as one home link."
+    nearestType: header
+    fallback: "the logo alone (the name is lost when brand.logo is set)"
+    seenIn: [restaurant]
+    occurrences: 1
+  home-page-title:
+    kind: component
+    status: proposed
+    description: "Home page <title> and og:title read 'Date El Gusto — Cocina chapina de familia' style: name plus tagline."
+    nearestType: page
+    fallback: "the site name alone"
+    seenIn: [restaurant]
+    occurrences: 1
+  button-variants:
+    kind: component
+    status: proposed
+    description: "Dark (ink) pill buttons with white text on specials, about and the gallery header; the primary orange pill stays for ordering."
+    nearestType: button
+    fallback: "every button in the primary colour"
+    seenIn: [restaurant]
+    occurrences: 1
+  section-spacing:
+    kind: layout
+    status: proposed
+    description: "The values strip uses about 40px vertical padding and the marquee about 28px top and 8px bottom, against the 64–120px of normal sections."
+    nearestType: section
+    fallback: "the normal section padding"
+    seenIn: [restaurant]
+    occurrences: 1
+  hero-wordmark:
+    kind: component
+    status: implemented
     description: The business name as the hero heading, in the script display font at display scale (about 230px on desktop, fluid on phones).
     fields:
       headingSize: "default | display"
@@ -862,6 +894,8 @@ pages:
         heading: What we do
         intro: "Three services, one goal: a company that runs itself."   # quote text containing ": "
         columns: 3                           # 2 | 3 | 4, default 3
+        iconStyle: emoji                     # emoji | badge, default emoji; badge: icon is a name from the shared icon set (pot, heart, home, family, leaf, mail, …) in a round accent badge
+        dividers: false                      # [OPTIONAL] default false; true: centred columns with thin rules instead of cards
         items:                               # [REQUIRED] at least 1
           - icon: "🧭"                       # [OPTIONAL] short glyph rendered as text (emoji or symbol), decorative
             title: Process design            # [REQUIRED]
@@ -927,11 +961,17 @@ pages:
         body: No slides, no sales pitch.     # [OPTIONAL]
         primaryAction: *action-book          # [REQUIRED]
         secondaryAction: *action-guide       # [OPTIONAL]
+        layout: band                         # band | photo-band, default band
+        # image: { src: /images/cta-band.webp, alt: Team at work }   # [REQUIRED for photo-band] photo under the scrim, content in a white card
 
       catalog-rich-text:
         type: richText
         heading: Our approach
-        width: narrow                        # narrow | wide, default narrow
+        width: narrow                        # narrow | wide, default narrow (ignored with image)
+        image: { src: /images/approach.webp, alt: Workshop whiteboard, width: 800, height: 600 }   # [OPTIONAL] photo beside the text
+        imagePosition: end                   # start | end, default end; stacked below 821px
+        action: *action-book                 # [OPTIONAL] button under the text
+        slab: accent                         # [OPTIONAL] accent | accent2 | accent3 | primary — colour block behind the photo
         # [REQUIRED] paragraphs separated by blank lines; supports **bold**,
         # *italic* and [links](https://…). Raw HTML is escaped.
         body: |-
@@ -943,8 +983,10 @@ pages:
         type: gallery
         heading: Workshops
         columns: 3                           # 2 | 3 | 4, default 3
-        images:                              # [REQUIRED] image + caption?
-          - { src: /images/gallery/workshop-01.webp, alt: Team sorting sticky notes, caption: Discovery workshop }
+        layout: grid                         # grid | marquee | masonry, default grid
+        action: { label: See all photos, href: /gallery/ }   # [OPTIONAL] button beside the heading
+        images:                              # [REQUIRED] image + caption? + span?
+          - { src: /images/gallery/workshop-01.webp, alt: Team sorting sticky notes, caption: Discovery workshop, span: tall }   # span: tall → two rows in masonry
           - { src: /images/gallery/workshop-02.webp, alt: Consultant presenting a process map }
 
       catalog-team:
@@ -998,6 +1040,7 @@ pages:
           enabled: true                      # default true
           submitLabel: Send message          # [OPTIONAL] unset → the locale's label ("Send message", "Enviar mensaje")
           successMessage: Thanks, we will reply within one business day.
+        # image, imagePosition, action, slab   # [OPTIONAL] as on richText: photo beside the details
 
       catalog-schedule:                      # for events and programs
         type: schedule
@@ -1018,6 +1061,20 @@ pages:
         expiredText: The summit is live!     # [OPTIONAL] unset → the locale's text ("It has started!", "¡Ya comenzó!")
         action: { label: Get tickets, href: https://tickets.meridian.example }   # [OPTIONAL]
         background: dark
+
+      catalog-specials:                      # a daily offer: dish names under one shared price
+        type: specials
+        heading: Lunch of the day            # [REQUIRED]
+        intro: Weekdays 11:00–15:00, drink and dessert included.
+        price: $14                           # [REQUIRED] display string (formatted by you)
+        priceNote: per plate                 # [OPTIONAL]
+        badge: true                          # [OPTIONAL] default true — price in a rotated star badge; false shows it as text
+        items: [Roast chicken, Vegetable curry, Grilled salmon]   # [REQUIRED] at least 1
+        images:                              # [OPTIONAL] up to 3, shown as a collage
+          - { src: /images/specials/lunch-01.webp, alt: Lunch table with several dishes }
+          - { src: /images/specials/lunch-02.webp, alt: Plate of roast chicken }
+          - { src: /images/specials/lunch-03.webp, alt: Bowl of vegetable curry }
+        action: { label: See the menu, href: /menu/ }   # [OPTIONAL]
 
 
 # =============================================================================

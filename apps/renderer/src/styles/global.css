@@ -86,3 +86,215 @@
     @apply text-primary underline underline-offset-2;
   }
 }
+
+/* --- whatsapp-commerce: storefront (packages/components/src/web/whatsapp-cart.ts, Menu.astro) --- */
+@theme inline {
+  /* WhatsApp green for order actions and a danger tone for removals; sites may override both. */
+  --color-wa: var(--saito-color-wa, #0d7a4a);
+  --color-danger: var(--saito-color-danger, #b8531b);
+}
+
+@layer components {
+  /* Dialog: bottom sheet on phones, centred card from 640px; flex only while open so a closed dialog stays hidden. */
+  .saito-sheet {
+    @apply m-auto mb-0 max-h-[92dvh] w-full max-w-full overflow-hidden rounded-t-panel bg-background text-ink backdrop:bg-scrim open:flex open:flex-col sm:mb-auto sm:max-h-[88vh] sm:max-w-[460px] sm:rounded-panel;
+  }
+  .saito-sheet-col {
+    @apply flex min-h-0 flex-1 flex-col;
+  }
+  .saito-sheet-body {
+    @apply min-h-0 flex-1 overflow-y-auto overscroll-contain;
+  }
+  .saito-sheet-head {
+    @apply flex items-center justify-between gap-3 border-b border-line py-2.5 pr-3 pl-5;
+  }
+  .saito-sheet-foot {
+    @apply flex flex-wrap items-center gap-x-3 gap-y-2.5 border-t border-line bg-background px-5 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))];
+  }
+  .saito-sheet-close {
+    @apply size-11 flex-none cursor-pointer rounded-full text-[1.6rem] leading-none text-ink;
+  }
+  .saito-sheet-hint {
+    @apply text-[.85rem] text-muted;
+  }
+  .saito-sheet-label {
+    @apply mb-1 block text-[.85rem] font-semibold;
+  }
+  /* text-base (16px) keeps iOS from zooming into the field */
+  .saito-sheet-input {
+    @apply min-h-12 w-full resize-y rounded-theme border-[1.5px] border-line bg-background px-3.5 py-3 text-base leading-[1.4] text-ink focus:border-ink focus:ring-3 focus:ring-primary/50 focus:outline-none;
+  }
+
+  .saito-btn-wa {
+    @apply bg-wa text-white hover:opacity-90;
+  }
+  .saito-btn-outline {
+    @apply border-[1.5px] border-ink bg-background text-ink;
+  }
+
+  /* Quantity stepper: − output + */
+  .saito-stepper {
+    @apply inline-flex flex-none items-center rounded-full border-[1.5px] border-line;
+  }
+  .saito-stepper button {
+    @apply size-11 cursor-pointer rounded-full text-[1.3rem] text-ink disabled:cursor-default disabled:opacity-35;
+  }
+
+  /* Secondary pill buttons (Cambiar, Eliminar, Mapa) */
+  .saito-pill {
+    @apply inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full border-[1.5px] border-line bg-background px-3 text-[.9rem] font-semibold whitespace-nowrap text-ink no-underline transition-colors hover:border-ink hover:bg-surface active:scale-[.97];
+  }
+  .saito-pill-danger {
+    @apply border-danger/35 text-danger hover:border-danger;
+  }
+  .saito-pill-wa {
+    @apply border-wa text-wa hover:border-wa;
+  }
+
+  /* Removable ingredient (checked = included) */
+  .saito-ingredient {
+    @apply flex min-h-11 cursor-pointer items-center gap-2.5 rounded-theme border-[1.5px] border-line px-3 py-1.5 text-[.92rem] leading-[1.25] has-[input:focus-visible]:outline-3 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ink;
+  }
+  .saito-ingredient input {
+    @apply size-5 flex-none accent-wa;
+  }
+  .saito-ingredient span {
+    @apply text-muted line-through;
+  }
+  .saito-ingredient input:checked + span {
+    @apply text-ink no-underline;
+  }
+
+  /* Sticky cart bar, shown only while the cart has items */
+  .saito-cart-bar {
+    @apply fixed right-3 bottom-[calc(12px+env(safe-area-inset-bottom))] left-3 z-60 flex min-h-14 cursor-pointer items-center gap-3 rounded-full bg-ink pr-5 pl-3.5 font-semibold text-background shadow-[0_10px_30px_rgba(0,0,0,.25)] sm:right-6 sm:bottom-6 sm:left-auto sm:min-w-[300px];
+  }
+  .saito-cart-bar-count {
+    @apply grid h-[30px] min-w-[30px] place-items-center rounded-[15px] bg-primary px-2 text-[.9rem] text-primary-contrast;
+  }
+
+  /* Delivery location row in checkout */
+  .saito-loc-share {
+    @apply border-[1.5px] border-dashed border-muted bg-background text-ink;
+  }
+  .saito-loc-set {
+    @apply flex flex-wrap items-center gap-x-2 gap-y-2.5 rounded-theme border-[1.5px] border-wa p-3 text-[.92rem] leading-[1.3];
+  }
+
+  /* Ordering notice above the menu */
+  .saito-order-notice {
+    @apply mt-1 mb-6 flex items-start gap-3 rounded-theme border-l-4 border-wa bg-surface px-4 py-3.5 text-[.95rem] leading-normal text-ink;
+  }
+}
+
+/* Leaflet delivery pin (L.divIcon className "saito-pin"): a rotated teardrop with a white dot, drawn in CSS because
+   Leaflet owns this element's markup and inline styles. Unlayered, like Leaflet's own stylesheet. */
+.saito-pin::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--saito-color-wa, #0d7a4a);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transform: rotate(-45deg);
+}
+.saito-pin::after {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 15px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+}
+/* --- end whatsapp-commerce --- */
+
+/* --- section-variants: marquee gallery, specials star badge (packages/components/src/ui/Marquee.astro, sections/Specials.astro) --- */
+/* The track holds its items twice (web/marquee.ts), so sliding by half plus half the 1.25rem gap loops seamlessly. */
+@keyframes saito-marquee {
+  to {
+    transform: translateX(calc(-50% - 0.625rem));
+  }
+}
+@layer components {
+  /* Static row (no JavaScript, or reduced motion): stays scrollable so every item is reachable. */
+  .saito-marquee {
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .saito-marquee[data-ready] {
+    overflow: hidden;
+  }
+  .saito-marquee[data-ready] > * {
+    animation: saito-marquee 40s linear infinite;
+  }
+  .saito-marquee[data-ready]:hover > * {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .saito-marquee[data-ready] > * {
+      animation: none;
+    }
+  }
+
+  /* Price burst: a 26-point star polygon. */
+  .saito-star-badge {
+    clip-path: polygon(50% 0, 60% 10%, 73% 5%, 78% 18%, 92% 20%, 90% 34%, 100% 44%, 92% 56%, 98% 70%, 85% 76%, 83% 90%, 69% 89%, 60% 100%, 50% 92%, 40% 100%, 31% 89%, 17% 90%, 15% 76%, 2% 70%, 8% 56%, 0 44%, 10% 34%, 8% 20%, 22% 18%, 27% 5%, 40% 10%);
+  }
+}
+/* --- end section-variants --- */
+
+/* --- site-chrome: transparent header, heading accent bar, scroll reveal (layout/Header.astro, web/header.ts, web/reveal.ts) --- */
+@layer components {
+  /* A transparent header lets the opening photo hero fill the first screen, its content centred below the bar. */
+  header[data-transparent] ~ main > section:first-child {
+    display: grid;
+    align-content: center;
+    min-height: 100svh;
+  }
+  header[data-transparent] ~ main > section:first-child > div {
+    width: 100%;
+  }
+
+  /* theme.headingDecoration: bar. Section headings are SectionHeader's (header > h2) and richText's h2;
+     the bar is centred under centred headings. */
+  [data-heading-decoration='bar'] :is([data-section] header > h2, [data-section='richText'] h2) {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.75rem;
+  }
+  [data-heading-decoration='bar'] :is([data-section] header > h2, [data-section='richText'] h2)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 4rem;
+    height: 0.25rem;
+    border-radius: 0.25rem;
+    background: var(--saito-color-accent);
+  }
+  [data-heading-decoration='bar'] [data-section] header.text-center > h2::after {
+    left: 50%;
+    translate: -50% 0;
+  }
+
+  /* theme.motion.reveal: hidden only once web/reveal.ts has tagged the blocks and marked the document ready,
+     so content never depends on JavaScript; the script skips reduced motion, and so does this rule. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal-ready] [data-reveal] {
+      transition:
+        opacity 0.7s,
+        transform 0.7s;
+    }
+    [data-reveal-ready] [data-reveal]:not([data-revealed]) {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+}
+/* --- end site-chrome --- */

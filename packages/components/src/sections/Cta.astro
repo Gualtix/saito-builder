@@ -9,13 +9,43 @@ interface Props {
 }
 
 const { section } = Astro.props;
+// The schema requires `image` for photo-band; guard anyway so a bad overlay degrades to the band.
+const image = section.layout === 'photo-band' ? section.image : undefined;
+// Photo band: the photo hides the section colour, and the white card needs the default button colours.
 ---
 
-<Section section={section} width="narrow" class="text-center">
-  <h2 class="font-heading text-3xl font-bold tracking-tight sm:text-4xl">{section.heading}</h2>
-  {section.body && <p class="saito-muted mt-4 text-lg">{section.body}</p>}
-  <div class="mt-8 flex flex-wrap justify-center gap-4">
-    <Button link={section.primaryAction} />
-    {section.secondaryAction && <Button link={section.secondaryAction} variant="secondary" />}
-  </div>
-</Section>
+{
+  image ? (
+    <Section section={{ ...section, background: 'default' }} class="relative isolate overflow-hidden">
+      <img
+        src={image.src}
+        alt={image.alt}
+        width={image.width}
+        height={image.height}
+        class="absolute inset-0 -z-10 h-full w-full object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="absolute inset-0 -z-10 bg-scrim" aria-hidden="true" />
+      <div class="py-4 sm:py-11">
+        <div class="mx-auto w-full max-w-[360px] rounded-card bg-background p-6 text-center text-ink shadow-[0_20px_50px_rgba(0,0,0,.35)]">
+          <h2 class="font-heading text-[2rem] leading-normal font-bold">{section.heading}</h2>
+          {section.body && <p class="mt-1.5 text-[.95rem] text-muted">{section.body}</p>}
+          <div class="mt-3.5 flex flex-wrap justify-center gap-3">
+            <Button link={section.primaryAction} />
+            {section.secondaryAction && <Button link={section.secondaryAction} variant="secondary" />}
+          </div>
+        </div>
+      </div>
+    </Section>
+  ) : (
+    <Section section={section} width="narrow" class="text-center">
+      <h2 class="font-heading text-3xl font-bold tracking-tight sm:text-4xl">{section.heading}</h2>
+      {section.body && <p class="saito-muted mt-4 text-lg">{section.body}</p>}
+      <div class="mt-8 flex flex-wrap justify-center gap-4">
+        <Button link={section.primaryAction} />
+        {section.secondaryAction && <Button link={section.secondaryAction} variant="secondary" />}
+      </div>
+    </Section>
+  )
+}

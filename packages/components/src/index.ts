@@ -12,6 +12,7 @@ import Pricing from './sections/Pricing.astro';
 import Products from './sections/Products.astro';
 import RichText from './sections/RichText.astro';
 import Schedule from './sections/Schedule.astro';
+import Specials from './sections/Specials.astro';
 import Stats from './sections/Stats.astro';
 import Team from './sections/Team.astro';
 import Testimonials from './sections/Testimonials.astro';
@@ -40,4 +41,5 @@ export const sectionComponents: Record<SectionType, (props: any) => any> = {
   contact: Contact,
   schedule: Schedule,
   countdown: Countdown,
+  specials: Specials,
 };

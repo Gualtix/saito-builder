@@ -335,7 +335,7 @@ const template = defineTemplate(
       },
 
       // --- REFERENCE ONLY: section catalog --------------------------------------
-      // The section types not used above, so the file shows all 16. Delete this
+      // The section types not used above, so the file shows all 17. Delete this
       // page when copying the file into a real template. The test checks that the
       // template as a whole covers every section type in the schema.
       {
@@ -385,6 +385,18 @@ const template = defineTemplate(
             heading: 'Next workshop starts in',
             target: '2027-03-11T09:00:00-06:00', // ISO 8601 date-time WITH offset
             expiredText: 'Registration is closed.',
+          },
+          {
+            id: 'specials',
+            type: 'specials',
+            heading: 'Lunch of the day', //   [REQUIRED]
+            intro: 'Weekdays 11:00–15:00, drink included.',
+            price: '$14', //                   [REQUIRED] display string
+            priceNote: 'per plate',
+            // badge: true by default (rotated star badge); false shows the price as text.
+            items: ['Roast chicken', 'Vegetable curry', 'Grilled salmon'], // [REQUIRED] dish names
+            images: [{ src: '/images/specials-1.webp', alt: 'Lunch table with several dishes' }], // up to 3, a collage
+            action: { label: 'See the menu', href: '/menu/' },
           },
         ],
       },
@@ -517,30 +529,34 @@ export const templateExtensions = {
   // Add newly discovered ones as 'unsupported' (same key as x-patterns); set 'supported' when the
   // platform ships it, and remove the matching flags from the templates. Checked by template-example.test.ts.
   capabilities: {
-    'transparent-header': { support: 'unsupported', requirement: 'navigation option transparentOverHero; Header.astro variant with a scroll script', firstSeenIn: 'family-kitchen' },
-    'header-icon-links': { support: 'unsupported', requirement: 'navigation.iconLinks; shared SVG icon set', firstSeenIn: 'family-kitchen' },
+    'transparent-header': { support: 'supported', requirement: 'navigation option transparentOverHero; Header.astro variant with a scroll script', firstSeenIn: 'family-kitchen' },
+    'header-icon-links': { support: 'supported', requirement: 'navigation.iconLinks; shared SVG icon set', firstSeenIn: 'family-kitchen' },
     'localized-ui-labels': { support: 'supported', requirement: 'packages/components/src/strings.ts (en, es), chosen by site.locale', firstSeenIn: 'family-kitchen' },
-    'hero-wordmark': { support: 'unsupported', requirement: 'hero option headingSize: display; fluid display font-size token', firstSeenIn: 'family-kitchen' },
-    'daily-specials': { support: 'unsupported', requirement: 'section type specials { heading, intro, price, priceNote, items, images, action }', firstSeenIn: 'family-kitchen' },
-    'promo-badge': { support: 'unsupported', requirement: 'badge { text, note } on specials and cta; CSS shape', firstSeenIn: 'family-kitchen' },
-    'image-marquee': { support: 'unsupported', requirement: 'gallery layout marquee; CSS loop, paused on hover, static under reduced motion', firstSeenIn: 'family-kitchen' },
-    'svg-icon-badges': { support: 'unsupported', requirement: 'features icon from a shared SVG set plus badgeColor; accent tokens', firstSeenIn: 'family-kitchen' },
-    'media-text-split': { support: 'unsupported', requirement: 'richText and contact fields image, imagePosition, action', firstSeenIn: 'family-kitchen' },
-    'offset-color-slab': { support: 'unsupported', requirement: 'media decoration slab: <accent token>; slab radius token', firstSeenIn: 'family-kitchen' },
-    'heading-accent-bar': { support: 'unsupported', requirement: 'theme option headingDecoration; shared section-heading component', firstSeenIn: 'family-kitchen' },
-    'line-doodles': { support: 'unsupported', requirement: 'per-section decoration slot for SVG assets', firstSeenIn: 'family-kitchen' },
-    'menu-item-photos': { support: 'unsupported', requirement: 'menu item image; Menu.astro layout cards', firstSeenIn: 'family-kitchen' },
-    'product-options-dialog': { support: 'unsupported', requirement: 'menu item ingredients; dialog web component', firstSeenIn: 'family-kitchen' },
-    'messaging-app-checkout': { support: 'unsupported', requirement: 'commerce provider whatsapp; cart web component; message, wa.me URL and order id with tests', firstSeenIn: 'family-kitchen' },
-    'delivery-location-pin': { support: 'unsupported', requirement: 'commerce.location; lazy Leaflet with SRI; geolocation allowed only when enabled', firstSeenIn: 'family-kitchen' },
+    'header-logo-wordmark': { support: 'unsupported', requirement: 'navigation option to render brand.logo and the business name together', firstSeenIn: 'family-kitchen' },
+    'home-page-title': { support: 'unsupported', requirement: 'seo.homeTitle or honour pages.index.title in Head.astro', firstSeenIn: 'family-kitchen' },
+    'button-variants': { support: 'unsupported', requirement: 'action variant primary | dark', firstSeenIn: 'family-kitchen' },
+    'section-spacing': { support: 'unsupported', requirement: 'section spacing default | compact', firstSeenIn: 'family-kitchen' },
+    'hero-wordmark': { support: 'supported', requirement: 'hero option headingSize: display; fluid display font-size token', firstSeenIn: 'family-kitchen' },
+    'daily-specials': { support: 'supported', requirement: 'section type specials { heading, intro, price, priceNote, items, images, action }', firstSeenIn: 'family-kitchen' },
+    'promo-badge': { support: 'supported', requirement: 'badge { text, note } on specials and cta; CSS shape', firstSeenIn: 'family-kitchen' },
+    'image-marquee': { support: 'supported', requirement: 'gallery layout marquee; CSS loop, paused on hover, static under reduced motion', firstSeenIn: 'family-kitchen' },
+    'svg-icon-badges': { support: 'supported', requirement: 'features icon from a shared SVG set plus badgeColor; accent tokens', firstSeenIn: 'family-kitchen' },
+    'media-text-split': { support: 'supported', requirement: 'richText and contact fields image, imagePosition, action', firstSeenIn: 'family-kitchen' },
+    'offset-color-slab': { support: 'supported', requirement: 'media decoration slab: <accent token>; slab radius token', firstSeenIn: 'family-kitchen' },
+    'heading-accent-bar': { support: 'supported', requirement: 'theme option headingDecoration; shared section-heading component', firstSeenIn: 'family-kitchen' },
+    'line-doodles': { support: 'supported', requirement: 'per-section decoration slot for SVG assets', firstSeenIn: 'family-kitchen' },
+    'menu-item-photos': { support: 'supported', requirement: 'menu item image; Menu.astro layout cards', firstSeenIn: 'family-kitchen' },
+    'product-options-dialog': { support: 'supported', requirement: 'menu item ingredients; dialog web component', firstSeenIn: 'family-kitchen' },
+    'messaging-app-checkout': { support: 'supported', requirement: 'commerce provider whatsapp; cart web component; message, wa.me URL and order id with tests', firstSeenIn: 'family-kitchen' },
+    'delivery-location-pin': { support: 'supported', requirement: 'commerce.location; lazy Leaflet with SRI; geolocation allowed only when enabled', firstSeenIn: 'family-kitchen' },
     'table-reservation': { support: 'unsupported', requirement: 'booking integration or forms endpoint; reservation section or cta variant', firstSeenIn: 'family-kitchen' },
-    'photo-band-card': { support: 'unsupported', requirement: 'cta backgroundImage and layout image-band; scrim token', firstSeenIn: 'family-kitchen' },
-    'masonry-gallery': { support: 'unsupported', requirement: 'gallery layout masonry with per-image span', firstSeenIn: 'family-kitchen' },
-    'section-header-action': { support: 'unsupported', requirement: 'optional headerAction link on sections without an action', firstSeenIn: 'family-kitchen' },
+    'photo-band-card': { support: 'supported', requirement: 'cta backgroundImage and layout image-band; scrim token', firstSeenIn: 'family-kitchen' },
+    'masonry-gallery': { support: 'supported', requirement: 'gallery layout masonry with per-image span', firstSeenIn: 'family-kitchen' },
+    'section-header-action': { support: 'supported', requirement: 'optional headerAction link on sections without an action', firstSeenIn: 'family-kitchen' },
     'carousel': { support: 'unsupported', requirement: 'testimonials layout carousel; small web component for the controls', firstSeenIn: 'family-kitchen' },
     'review-rating': { support: 'unsupported', requirement: 'testimonial rating 1-5 and source', firstSeenIn: 'family-kitchen' },
     'category-tiles': { support: 'unsupported', requirement: 'section type tiles, or a gallery layout with intro and action', firstSeenIn: 'family-kitchen' },
-    'scroll-reveal': { support: 'unsupported', requirement: 'theme motion option reveal; one IntersectionObserver script', firstSeenIn: 'family-kitchen' },
+    'scroll-reveal': { support: 'supported', requirement: 'theme motion option reveal; one IntersectionObserver script', firstSeenIn: 'family-kitchen' },
     'installable-app': { support: 'unsupported', requirement: 'brand.pwa; Head.astro tags; install web component; service-worker registration', firstSeenIn: 'family-kitchen' },
     'offline-page': { support: 'unsupported', requirement: 'per-site service worker and offline page; no-cache header for /sw.js', firstSeenIn: 'family-kitchen' },
   },

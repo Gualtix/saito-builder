@@ -3,6 +3,7 @@ import type { ResolvedPage, ResolvedSite } from '@saito/core';
 import Footer from './Footer.astro';
 import Head from './Head.astro';
 import Header from './Header.astro';
+import WhatsappCart from './WhatsappCart.astro';
 import { strings } from '../strings.ts';
 
 interface Props {
@@ -16,14 +17,27 @@ const t = strings(site.locale);
 ---
 
 <!doctype html>
-<html lang={site.locale} data-site={site.id} data-tenant={site.tenant}>
+<html
+  lang={site.locale}
+  data-site={site.id}
+  data-tenant={site.tenant}
+  data-heading-decoration={site.theme.headingDecoration === 'bar' ? 'bar' : undefined}
+>
   <head>
     <Head site={site} page={page} />
+    {
+      /* site-chrome: scroll reveal, only when the theme asks for it */
+      site.theme.motion?.reveal && (
+        <script>
+          import '../web/reveal.ts';
+        </script>
+      )
+    }
     <slot name="head" />
   </head>
   <body class="flex min-h-screen flex-col bg-background font-body text-ink antialiased">
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 saito-btn saito-btn-primary">{t.skipToContent}</a>
-    <Header site={site} currentPath={page.path} />
+    <Header site={site} currentPath={page.path} page={page} />
     <main id="main" class="flex-1">
       <slot />
     </main>
@@ -33,5 +47,6 @@ const t = strings(site.locale);
         <div hidden id="snipcart" data-api-key={commerce.publicKey} data-currency={commerce.currency.toLowerCase()} data-config-modal-style="side" />
       )
     }
+    {commerce?.provider === 'whatsapp' && <WhatsappCart site={site} commerce={commerce} />}
   </body>
 </html>

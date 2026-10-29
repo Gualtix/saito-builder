@@ -1,6 +1,9 @@
 ---
 import { renderRichText, type ResolvedSite, type SectionOf } from '@saito/core';
+import Button from '../ui/Button.astro';
+import MediaSplit from '../ui/MediaSplit.astro';
 import Section from '../ui/Section.astro';
+import { doodles, doodleSvgAttrs } from '../ui/doodles.ts';
 
 interface Props {
   section: SectionOf<'richText'>;
@@ -10,9 +13,24 @@ interface Props {
 const { section } = Astro.props;
 // renderRichText escapes its input before applying the small markup subset.
 const html = renderRichText(section.body);
+// A photo beside the text needs the full content width.
+const width = section.image ? 'default' : section.width === 'wide' ? 'default' : 'narrow';
+// The doodle sits out of flow below the text, so it never covers copy; faint, and only from 821px.
 ---
 
-<Section section={section} width={section.width === 'wide' ? 'default' : 'narrow'}>
-  {section.heading && <h2 class="font-heading mb-6 text-3xl font-bold tracking-tight">{section.heading}</h2>}
-  <div class="saito-prose" set:html={html} />
+<Section section={section} width={width}>
+  <MediaSplit image={section.image} position={section.imagePosition} slab={section.slab}>
+    {section.heading && <h2 class="font-heading mb-6 text-3xl font-bold tracking-tight">{section.heading}</h2>}
+    <div class="saito-prose" set:html={html} />
+    {section.action && <Button link={section.action} class="mt-6" />}
+    {
+      section.doodle && (
+        <svg
+          {...doodleSvgAttrs}
+          class="saito-muted pointer-events-none absolute mt-[18px] hidden w-[110px] opacity-25 min-[821px]:block"
+          set:html={doodles[section.doodle]}
+        />
+      )
+    }
+  </MediaSplit>
 </Section>

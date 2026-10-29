@@ -5,9 +5,19 @@ import { themeSchema } from './theme.ts';
 export const environments = ['development', 'staging', 'production'] as const;
 export type Environment = (typeof environments)[number];
 
+// --- site-chrome: header icon links (same platforms as `footer.social`, plus email) ---
+export const navigationIconNames = ['email', 'x', 'facebook', 'instagram', 'linkedin', 'youtube', 'github', 'tiktok'] as const;
+// --- end site-chrome ---
+
 export const navigationSchema = z.object({
   links: z.array(linkSchema).default([]),
   cta: linkSchema.optional(),
+  // --- site-chrome ---
+  /** Transparent header over the hero; applies only when the page starts with an `image-background` hero that has an image. */
+  transparent: z.boolean().default(false),
+  /** Round icon buttons after the links, on wide screens only. */
+  iconLinks: z.array(z.object({ icon: z.enum(navigationIconNames), href: z.string().min(1) })).default([]),
+  // --- end site-chrome ---
 });
 
 export const footerSchema = z.object({
@@ -41,6 +51,23 @@ export const integrationsSchema = z.object({
       z.object({ provider: z.literal('snipcart'), publicKey: z.string().min(1), currency: z.string().length(3).default('USD') }),
       z.object({ provider: z.literal('shopify'), storeDomain: z.string().min(1), storefrontToken: z.string().min(1) }),
       z.object({ provider: z.literal('commerce-layer'), organization: z.string().min(1), clientId: z.string().min(1) }),
+      // Order by WhatsApp: the cart lives in the browser and hands off to wa.me. Every field is public by design.
+      z.object({
+        provider: z.literal('whatsapp'),
+        /** Any format; reduced to digits for wa.me. */
+        phone: z.string().min(6),
+        currency: z.string().length(3),
+        orderIdPrefix: z.string().regex(/^[A-Z0-9]{1,6}$/),
+        maxQty: z.number().int().min(1).max(99).default(20),
+        /** Optional delivery pin; also switches the build's Permissions-Policy to geolocation=(self). */
+        location: z
+          .object({
+            enabled: z.boolean().default(false),
+            center: z.tuple([z.number(), z.number()]),
+            zoom: z.number().int().min(1).max(19).default(16),
+          })
+          .optional(),
+      }),
     ])
     .optional(),
   forms: z

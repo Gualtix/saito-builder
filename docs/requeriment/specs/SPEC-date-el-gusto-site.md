@@ -1,6 +1,6 @@
 # Spec: `date-el-gusto-site`
 
-> Module of the [capability map](date-el-gusto-capability-map.md). Status: draft, awaiting review (2026-10-29). Depends on: `noindex-header`, `family-kitchen-template` (each release), `pwa` (optional).
+> Module of the [capability map](date-el-gusto-capability-map.md). Status: approved (2026-10-29); open questions take the recommendation. Depends on: `noindex-header`, `family-kitchen-template` (each release), `pwa` (optional).
 > **No automated tests** (decision 2026-10-29): validation is manual end-to-end testing by a person, using the checks under *Manual verification*.
 
 ## Objective

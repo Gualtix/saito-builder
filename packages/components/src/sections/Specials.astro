@@ -1,0 +1,68 @@
+---
+import type { ResolvedSite, SectionOf } from '@saito/core';
+import Button from '../ui/Button.astro';
+import Section from '../ui/Section.astro';
+
+interface Props {
+  section: SectionOf<'specials'>;
+  site: ResolvedSite;
+}
+
+const { section } = Astro.props;
+const { images } = section;
+// Collage: with three photos the first one fills the left column, two rows high.
+const collage = { 1: 'grid-cols-1 grid-rows-1', 2: 'grid-cols-2 grid-rows-1', 3: 'grid-cols-[1.2fr_1fr] grid-rows-2' };
+---
+
+<Section section={section}>
+  <div
+    class:list={[
+      'relative grid grid-cols-1 items-center gap-8 rounded-panel bg-surface p-[clamp(24px,4vw,48px)] text-ink',
+      images.length > 0 && 'min-[821px]:grid-cols-[1fr_1.1fr]',
+    ]}
+  >
+    <div>
+      <h2 class="font-body mb-3 text-[1.7rem] leading-[1.2] font-extrabold uppercase">{section.heading}</h2>
+      {
+        section.badge && (
+          <p class="saito-star-badge absolute -top-[22px] right-[clamp(12px,3vw,40px)] grid h-[92px] w-[92px] rotate-[10deg] place-items-center bg-primary text-center text-[1.15rem] leading-[1.1] font-extrabold text-primary-contrast">
+            <span>
+              {section.price}
+              {section.priceNote && <small class="block text-[.6rem] font-semibold">{section.priceNote}</small>}
+            </span>
+          </p>
+        )
+      }
+      {section.intro && <p>{section.intro}</p>}
+      <ul class="mt-3.5 mb-[22px] *:relative *:pl-[22px] *:before:absolute *:before:top-[.7em] *:before:left-0 *:before:h-2 *:before:w-2 *:before:rounded-full *:before:bg-primary">
+        {section.items.map((item) => <li>{item}</li>)}
+      </ul>
+      {
+        !section.badge && (
+          <p class="mb-[22px] text-2xl font-extrabold">
+            {section.price}
+            {section.priceNote && <span class="text-sm font-semibold text-muted"> {section.priceNote}</span>}
+          </p>
+        )
+      }
+      {section.action && <Button link={section.action} />}
+    </div>
+    {
+      images.length > 0 && (
+        <div class:list={['grid h-[260px] gap-3 min-[821px]:h-[340px]', collage[images.length as 1 | 2 | 3]]}>
+          {images.map((image, i) => (
+            <img
+              src={image.src}
+              alt={image.alt}
+              width={image.width}
+              height={image.height}
+              class:list={['h-full w-full rounded-card object-cover', images.length === 3 && i === 0 && 'row-span-2']}
+              loading="lazy"
+              decoding="async"
+            />
+          ))}
+        </div>
+      )
+    }
+  </div>
+</Section>

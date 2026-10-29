@@ -39,49 +39,49 @@
 ## Wave 2 (in parallel), with wave 2′
 
 ### `section-variants` ([spec](specs/SPEC-section-variants.md))
-- [ ] **T8** Shared icon set, and features `iconStyle: badge` plus `dividers`
+- [x] **T8** Shared icon set, and features `iconStyle: badge` plus `dividers`
   - Files: `ui/icons.ts`, `packages/core/src/schema/sections.ts`, `sections/Features.astro`, `apps/studio/schemaTypes/index.ts` · Owner: `fullstack-engineer`
-- [ ] **T9** New section type `specials` with price badge: schema, component, registration
+- [x] **T9** New section type `specials` with price badge: schema, component, registration
   - Files: `packages/core/src/schema/sections.ts`, `sections/Specials.astro`, `packages/components/src/index.ts`, `global.css` · Owner: `fullstack-engineer`
-- [ ] **T10** `specials` in the Studio and both reference files
+- [x] **T10** `specials` in the Studio and both reference files
   - Check: typecheck; `saito validate --all` (`example.config.yaml` still resolves); `specials` is editable in the Studio
   - Files: `apps/studio/schemaTypes/index.ts`, `sites/example.config.yaml`, `packages/templates/src/template.example.ts`, `docs/CONFIGURATION.md` · Owner: `fullstack-engineer` · After: T9
-- [ ] **T11** Gallery `layout: marquee | masonry`, image `span`, `action`
+- [x] **T11** Gallery `layout: marquee | masonry`, image `span`, `action`
   - Files: `sections.ts`, `sections/Gallery.astro`, `web/marquee.ts`, `global.css`, `apps/studio/schemaTypes/index.ts` · Owner: `fullstack-engineer`
-- [ ] **T12** `richText` and `contact`: `image`, `imagePosition`, `action`, `slab`
+- [x] **T12** `richText` and `contact`: `image`, `imagePosition`, `action`, `slab`
   - Files: `sections.ts`, `sections/RichText.astro`, `sections/Contact.astro`, `global.css`, `apps/studio/schemaTypes/index.ts` · Owner: `fullstack-engineer`
-- [ ] **T13** `cta` `layout: photo-band` with `image`
+- [x] **T13** `cta` `layout: photo-band` with `image`
   - Files: `sections.ts`, `sections/Cta.astro`, `apps/studio/schemaTypes/index.ts` · Owner: `fullstack-engineer`
-- [ ] **T14** Close-out: docs; `family-kitchen` minor release adopting T8–T13; remove 9 flags; registry and `x-patterns` · Owner: primary · After: T8–T13
+- [x] **T14** Close-out: docs; `family-kitchen` minor release adopting T8–T13; remove 9 flags; registry and `x-patterns` · Owner: primary · After: T8–T13
 
 ### `site-chrome` ([spec](specs/SPEC-site-chrome.md))
-- [ ] **T15** `navigation.transparent` and `navigation.iconLinks`; header web component
+- [x] **T15** `navigation.transparent` and `navigation.iconLinks`; header web component
   - Files: `packages/core/src/schema/site.ts`, `layout/Header.astro`, `web/header.ts`, `apps/studio/schemaTypes/index.ts` · Owner: `fullstack-engineer` · After: T8 (icons)
-- [ ] **T16** `hero.headingSize: display` and `theme.headingDecoration: bar`
+- [x] **T16** `hero.headingSize: display` and `theme.headingDecoration: bar`
   - Files: `sections.ts`, `schema/theme.ts`, `sections/Hero.astro`, `ui/SectionHeader.astro`, `apps/studio/schemaTypes/index.ts` · Owner: `fullstack-engineer`
-- [ ] **T17** `richText.doodle` and the doodle set
+- [x] **T17** `richText.doodle` and the doodle set
   - Files: `sections.ts`, `sections/RichText.astro`, `ui/doodles.ts`, `apps/studio/schemaTypes/index.ts` · Owner: `fullstack-engineer` · After: T12 (same component)
-- [ ] **T18** `theme.motion.reveal` with the reveal script
+- [x] **T18** `theme.motion.reveal` with the reveal script
   - Files: `schema/theme.ts`, `layout/SiteLayout.astro`, `web/reveal.ts`, `global.css` · Owner: `frontend-engineer`
-- [ ] **T19** Close-out: docs; `family-kitchen` minor release adopting T15–T18; remove 6 flags; registry and `x-patterns` · Owner: primary · After: T15–T18
+- [x] **T19** Close-out: docs; `family-kitchen` minor release adopting T15–T18; remove 6 flags; registry and `x-patterns` · Owner: primary · After: T15–T18
 
 ### `whatsapp-commerce` ([spec](specs/SPEC-whatsapp-commerce.md))
-- [ ] **T20** `whatsapp` provider schema; menu item `image` and `ingredients`; `menu.layout: cards`
+- [x] **T20** `whatsapp` provider schema; menu item `image` and `ingredients`; `menu.layout: cards`
   - Files: `packages/core/src/schema/site.ts`, `sections.ts`, `sections/Menu.astro`, `apps/studio/schemaTypes/index.ts` · Owner: `fullstack-engineer`
-- [ ] **T21** Port the storefront into `web/whatsapp-cart.ts`, with its strings and styles
+- [x] **T21** Port the storefront into `web/whatsapp-cart.ts`, with its strings and styles
   - Acceptance: message format and order id identical to the prototype's
   - Files: `web/whatsapp-cart.ts`, `strings.ts`, `global.css` · Owner: `frontend-engineer` · After: T2, T20
-- [ ] **T22** Mount the cart in `SiteLayout`; `geolocation=(self)` only when location is enabled
+- [x] **T22** Mount the cart in `SiteLayout`; `geolocation=(self)` only when location is enabled
   - Files: `layout/SiteLayout.astro`, `packages/cli/src/build.ts` · Owner: `fullstack-engineer` · After: T21
-- [ ] **T23** Close-out: docs; `family-kitchen` minor release (cards, item images, ingredients); remove 4 flags; registry and `x-patterns` · Owner: primary · After: T22
+- [x] **T23** Close-out: docs; `family-kitchen` minor release (cards, item images, ingredients); remove 4 flags; registry and `x-patterns` · Owner: primary · After: T22
 
 ### `date-el-gusto-site`, wave 2′ ([spec](specs/SPEC-date-el-gusto-site.md); runbook phases)
-- [ ] **T24** Rewrite `site.config.yaml` as a thin site on `family-kitchen@1` (runbook Phase 1); drop `x-extraction`
+- [x] **T24** Rewrite `site.config.yaml` as a thin site on `family-kitchen@1` (runbook Phase 1); drop `x-extraction`
   - Check: `saito validate date-el-gusto --env production` · Owner: primary · After: Checkpoint A
-- [ ] **T25** Download and optimize the assets into `public/`: images as WebP, logo, favicon (Phase 2 §2.2) · Owner: primary
+- [x] **T25** Download and optimize the assets into `public/`: images as WebP, logo, favicon (Phase 2 §2.2) · Owner: primary
 - [ ] **T26** Sanity: Studio schema deploy, seed staging, then promote to production (Phases 3–4) · Owner: primary, with the person for logins · After: T10, T20 (Studio fields exist)
 - [ ] **T27** Cloudflare Pages project, env files, webhooks, first staging deploy (Phases 5–6) · Owner: `devops-engineer`, with the person for accounts
-- [ ] **T28** Add `integrations.commerce` (`whatsapp`) to the site config · Owner: primary · After: T23
+- [x] **T28** Add `integrations.commerce` (`whatsapp`) to the site config · Owner: primary · After: T23
 
 **▶ Checkpoint B (person):** see [plan](plan.md#checkpoints-manual-by-a-person).
 
