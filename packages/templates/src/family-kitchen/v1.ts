@@ -28,7 +28,7 @@ const menuPhoto = (id: string, alt: string) => photo(id, alt, 600, 450);
 const template = defineTemplate({
   id: 'family-kitchen',
   name: 'Cocina Familiar',
-  version: '1.5.0',
+  version: '1.6.0',
   description:
     'Warm single-page site for family restaurants in Guatemala (GTQ, +502): daily lunch, photo menu, story, gallery, hours and ordering by WhatsApp.',
   websiteTypes: ['restaurant', 'landing-page'],
@@ -39,8 +39,8 @@ const template = defineTemplate({
     radii: { button: 'full', card: 'xl', image: '2xl', panel: '3xl' },
     headingDecoration: 'bar',
     motion: { reveal: true },
+    logoLockup: 'mark-name',
   },
-  // UNSUPPORTED header-logo-wordmark → the logo alone; the business name is not shown beside it
   navigation: {
     links: [linkAbout, linkMenu, linkVisit],
     cta: actionOrder,
@@ -276,6 +276,7 @@ const template = defineTemplate({
     { version: '1.3.0', notes: 'Menu as photo cards; items carry a photo and removable ingredients for the WhatsApp cart (the site enables integrations.commerce).' },
     { version: '1.4.0', notes: 'Transparent header over the hero with email and social icon links; display-size hero wordmark; accent bar under section headings; line doodles on about and flavors; scroll reveal.' },
     { version: '1.5.0', notes: 'Installable app and offline page are supported; the site opts in with brand.pwa and supplies the files listed under assets.' },
+    { version: '1.6.0', notes: 'Logo mark and business name together in the header and footer (theme.logoLockup: mark-name).' },
   ],
 });
 
@@ -299,13 +300,6 @@ export const templateExtensions = {
   // platform requirement: why the design has it, how it behaves in the source, and what the platform must add.
   // The template renders the fallback today; `// UNSUPPORTED` comments mark where. Registry: template.example.ts.
   unsupportedCapabilities: {
-    'header-logo-wordmark': {
-      affects: ['header'],
-      purpose: 'Show the brand mark and the business name together in the header.',
-      expectedBehavior: 'Logo mark (32px) followed by the business name in the script heading font, as one home link.',
-      requirements: ['brand option to render the logo and logoText together (schema, Header.astro, docs)'],
-      fallback: 'the logo alone (the name is lost when brand.logo is set)',
-    },
     'home-page-title': {
       affects: ['site'],
       purpose: 'A descriptive browser and share title for the home page.',

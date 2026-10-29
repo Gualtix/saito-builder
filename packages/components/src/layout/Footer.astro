@@ -1,5 +1,6 @@
 ---
 import { safeHref, type ResolvedSite } from '@saito/core';
+import BrandLockup from '../ui/BrandLockup.astro';
 
 interface Props {
   site: ResolvedSite;
@@ -22,7 +23,7 @@ const socialLabels: Record<string, string> = {
 <footer class="border-t border-line bg-surface text-ink">
   <div class="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 md:flex-row md:gap-16 lg:px-8">
     <div class="md:mr-auto">
-      <p class="font-heading text-lg font-bold">{site.brand.logoText}</p>
+      <BrandLockup site={site} placement="footer" />
       {tagline && <p class="mt-2 max-w-sm text-sm text-muted">{tagline}</p>}
       {
         social.length > 0 && (

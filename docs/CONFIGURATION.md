@@ -59,6 +59,8 @@ theme:
     image: 2xl           # gallery images, split-hero image
     panel: 3xl           # reserved for panels and slabs
   headingDecoration: bar # none (default) | bar: a short accent bar under section headings (section headers and richText)
+  logoLockup: mark-name  # mark (default): the header shows brand.logo alone, or logoText without a logo; the footer shows logoText
+                         # mark-name: brand.logo followed by logoText in the heading font, in the header and the footer
   motion:
     reveal: true         # default false: blocks after the hero fade in and rise 24px over 700ms as they scroll into view;
                          # shown at once under reduced motion, and never hidden without JavaScript

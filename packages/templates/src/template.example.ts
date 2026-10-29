@@ -532,7 +532,7 @@ export const templateExtensions = {
     'transparent-header': { support: 'supported', requirement: 'navigation option transparentOverHero; Header.astro variant with a scroll script', firstSeenIn: 'family-kitchen' },
     'header-icon-links': { support: 'supported', requirement: 'navigation.iconLinks; shared SVG icon set', firstSeenIn: 'family-kitchen' },
     'localized-ui-labels': { support: 'supported', requirement: 'packages/components/src/strings.ts (en, es), chosen by site.locale', firstSeenIn: 'family-kitchen' },
-    'header-logo-wordmark': { support: 'unsupported', requirement: 'navigation option to render brand.logo and the business name together', firstSeenIn: 'family-kitchen' },
+    'header-logo-wordmark': { support: 'supported', requirement: 'theme.logoLockup: mark-name (theme, not navigation: the seed copies navigation into Sanity, which would shadow template changes); ui/BrandLockup.astro in Header and Footer', firstSeenIn: 'family-kitchen' },
     'home-page-title': { support: 'unsupported', requirement: 'seo.homeTitle or honour pages.index.title in Head.astro', firstSeenIn: 'family-kitchen' },
     'button-variants': { support: 'unsupported', requirement: 'action variant primary | dark', firstSeenIn: 'family-kitchen' },
     'section-spacing': { support: 'unsupported', requirement: 'section spacing default | compact', firstSeenIn: 'family-kitchen' },

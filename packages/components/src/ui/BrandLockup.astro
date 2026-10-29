@@ -1,0 +1,36 @@
+---
+import type { ResolvedSite } from '@saito/core';
+
+interface Props {
+  site: ResolvedSite;
+  /** `header`: the home link, showing the logo alone (or the name without one). `footer`: the name alone, not a link. */
+  placement: 'header' | 'footer';
+}
+
+const { site, placement } = Astro.props;
+const { logo, logoText } = site.brand;
+// theme.logoLockup "mark-name": logo + name together; the logo is decorative because the visible name labels it.
+const lockup = site.theme.logoLockup === 'mark-name' && !!logo;
+const Tag = placement === 'header' ? 'a' : 'p';
+// Non-lockup classes are today's exact markup, so sites without the option render unchanged.
+const classes = lockup
+  ? 'font-heading flex min-w-0 items-center gap-2 font-bold'
+  : placement === 'header'
+    ? 'font-heading flex items-center gap-2 text-lg font-bold'
+    : 'font-heading text-lg font-bold';
+---
+
+<Tag href={placement === 'header' ? '/' : undefined} class={classes}>
+  {
+    lockup && logo ? (
+      <>
+        <img src={logo.src} alt="" class="h-8 w-auto shrink-0" width={logo.width} height={logo.height} />
+        <span class="truncate text-2xl">{logoText}</span>
+      </>
+    ) : placement === 'header' && logo ? (
+      <img src={logo.src} alt={logo.alt || site.name} class="h-8 w-auto" width={logo.width} height={logo.height} />
+    ) : (
+      logoText
+    )
+  }
+</Tag>

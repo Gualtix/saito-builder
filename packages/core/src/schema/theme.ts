@@ -43,6 +43,8 @@ export const themeSchema = z.object({
   /** `bar`: a short accent-coloured bar under section headings (SectionHeader and richText). Unset means `none`. */
   // Optional rather than .default('none') so theme presets typed as the output `Theme` stay valid.
   headingDecoration: z.enum(['none', 'bar']).optional(),
+  /** `mark-name`: the header and footer show the logo beside the business name (needs `brand.logo`). Unset means `mark`. */
+  logoLockup: z.enum(['mark', 'mark-name']).optional(),
   /** `reveal`: blocks fade in and rise as they scroll into view (skipped under reduced motion). */
   motion: z.object({ reveal: z.boolean().default(false) }).optional(),
   // --- end site-chrome ---

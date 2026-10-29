@@ -577,8 +577,8 @@ x-patterns:
     occurrences: 1
   header-logo-wordmark:
     kind: component
-    status: proposed
-    description: "Logo mark (32px) followed by the business name in the script heading font, as one home link."
+    status: implemented
+    description: "Logo mark (32px) followed by the business name in the script heading font, as one home link; the footer repeats the lockup."
     nearestType: header
     fallback: "the logo alone (the name is lost when brand.logo is set)"
     seenIn: [restaurant]
@@ -716,6 +716,7 @@ theme:
     card: xl                 # 1.25rem
     image: 2xl               # 1.875rem (gallery and hero images)
     panel: 3xl               # 2.5rem (colour slabs, panels)
+  logoLockup: mark           # [OPTIONAL] default mark — mark | mark-name (brand.logo and logoText together in header and footer)
 
 
 # =============================================================================

@@ -244,6 +244,7 @@ Saito's `commerce` integration only supports `snipcart`, `shopify` and `commerce
 - [ ] Diff it against the local build: `diff -r` of the two `dist/staging/date-el-gusto` outputs, ignoring `/_astro/` hashes. Only image URLs should differ.
 - [ ] Promote: `npx sanity dataset copy staging production`, or seed with `--env production`.
 - [ ] After migration, follow the golden rule (README, "Content publishing"): Sanity owns editable content, YAML owns structure, theme and integrations. Record that in the site config header, and never run `seed --overwrite` from a build.
+- [ ] Know the side effect: the seed copies the template's `navigation` into `siteSettings`, and a content `navigation` replaces the template's whole object. From then on, template releases that change navigation (links, icon links, transparency) do not reach the site until someone edits it in the Studio. Template-wide presentation settings therefore go in the theme (YAML-only), as `theme.logoLockup` does.
 
 ### Acceptance criteria
 
