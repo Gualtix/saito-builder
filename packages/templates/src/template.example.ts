@@ -160,6 +160,9 @@ const template = defineTemplate(
         primary: '#1d4ed8', //            buttons, links, "primary" section backgrounds
         primaryContrast: '#ffffff', //    text on primary; keep WCAG AA (4.5:1) with primary
         accent: '#f59e0b', //             highlights and badges
+        accent2: '#10b981', //            [OPTIONAL] extra accents (badges, colour blocks); unset → accent
+        accent3: '#f43f5e', //            [OPTIONAL]
+        scrim: '#140f0a9e', //            [OPTIONAL] #rrggbbaa overlay on full-bleed photos; unset → black at 55%
         // secondary ("dark" backgrounds), background, surface (cards, footer),
         // text, muted (keep AA with background) and border come from themes.slate.
       },
@@ -168,8 +171,8 @@ const template = defineTemplate(
         body: 'Inter',
         googleFonts: true, //             [OPTIONAL] default true — false for system or self-hosted fonts
       },
-      radius: 'md', //                    [OPTIONAL] default md — none | sm | md | lg | full; one value for
-      //                                  every rounded element, so `full` turns cards into pills
+      radius: 'md', //                    [OPTIONAL] default md — none | sm | md | lg | xl | 2xl | 3xl | full
+      radii: { button: 'full', card: 'xl', image: '2xl', panel: '3xl' }, // [OPTIONAL] per role; unset → radius
     },
 
     // --- Navigation ------------------------------------------------------------
@@ -326,7 +329,7 @@ const template = defineTemplate(
             address: '100 Main Street, Springfield',
             hours: [{ days: 'Monday–Friday', hours: '9:00–17:00' }],
             // The form only renders when the site sets integrations.forms.
-            form: { enabled: true, submitLabel: 'Send message' },
+            form: { enabled: true, submitLabel: 'Send message' }, // [OPTIONAL] submitLabel, successMessage: unset → locale string
           },
         ],
       },
@@ -457,14 +460,10 @@ export const templateExtensions = {
     spacing: { section: { $type: 'dimension', $value: '6rem' }, gutter: { $type: 'dimension', $value: '1.5rem' } },
     fontSize: { h1: { $type: 'dimension', $value: '3.5rem' }, body: { $type: 'dimension', $value: '1rem' } },
     motion: { base: { $type: 'duration', $value: '250ms' } },
-    // Per-role radii and shadows: theme.radius is one value, so a design with pill buttons
-    // and soft cards keeps the difference here (theme.radius follows the cards).
-    radius: { card: { $type: 'dimension', $value: '1.75rem' }, button: { $type: 'dimension', $value: '999px' } },
+    // Shadows (per-role radii, extra accents and the photo scrim are theme fields).
     shadow: {
       photo: { $type: 'shadow', $value: { offsetX: '0', offsetY: '18px', blur: '26px', spread: '-14px', color: '#24151080' } },
     },
-    // Translucent overlay over full-bleed photo bands (hero, CTA bands), as 8-digit hex.
-    overlay: { scrim: { $type: 'color', $value: '#140f0a9e' } },
   },
 
   // What a site must supply for this template to look finished.
@@ -520,7 +519,7 @@ export const templateExtensions = {
   capabilities: {
     'transparent-header': { support: 'unsupported', requirement: 'navigation option transparentOverHero; Header.astro variant with a scroll script', firstSeenIn: 'family-kitchen' },
     'header-icon-links': { support: 'unsupported', requirement: 'navigation.iconLinks; shared SVG icon set', firstSeenIn: 'family-kitchen' },
-    'localized-ui-labels': { support: 'unsupported', requirement: 'locale-keyed strings dictionary in packages/components, chosen by site.locale', firstSeenIn: 'family-kitchen' },
+    'localized-ui-labels': { support: 'supported', requirement: 'packages/components/src/strings.ts (en, es), chosen by site.locale', firstSeenIn: 'family-kitchen' },
     'hero-wordmark': { support: 'unsupported', requirement: 'hero option headingSize: display; fluid display font-size token', firstSeenIn: 'family-kitchen' },
     'daily-specials': { support: 'unsupported', requirement: 'section type specials { heading, intro, price, priceNote, items, images, action }', firstSeenIn: 'family-kitchen' },
     'promo-badge': { support: 'unsupported', requirement: 'badge { text, note } on specials and cta; CSS shape', firstSeenIn: 'family-kitchen' },
@@ -539,7 +538,7 @@ export const templateExtensions = {
     'masonry-gallery': { support: 'unsupported', requirement: 'gallery layout masonry with per-image span', firstSeenIn: 'family-kitchen' },
     'section-header-action': { support: 'unsupported', requirement: 'optional headerAction link on sections without an action', firstSeenIn: 'family-kitchen' },
     'carousel': { support: 'unsupported', requirement: 'testimonials layout carousel; small web component for the controls', firstSeenIn: 'family-kitchen' },
-    'review-rating': { support: 'unsupported', requirement: 'testimonial rating 1–5 and source', firstSeenIn: 'family-kitchen' },
+    'review-rating': { support: 'unsupported', requirement: 'testimonial rating 1-5 and source', firstSeenIn: 'family-kitchen' },
     'category-tiles': { support: 'unsupported', requirement: 'section type tiles, or a gallery layout with intro and action', firstSeenIn: 'family-kitchen' },
     'scroll-reveal': { support: 'unsupported', requirement: 'theme motion option reveal; one IntersectionObserver script', firstSeenIn: 'family-kitchen' },
     'installable-app': { support: 'unsupported', requirement: 'brand.pwa; Head.astro tags; install web component; service-worker registration', firstSeenIn: 'family-kitchen' },

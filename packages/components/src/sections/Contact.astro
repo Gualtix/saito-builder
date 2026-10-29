@@ -2,6 +2,7 @@
 import type { ResolvedSite, SectionOf } from '@saito/core';
 import Section from '../ui/Section.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
+import { strings } from '../strings.ts';
 
 interface Props {
   section: SectionOf<'contact'>;
@@ -12,6 +13,7 @@ const { section, site } = Astro.props;
 const endpoint = site.integrations.forms?.endpoint;
 const action = endpoint ? `${endpoint.replace(/\/+$/, '')}/v1/sites/${site.id}/contact` : undefined;
 const showForm = section.form.enabled && action;
+const t = strings(site.locale);
 ---
 
 <Section section={section}>
@@ -21,7 +23,7 @@ const showForm = section.form.enabled && action;
       {
         section.address && (
           <div>
-            <h3 class="font-semibold">Address</h3>
+            <h3 class="font-semibold">{t.address}</h3>
             <address class="saito-muted whitespace-pre-line not-italic">{section.address}</address>
           </div>
         )
@@ -29,7 +31,7 @@ const showForm = section.form.enabled && action;
       {
         (section.email || section.phone) && (
           <div>
-            <h3 class="font-semibold">Contact</h3>
+            <h3 class="font-semibold">{t.contact}</h3>
             {section.email && (
               <p>
                 <a class="underline" href={`mailto:${section.email}`}>{section.email}</a>
@@ -46,7 +48,7 @@ const showForm = section.form.enabled && action;
       {
         section.hours.length > 0 && (
           <div>
-            <h3 class="font-semibold">Opening hours</h3>
+            <h3 class="font-semibold">{t.openingHours}</h3>
             <dl class="mt-1 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1">
               {section.hours.map((row) => (
                 <>
@@ -62,7 +64,7 @@ const showForm = section.form.enabled && action;
         section.mapEmbedUrl && (
           <iframe
             src={section.mapEmbedUrl}
-            title={`Map: ${site.name}`}
+            title={`${t.map}: ${site.name}`}
             class="aspect-video w-full rounded-theme border border-line"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
@@ -73,7 +75,11 @@ const showForm = section.form.enabled && action;
 
     {
       showForm && (
-        <saito-contact-form success-message={section.form.successMessage}>
+        <saito-contact-form
+          success-message={section.form.successMessage ?? t.formSuccess}
+          sending-message={t.formSending}
+          error-message={t.formError}
+        >
           <form action={action} method="post" class="saito-card space-y-4">
             <input type="hidden" name="page" value={Astro.url.pathname} />
             {/* Honeypot: hidden from people, filled by bots, rejected by the API. */}
@@ -83,19 +89,19 @@ const showForm = section.form.enabled && action;
               </label>
             </div>
             <label class="block">
-              <span class="text-sm font-medium">Name</span>
+              <span class="text-sm font-medium">{t.formName}</span>
               <input class="saito-input" type="text" name="name" required maxlength="200" autocomplete="name" />
             </label>
             <label class="block">
-              <span class="text-sm font-medium">Email</span>
+              <span class="text-sm font-medium">{t.formEmail}</span>
               <input class="saito-input" type="email" name="email" required maxlength="320" autocomplete="email" />
             </label>
             <label class="block">
-              <span class="text-sm font-medium">Message</span>
+              <span class="text-sm font-medium">{t.formMessage}</span>
               <textarea class="saito-input min-h-32" name="message" required maxlength="5000" />
             </label>
             <button type="submit" class="saito-btn saito-btn-primary w-full">
-              {section.form.submitLabel}
+              {section.form.submitLabel ?? t.formSubmit}
             </button>
             <p data-status role="status" aria-live="polite" class="text-sm" />
           </form>

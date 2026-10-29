@@ -5,6 +5,9 @@ const radius: Record<Theme['radius'], string> = {
   sm: '0.25rem',
   md: '0.5rem',
   lg: '1rem',
+  xl: '1.25rem',
+  '2xl': '1.875rem',
+  '3xl': '2.5rem',
   full: '9999px',
 };
 
@@ -29,7 +32,17 @@ export function themeToCss(theme: Theme): string {
     '--saito-font-body': `"${theme.fonts.body}", ${fallbackStack}`,
     '--saito-radius': radius[theme.radius],
   };
-  const body = Object.entries(vars)
+  // Emitted only when set, so sites without them keep byte-identical CSS.
+  const optional: Record<string, string | undefined> = {
+    '--saito-color-accent-2': theme.colors.accent2,
+    '--saito-color-accent-3': theme.colors.accent3,
+    '--saito-color-scrim': theme.colors.scrim,
+    '--saito-radius-button': theme.radii?.button && radius[theme.radii.button],
+    '--saito-radius-card': theme.radii?.card && radius[theme.radii.card],
+    '--saito-radius-image': theme.radii?.image && radius[theme.radii.image],
+    '--saito-radius-panel': theme.radii?.panel && radius[theme.radii.panel],
+  };
+  const body = [...Object.entries(vars), ...Object.entries(optional).filter(([, v]) => v)]
     .map(([k, v]) => `${k}: ${v};`)
     .join(' ');
   return `:root { color-scheme: ${theme.mode}; ${body} }`;

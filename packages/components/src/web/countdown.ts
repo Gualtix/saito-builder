@@ -1,6 +1,7 @@
 /**
- * <saito-countdown target="2030-01-01T09:00:00Z" expired-text="We're live!">fallback</saito-countdown>
- * Framework-independent live countdown; the server-rendered fallback stays until it upgrades.
+ * <saito-countdown target="2030-01-01T09:00:00Z" expired-text="We're live!" days-label="Days" hours-label="Hours"
+ *   minutes-label="Minutes" seconds-label="Seconds">fallback</saito-countdown>
+ * Framework-independent live countdown (unit labels default to English); the server-rendered fallback stays until it upgrades.
  */
 export class SaitoCountdown extends HTMLElement {
   private timer: number | undefined;
@@ -25,10 +26,10 @@ export class SaitoCountdown extends HTMLElement {
       return;
     }
     const units: Array<[string, number]> = [
-      ['Days', Math.floor(remaining / 86_400_000)],
-      ['Hours', Math.floor(remaining / 3_600_000) % 24],
-      ['Minutes', Math.floor(remaining / 60_000) % 60],
-      ['Seconds', Math.floor(remaining / 1000) % 60],
+      [this.getAttribute('days-label') ?? 'Days', Math.floor(remaining / 86_400_000)],
+      [this.getAttribute('hours-label') ?? 'Hours', Math.floor(remaining / 3_600_000) % 24],
+      [this.getAttribute('minutes-label') ?? 'Minutes', Math.floor(remaining / 60_000) % 60],
+      [this.getAttribute('seconds-label') ?? 'Seconds', Math.floor(remaining / 1000) % 60],
     ];
     const grid = document.createElement('div');
     grid.className = 'mx-auto grid max-w-lg grid-cols-4 gap-4';

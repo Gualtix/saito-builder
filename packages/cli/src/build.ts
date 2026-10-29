@@ -28,6 +28,7 @@ export function writeEdgeArtifacts(dir: string, site: ResolvedSite): void {
   mkdirSync(dir, { recursive: true });
   // Astro's content layer leaves empty module stubs in outDirs outside the project; they are never served.
   for (const stub of ['content-assets.mjs', 'content-modules.mjs']) rmSync(join(dir, stub), { force: true });
+  const indexable = site.env === 'production' && !site.seo.noindex;
   const security = [
     '  X-Content-Type-Options: nosniff',
     '  Referrer-Policy: strict-origin-when-cross-origin',
@@ -43,7 +44,7 @@ export function writeEdgeArtifacts(dir: string, site: ResolvedSite): void {
       '/*',
       '  Cache-Control: public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
       ...security,
-      ...(site.env === 'production' ? [] : ['  X-Robots-Tag: noindex']),
+      ...(indexable ? [] : ['  X-Robots-Tag: noindex']),
       '',
     ].join('\n'),
   );

@@ -199,8 +199,9 @@ export const contactSection = z.object({
   form: z
     .object({
       enabled: z.boolean().default(true),
-      submitLabel: z.string().default('Send message'),
-      successMessage: z.string().default('Thanks! We will get back to you shortly.'),
+      // Unset: the component uses the locale string (packages/components/src/strings.ts).
+      submitLabel: z.string().optional(),
+      successMessage: z.string().optional(),
     })
     .default({}),
 });
@@ -235,7 +236,8 @@ export const countdownSection = z.object({
   heading: z.string().min(1),
   /** ISO 8601 date-time, e.g. 2027-03-14T09:00:00Z */
   target: z.string().datetime({ offset: true }),
-  expiredText: z.string().default('It has started!'),
+  /** Unset: the component uses the locale string. */
+  expiredText: z.string().optional(),
   action: linkSchema.optional(),
 });
 

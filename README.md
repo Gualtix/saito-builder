@@ -650,7 +650,7 @@ sequenceDiagram
 
 | Artifact | Purpose |
 |---|---|
-| `_headers` | Immutable caching for `/_astro/*`, short edge TTL + `stale-while-revalidate` for HTML, security headers, `X-Robots-Tag: noindex` outside production |
+| `_headers` | Immutable caching for `/_astro/*`, short edge TTL + `stale-while-revalidate` for HTML, security headers, `X-Robots-Tag: noindex` outside production or when `seo.noindex` is true |
 | `saito-manifest.json` | Site, tenant, environment, URL, template version, pages, build time |
 
 ### Checks before a deploy
@@ -906,7 +906,7 @@ Only sites with `integrations.forms` are served. Bots that fill the honeypot get
 | Rich text | `renderRichText` escapes first, then applies its small markup subset |
 | Inline JSON | JSON-LD and analytics snippets use `jsonForScript` |
 | CSS | Theme colours are hex only; font names are regex-restricted |
-| Indexing | Non-production builds are always `noindex` |
+| Indexing | Non-production builds are always `noindex`; `seo.noindex: true` makes a site `noindex` in production too |
 | Secrets | Never in site configs or git: deploy credentials live in git-ignored `environments/<site>/.<env>.env`; deploy hook URLs live only in Cloudflare and the Sanity webhook |
 | Sanity ids | Must not contain `.` (dotted ids are private) |
 

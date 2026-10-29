@@ -19,7 +19,7 @@ const overlay = layout === 'image-background' && image;
     overlay && (
       <>
         <img src={image.src} alt="" class="absolute inset-0 h-full w-full object-cover" loading="eager" fetchpriority="high" />
-        <div class="absolute inset-0 bg-black/55" />
+        <div class="absolute inset-0 bg-scrim" />
       </>
     )
   }
@@ -45,7 +45,7 @@ const overlay = layout === 'image-background' && image;
     </div>
     {
       isSplit && (
-        <div class="aspect-[4/3] overflow-hidden rounded-theme border border-line bg-surface">
+        <div class="aspect-[4/3] overflow-hidden rounded-image border border-line bg-surface">
           {image ? (
             <img src={image.src} alt={image.alt} width={image.width} height={image.height} class="h-full w-full object-cover" loading="eager" />
           ) : (

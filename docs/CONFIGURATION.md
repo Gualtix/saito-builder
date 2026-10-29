@@ -20,13 +20,13 @@ The schema source of truth is [`packages/core/src/schema/site.ts`](../packages/c
 | `name` | ✔ | Site name (logo text fallback, `<title>`, JSON-LD) |
 | `template` | ✔ | `<template>@<range>`: `corporate@1` (recommended), `landing@^2.1.0`, `event@latest` |
 | `description` | | Default meta description |
-| `locale` | | BCP-47 language tag, default `en`; also used for price and date formatting |
+| `locale` | | BCP-47 language tag, default `en`; also used for price and date formatting, and for the labels the components write themselves (`en`, `es`; other languages fall back to English) |
 | `environments` | | `{ development, staging, production }` → `{ url }`. Sets canonical URLs and sitemaps |
 | `brand` | | `logo: { src, alt, width?, height? }`, `logoText`, `favicon` |
 | `theme` | | Partial theme, merged over the template's (see below) |
 | `navigation` | | `links: [{ label, href }]`, `cta: { label, href }`. Replaces the template navigation |
 | `footer` | | `tagline`, `columns: [{ title, links }]`, `social: [{ platform, href }]`, `legal` |
-| `seo` | | `titleTemplate` (`%s` = page title), `defaultImage`, `twitterHandle`, `noindex`, `schemaType` |
+| `seo` | | `titleTemplate` (`%s` = page title), `defaultImage`, `twitterHandle`, `noindex` (meta robots, `robots.txt` and the `X-Robots-Tag` header, in every environment, production included), `schemaType` |
 | `integrations` | | `analytics`, `commerce`, `forms` (see below) |
 | `pages` | | Page overrides keyed by slug (see below) |
 
@@ -45,11 +45,19 @@ theme:
     text: "#111827"
     muted: "#4b5563"
     border: "#e5e7eb"
+    accent2: "#10b981"           # optional extra accents; unset → accent
+    accent3: "#f43f5e"
+    scrim: "#140f0a9e"           # optional #rrggbbaa overlay on full-bleed photos; unset → black at 55%
   fonts:
     heading: Poppins     # letters, digits, spaces; loaded from Google Fonts
     body: Inter
     googleFonts: true    # false for system or self-hosted fonts
-  radius: md             # none | sm | md | lg | full
+  radius: md             # none | sm | md | lg | xl | 2xl | 3xl | full
+  radii:                 # optional per-role radius, same scale; an unset role uses radius
+    button: full         # .saito-btn
+    card: xl             # .saito-card
+    image: 2xl           # gallery images, split-hero image
+    panel: 3xl           # reserved for panels and slabs
 ```
 
 ## Pages and sections
@@ -96,9 +104,9 @@ Every section accepts `background: default | surface | primary | dark` and an op
 | `team` | `heading`, `intro`, `members[]: { name*, role, photo, bio }` |
 | `menu` | `heading`, `intro`, `currency`, `categories[]: { name*, items[]: { id, name*, description, price*, tags[], orderable } }` |
 | `products` | `heading`, `intro`, `currency`, `items[]: { id*, name*, description, price*, image, url }` |
-| `contact` | `heading`, `intro`, `email`, `phone`, `address`, `hours[]: { days, hours }`, `mapEmbedUrl`, `form: { enabled, submitLabel, successMessage }` |
+| `contact` | `heading`, `intro`, `email`, `phone`, `address`, `hours[]: { days, hours }`, `mapEmbedUrl`, `form: { enabled, submitLabel, successMessage }` (both unset → the locale's text) |
 | `schedule` | `heading`, `intro`, `days[]: { label*, items[]: { time*, title*, speaker, description } }` |
-| `countdown` | `heading`*, `target`* (ISO date-time with offset), `expiredText`, `action` |
+| `countdown` | `heading`*, `target`* (ISO date-time with offset), `expiredText` (unset → the locale's text), `action` |
 
 `*` = required. Links are `{ label, href }`; images are `{ src, alt, width?, height? }`.
 

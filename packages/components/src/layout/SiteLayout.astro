@@ -3,6 +3,7 @@ import type { ResolvedPage, ResolvedSite } from '@saito/core';
 import Footer from './Footer.astro';
 import Head from './Head.astro';
 import Header from './Header.astro';
+import { strings } from '../strings.ts';
 
 interface Props {
   site: ResolvedSite;
@@ -11,6 +12,7 @@ interface Props {
 
 const { site, page } = Astro.props;
 const commerce = site.integrations.commerce;
+const t = strings(site.locale);
 ---
 
 <!doctype html>
@@ -20,7 +22,7 @@ const commerce = site.integrations.commerce;
     <slot name="head" />
   </head>
   <body class="flex min-h-screen flex-col bg-background font-body text-ink antialiased">
-    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 saito-btn saito-btn-primary">Skip to content</a>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 saito-btn saito-btn-primary">{t.skipToContent}</a>
     <Header site={site} currentPath={page.path} />
     <main id="main" class="flex-1">
       <slot />

@@ -3,6 +3,7 @@ import { formatPrice, safeHref, type ResolvedSite, type SectionOf } from '@saito
 import AddToCart from '../ui/AddToCart.astro';
 import Section from '../ui/Section.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
+import { strings } from '../strings.ts';
 
 interface Props {
   section: SectionOf<'products'>;
@@ -14,6 +15,7 @@ const { section, site, pageUrl } = Astro.props;
 // Snipcart works purely client-side. Headless Shopify / Commerce Layer link out to each product's checkout URL.
 const useCart = site.integrations.commerce?.provider === 'snipcart';
 const absolute = (src: string) => (src.startsWith('/') ? `${site.url}${src}` : src);
+const t = strings(site.locale);
 ---
 
 <Section section={section} width="wide">
@@ -36,11 +38,12 @@ const absolute = (src: string) => (src.startsWith('/') ? `${site.url}${src}` : s
                   url={pageUrl}
                   description={item.description}
                   image={item.image ? absolute(item.image.src) : undefined}
+                  label={t.addToOrder}
                 />
               ) : (
                 item.url && (
                   <a href={safeHref(item.url)} class="saito-btn saito-btn-primary !px-4 !py-1.5 text-sm" rel="noopener noreferrer">
-                    Buy
+                    {t.buy}
                   </a>
                 )
               )}

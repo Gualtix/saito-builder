@@ -28,14 +28,17 @@ const lunch = (id: string, name: string) => ({ id, name, price: 65 });
 const template = defineTemplate({
   id: 'family-kitchen',
   name: 'Cocina Familiar',
-  version: '1.0.0',
+  version: '1.1.0',
   description:
     'Warm single-page site for family restaurants in Guatemala (GTQ, +502): daily lunch, photo menu, story, gallery, hours and ordering by WhatsApp.',
   websiteTypes: ['restaurant', 'landing-page'],
   tags: ['single-page', 'hospitality', 'menu', 'ordering', 'whatsapp', 'daily-specials', 'guatemala'],
-  theme: themes.citrus,
+  theme: {
+    ...themes.citrus,
+    colors: { ...themes.citrus.colors, accent2: '#e3793f', accent3: '#f1c964', scrim: '#140f0a9e' },
+    radii: { button: 'full', card: 'xl', image: '2xl', panel: '3xl' },
+  },
   // UNSUPPORTED header-icon-links → email and social icons only in the footer
-  // UNSUPPORTED localized-ui-labels → the mobile menu button reads "Menu"
   navigation: { links: [linkAbout, linkMenu, linkVisit], cta: actionOrder },
   footer: {
     tagline: 'Calle Principal 0-00, Zona 1, Ciudad · +502 0000 0000',
@@ -237,7 +240,6 @@ const template = defineTemplate({
         {
           // UNSUPPORTED media-text-split → photo lost
           // UNSUPPORTED offset-color-slab → omitted
-          // UNSUPPORTED localized-ui-labels → English contact labels
           id: 'visit',
           type: 'contact',
           heading: 'Visítanos',
@@ -254,7 +256,10 @@ const template = defineTemplate({
       ],
     },
   ],
-  changelog: [{ version: '1.0.0', notes: 'Initial release.' }],
+  changelog: [
+    { version: '1.0.0', notes: 'Initial release.' },
+    { version: '1.1.0', notes: 'Theme: accent2 (burnt orange), accent3 (mustard), photo scrim, per-role radii (pill buttons, 20px cards, 30px images, 40px panels).' },
+  ],
 });
 
 export default template;
@@ -290,13 +295,6 @@ export const templateExtensions = {
       expectedBehavior: 'Circular outlined icon buttons (email, Facebook, Instagram) after the nav links on wide screens; hidden on narrow ones.',
       requirements: ['navigation.iconLinks: { platform | email, href }[]', 'a shared SVG icon set in packages/components'],
       fallback: 'footer.social',
-    },
-    'localized-ui-labels': {
-      affects: ['header', 'visit'],
-      purpose: 'Every visible label in the site language.',
-      expectedBehavior: 'Component chrome in Spanish: the mobile menu button ("Menú"), contact labels ("Dirección", "Horario de atención"), cart and dialog copy.',
-      requirements: ['one locale-keyed strings dictionary in packages/components, chosen by site.locale', 'the components read labels from it instead of literals'],
-      fallback: 'English labels',
     },
     'hero-wordmark': {
       affects: ['hero'],
@@ -460,21 +458,12 @@ export const templateExtensions = {
       fallback: "the browser's own offline error",
     },
   },
-  // Design tokens the theme cannot hold (DTCG). theme.radius follows the cards.
+  // Design tokens the theme cannot hold (DTCG). Radii, accent2/3 and the scrim moved to the theme in 1.1.0.
   tokens: {
-    radius: {
-      card: { $type: 'dimension', $value: '20px' },
-      frame: { $type: 'dimension', $value: '30px' },
-      slab: { $type: 'dimension', $value: '40px' },
-      button: { $type: 'dimension', $value: '9999px' },
-    },
     colorAccents: {
-      burnt: { $type: 'color', $value: '#e3793f' },
-      mustard: { $type: 'color', $value: '#f1c964' },
       sageDark: { $type: 'color', $value: '#5f8446' },
       ordering: { $type: 'color', $value: '#0d7a4a' }, // WhatsApp green on order actions
     },
-    overlay: { scrim: { $type: 'color', $value: '#140f0a9e' } }, // over full-bleed photo bands
     spacing: {
       section: { $type: 'dimension', $value: 'clamp(64px, 9vw, 120px)' },
       gutter: { $type: 'dimension', $value: 'clamp(16px, 4vw, 48px)' },

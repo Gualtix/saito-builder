@@ -1,6 +1,6 @@
 # Intent: Date El Gusto v1, Saito pipeline showcase
 
-> **Status:** confirmed on 2026-10-29 (interview). Runbook: [`step-by-step.md`](../../step-by-step.md). Capability map: [`docs/specs/date-el-gusto-capability-map.md`](../specs/date-el-gusto-capability-map.md).
+> **Status:** confirmed on 2026-10-29 (interview). Runbook: [`step-by-step.md`](../step-by-step.md). Capability map: [`specs/date-el-gusto-capability-map.md`](../specs/date-el-gusto-capability-map.md).
 
 | | |
 |---|---|

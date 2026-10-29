@@ -85,7 +85,7 @@ export const templateExtensions = {
 
 ## 4. Theme
 
-1. Map the project's design tokens to the 9 slots, fonts and radius using `mapping.md` section 4 (radius comes from cards, never `full` for pill buttons).
+1. Map the project's design tokens to the 9 slots, fonts and radius using `mapping.md` section 4 (per-role corners in `radii`, `radius` from the cards, never `full`).
 2. Compare with the presets in `packages/templates/src/themes.ts`:
    - **Close to a preset** (same mode and fonts, colors differ only in a slot or two): spread it and override those slots.
    - **Distinct**: add a new preset to `themes.ts` (see `enrichment.md`) and use it.

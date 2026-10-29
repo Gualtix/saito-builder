@@ -126,7 +126,7 @@ Tell the user briefly:
 - Don't drop a feature because the platform can't render it, and don't approximate it silently: every fallback has a flag.
 - `defineTemplate` rejects unknown manifest fields at compile time, and zod drops unknown fields inside sections: keep extras in `templateExtensions`.
 - Links: only `http(s):`, `mailto:`, `tel:`, `/…` and `#…` survive rendering.
-- `theme.radius` is one value for every rounded element; `full` turns cards into pills.
+- `theme.radius` is the default corner; per-role corners (button, card, image, panel) go in `theme.radii`. `radius: full` turns inputs into pills.
 - `footer.legal` is printed after `© <year> <site name>.`.
 - `menu`/`products` prices are numbers, `pricing` prices are strings, `countdown.target` needs a timezone offset.
 - The contact form only renders when a site sets `integrations.forms`, and its labels are hardcoded in English.

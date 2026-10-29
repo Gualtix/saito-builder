@@ -3,7 +3,7 @@
 **Source:** `live-sketching/eatery-cafe/tangerine/tangerine-web-site/` (zero-build landing page, WhatsApp storefront and installable PWA)
 **Target:** a new reusable template extracted from the prototype (working name `family-kitchen@1`) and the site `date-el-gusto` (tenant `date-el-gusto`) built on it. Rendered by `apps/renderer` (Astro 5), content in Sanity (`apps/studio`), deployed with `./deploy.sh` (code and YAML changes) and Cloudflare Pages deploy hooks (Sanity publishes), served at `saito-date-el-gusto.pages.dev`.
 **Environments:** `development` (local) · `staging` (the "preview" environment) · `production`.
-**Intent:** [`docs/intent/date-el-gusto-showcase.md`](docs/intent/date-el-gusto-showcase.md) (confirmed 2026-10-29). **Platform work:** [`docs/specs/date-el-gusto-capability-map.md`](docs/specs/date-el-gusto-capability-map.md).
+**Intent:** [`intent/date-el-gusto-showcase.md`](intent/date-el-gusto-showcase.md) (confirmed 2026-10-29). **Platform work:** [`specs/date-el-gusto-capability-map.md`](specs/date-el-gusto-capability-map.md).
 
 > **What v1 is.** A showcase for internal stakeholders that proves Saito as a website factory. A real restaurant client may follow, and v1 must not block that. Everything that only a real client needs is in [Before a real client](#before-a-real-client).
 >

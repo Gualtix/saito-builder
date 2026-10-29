@@ -587,8 +587,8 @@ x-patterns:
     occurrences: 1
   localized-ui-labels:
     kind: component
-    status: proposed
-    description: "Component chrome in the site language: mobile menu button, contact labels, form and dialog copy. Today several labels are hard-coded in English."
+    status: implemented              # packages/components/src/strings.ts (en, es; other languages → en)
+    description: "Component chrome in the site language: mobile menu button, contact labels, form and dialog copy."
     fields:
       locale: "site.locale (no new site field)"
     nearestType: none
@@ -664,11 +664,19 @@ theme:
     text: "#0f172a"              # body text
     muted: "#475569"             # secondary text; keep AA contrast with background
     border: "#e2e8f0"            # dividers, inputs
+    accent2: "#10b981"           # [OPTIONAL] extra accents (badges, colour blocks); unset → accent
+    accent3: "#f43f5e"           # [OPTIONAL]
+    scrim: "#140f0a9e"           # [OPTIONAL] #rrggbbaa overlay on full-bleed photos; unset → black at 55%
   fonts:
     heading: Fraunces        # letters, digits and spaces only (written into CSS)
     body: Inter
     googleFonts: true        # [OPTIONAL] default true — false for system or self-hosted fonts
-  radius: md                 # [OPTIONAL] default md — none | sm | md | lg | full
+  radius: md                 # [OPTIONAL] default md — none | sm | md | lg | xl | 2xl | 3xl | full
+  radii:                     # [OPTIONAL] per-role radius on the same scale; an unset role uses radius
+    button: full             # pill buttons
+    card: xl                 # 1.25rem
+    image: 2xl               # 1.875rem (gallery and hero images)
+    panel: 3xl               # 2.5rem (colour slabs, panels)
 
 
 # =============================================================================
@@ -988,7 +996,7 @@ pages:
         mapEmbedUrl: https://www.google.com/maps/embed?pb=placeholder   # [OPTIONAL] absolute URL
         form:                                # [OPTIONAL] needs integrations.forms to submit
           enabled: true                      # default true
-          submitLabel: Send message          # default "Send message"
+          submitLabel: Send message          # [OPTIONAL] unset → the locale's label ("Send message", "Enviar mensaje")
           successMessage: Thanks, we will reply within one business day.
 
       catalog-schedule:                      # for events and programs
@@ -1007,7 +1015,7 @@ pages:
         type: countdown
         heading: Operations Summit starts in # [REQUIRED]
         target: 2027-03-11T09:00:00-08:00    # [REQUIRED] ISO 8601 date-time WITH offset
-        expiredText: The summit is live!     # [OPTIONAL] default "It has started!"
+        expiredText: The summit is live!     # [OPTIONAL] unset → the locale's text ("It has started!", "¡Ya comenzó!")
         action: { label: Get tickets, href: https://tickets.meridian.example }   # [OPTIONAL]
         background: dark
 
@@ -1043,14 +1051,6 @@ x-tokens:
     fast:   { $type: duration, $value: 150ms }
     base:   { $type: duration, $value: 250ms }
     easing: { $type: cubicBezier, $value: [0.2, 0, 0, 1] }
-  radius:                           # per-role radii; theme.radius is one global value
-    button: { $type: dimension, $value: 9999px }   # pill buttons
-    card:   { $type: dimension, $value: 1.25rem }
-    image:  { $type: dimension, $value: 1.875rem }
-    panel:  { $type: dimension, $value: 2.5rem }
-  colorAccents:                     # extra accent colors beyond theme.accent (badges, color blocks)
-    accent2: { $type: color, $value: "#10b981" }
-    accent3: { $type: color, $value: "#f43f5e" }
   breakpoint:                       # mobile-first min-widths
     sm: { $type: dimension, $value: 640px }
     md: { $type: dimension, $value: 768px }

@@ -1,6 +1,7 @@
 ---
 import { safeHref, type ResolvedSite } from '@saito/core';
 import Button from '../ui/Button.astro';
+import { strings } from '../strings.ts';
 
 interface Props {
   site: ResolvedSite;
@@ -10,6 +11,7 @@ interface Props {
 const { site, currentPath } = Astro.props;
 const { links, cta } = site.navigation;
 const hasCart = site.integrations.commerce?.provider === 'snipcart';
+const t = strings(site.locale);
 const isCurrent = (href: string) => href === currentPath;
 ---
 
@@ -25,7 +27,7 @@ const isCurrent = (href: string) => href === currentPath;
       }
     </a>
 
-    <nav aria-label="Main" class="hidden items-center gap-8 md:flex">
+    <nav aria-label={t.navMain} class="hidden items-center gap-8 md:flex">
       {
         links.map((link) => (
           <a href={safeHref(link.href)} class="text-sm font-medium text-muted transition hover:text-ink" aria-current={isCurrent(link.href) ? 'page' : undefined}>
@@ -36,7 +38,7 @@ const isCurrent = (href: string) => href === currentPath;
       {
         hasCart && (
           <button type="button" class="snipcart-checkout text-sm font-medium">
-            Cart (<span class="snipcart-items-count">0</span>)
+            {t.cart} (<span class="snipcart-items-count">0</span>)
           </button>
         )
       }
@@ -44,8 +46,8 @@ const isCurrent = (href: string) => href === currentPath;
     </nav>
 
     <details class="relative md:hidden">
-      <summary class="cursor-pointer list-none rounded-theme border border-line px-3 py-1.5 text-sm font-medium">Menu</summary>
-      <nav aria-label="Mobile" class="absolute right-0 mt-2 flex w-56 flex-col gap-1 rounded-theme border border-line bg-background p-2 shadow-lg">
+      <summary class="cursor-pointer list-none rounded-theme border border-line px-3 py-1.5 text-sm font-medium">{t.menu}</summary>
+      <nav aria-label={t.navMobile} class="absolute right-0 mt-2 flex w-56 flex-col gap-1 rounded-theme border border-line bg-background p-2 shadow-lg">
         {
           links.map((link) => (
             <a href={safeHref(link.href)} class="rounded-theme px-3 py-2 text-sm hover:bg-surface">
@@ -56,7 +58,7 @@ const isCurrent = (href: string) => href === currentPath;
         {
           hasCart && (
             <button type="button" class="snipcart-checkout rounded-theme px-3 py-2 text-left text-sm hover:bg-surface">
-              Cart (<span class="snipcart-items-count">0</span>)
+              {t.cart} (<span class="snipcart-items-count">0</span>)
             </button>
           )
         }

@@ -89,10 +89,12 @@ Map the design tokens into the nine required colour slots. CSS custom properties
 | `muted` | Secondary text (keep AA contrast against background) |
 | `border` | Dividers and input borders |
 
-- Colours must be hex: convert `rgb()`/`hsl()`; drop alpha.
+- Colours must be hex: convert `rgb()`/`hsl()`; drop alpha. The one exception is `colors.scrim` (`#rrggbbaa`), the overlay on full-bleed photos.
+- A second and third accent go to `colors.accent2` / `accent3`; unset, they fall back to `accent`.
 - Tailwind aliases (`--color-tangerine: var(--tangerine)`) point at the real token: follow them to the value.
 - `fonts.heading` / `fonts.body`: the Google Fonts family names (letters, digits, spaces only). The renderer has one heading and one body font: a third font is lost.
-- `radius` is one value for every rounded element (cards, inputs, images, buttons), so take it from the **cards**, not the buttons: 0 → `none`, up to ~4px → `sm`, ~6–12px → `md`, ~14–40px → `lg`. Pill buttons do not mean `full`: `full` would turn cards and inputs into pills. Per-role radii go to `templateExtensions.tokens`.
+- `radius` is the default for every rounded element (inputs, header, schedule, and any role not set), so take it from the **cards**: 0 → `none`, up to ~4px → `sm`, ~6–12px → `md`, ~14–18px → `lg`, ~20px → `xl`, ~30px → `2xl`, ~40px → `3xl`. Never `full`: it turns inputs into pills.
+- Per-role radii go to `radii: { button, card, image, panel }` on the same scale: pill buttons are `button: full`.
 - `mode: dark` only when the page background is dark.
 - Spacing scales, breakpoints, shadows and motion go to `templateExtensions.tokens` if they are distinctive; the renderer does not use them.
 
@@ -120,7 +122,7 @@ How the shared components render, so you don't have to read their source.
 
 | Fact | Consequence |
 |---|---|
-| `theme.radius` is one value for cards, inputs, images and buttons | Take it from the cards; `full` turns cards into pills |
+| `theme.radii` sets buttons, cards, images and panels; everything else uses `theme.radius` | Pill buttons are `radii.button: full`, never `radius: full` |
 | `dark` sections are `bg-secondary` with `background`-coloured text; `primary` sections use `primaryContrast` text | `secondary` must be dark and `background` light, or dark bands become unreadable |
 | Cards (`.saito-card`) are `background`-coloured with a `border`-coloured outline | On a `default` section a card is background-on-background, so `border` is what outlines it: use a soft divider colour, not a dark input border |
 | `hero` with `image-background` renders its image with `alt=""`; `split` without an image shows a gradient box | Alt text only matters for `split`; a photo-led design without an image gets the gradient |

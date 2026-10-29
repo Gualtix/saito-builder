@@ -7,9 +7,11 @@ interface Props {
   url: string;
   description?: string;
   image?: string;
+  /** Button text, from strings(site.locale).addToOrder. */
+  label: string;
 }
 
-const { id, name, price, url, description, image } = Astro.props;
+const { id, name, price, url, description, image, label } = Astro.props;
 ---
 
 <button
@@ -22,5 +24,5 @@ const { id, name, price, url, description, image } = Astro.props;
   data-item-description={description}
   data-item-image={image}
 >
-  Add to order
+  {label}
 </button>

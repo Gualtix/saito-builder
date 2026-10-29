@@ -9,6 +9,8 @@
   --color-primary-contrast: var(--saito-color-primary-contrast);
   --color-secondary: var(--saito-color-secondary);
   --color-accent: var(--saito-color-accent);
+  --color-accent-2: var(--saito-color-accent-2, var(--saito-color-accent));
+  --color-accent-3: var(--saito-color-accent-3, var(--saito-color-accent));
   --color-background: var(--saito-color-background);
   --color-surface: var(--saito-color-surface);
   --color-ink: var(--saito-color-text);
@@ -16,7 +18,12 @@
   --color-line: var(--saito-color-border);
   --font-heading: var(--saito-font-heading);
   --font-body: var(--saito-font-body);
+  --color-scrim: var(--saito-color-scrim, rgb(0 0 0 / 0.55));
   --radius-theme: var(--saito-radius);
+  --radius-button: var(--saito-radius-button, var(--saito-radius));
+  --radius-card: var(--saito-radius-card, var(--saito-radius));
+  --radius-image: var(--saito-radius-image, var(--saito-radius));
+  --radius-panel: var(--saito-radius-panel, var(--saito-radius));
 }
 
 @layer base {
@@ -32,7 +39,7 @@
 
 @layer components {
   .saito-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-theme px-6 py-3 font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-button px-6 py-3 font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60;
   }
   .saito-btn-primary {
     @apply bg-primary text-primary-contrast hover:opacity-90;
@@ -49,7 +56,7 @@
   }
 
   .saito-card {
-    @apply rounded-theme border border-line bg-background p-6 text-ink shadow-sm;
+    @apply rounded-card border border-line bg-background p-6 text-ink shadow-sm;
   }
   .saito-input {
     @apply mt-1 block w-full rounded-theme border border-line bg-background px-3 py-2 text-ink focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none;

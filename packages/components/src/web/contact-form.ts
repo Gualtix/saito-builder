@@ -1,9 +1,9 @@
 /**
- * <saito-contact-form success-message="…"><form action="…">…</form></saito-contact-form>
+ * <saito-contact-form success-message="…" sending-message="…" error-message="…"><form action="…">…</form></saito-contact-form>
  *
  * Progressive enhancement: without JavaScript the inner form posts normally (the API redirects back).
  * With JavaScript, submissions go over fetch and status is announced inline.
- * Framework-independent, so it can be reused outside Astro.
+ * Framework-independent, so it can be reused outside Astro; copy comes from the attributes (English fallbacks).
  */
 export class SaitoContactForm extends HTMLElement {
   connectedCallback(): void {
@@ -24,7 +24,7 @@ export class SaitoContactForm extends HTMLElement {
     };
 
     if (button) button.disabled = true;
-    setStatus('Sending…');
+    setStatus(this.getAttribute('sending-message') ?? 'Sending…');
     try {
       const response = await fetch(form.action, {
         method: 'POST',
@@ -36,7 +36,7 @@ export class SaitoContactForm extends HTMLElement {
       setStatus(this.getAttribute('success-message') ?? 'Thanks! Your message has been sent.');
       this.dispatchEvent(new CustomEvent('saito:submitted', { bubbles: true }));
     } catch {
-      setStatus('Sorry, something went wrong. Please try again later.');
+      setStatus(this.getAttribute('error-message') ?? 'Sorry, something went wrong. Please try again later.');
     } finally {
       if (button) button.disabled = false;
     }

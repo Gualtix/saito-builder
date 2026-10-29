@@ -3,6 +3,7 @@ import { formatPrice, type ResolvedSite, type SectionOf } from '@saito/core';
 import AddToCart from '../ui/AddToCart.astro';
 import Section from '../ui/Section.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
+import { strings } from '../strings.ts';
 
 interface Props {
   section: SectionOf<'menu'>;
@@ -12,6 +13,7 @@ interface Props {
 
 const { section, site, pageUrl } = Astro.props;
 const canOrder = site.integrations.commerce?.provider === 'snipcart';
+const t = strings(site.locale);
 ---
 
 <Section section={section} width="narrow">
@@ -36,7 +38,7 @@ const canOrder = site.integrations.commerce?.provider === 'snipcart';
                 <div class="flex shrink-0 flex-col items-end gap-2">
                   <span class="font-semibold">{formatPrice(item.price, section.currency, site.locale)}</span>
                   {canOrder && item.orderable && item.id && (
-                    <AddToCart id={item.id} name={item.name} price={item.price} url={pageUrl} description={item.description} />
+                    <AddToCart id={item.id} name={item.name} price={item.price} url={pageUrl} description={item.description} label={t.addToOrder} />
                   )}
                 </div>
               </li>
